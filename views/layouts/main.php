@@ -22,6 +22,7 @@ SimpleAsset::register($this);
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css">
 </head>
 <body>
 <?php $this->beginBody() ?>

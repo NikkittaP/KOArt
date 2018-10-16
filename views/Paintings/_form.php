@@ -20,17 +20,8 @@ use kartik\number\NumberControl;
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
     <?php
-    echo NumberControl::widget([
-        'name' => 'width',
-        'value' => null,
-        'options' => $saveOptions,
-        'displayOptions' => [
-            'class' => 'form-control kv-monospace',
-            'placeholder' => 'Enter a valid amount...'
-        ],
-        'saveInputContainer' => $saveCont
-    ]);
-    = $form->field($model, 'width')->textInput() ?>
+    echo $form->field($model, 'width')->
+    input('number', ['min'=>1, 'max'=> 1000, 'step'=>1, 'placeholder'=>'Ширина от 1 до 1000']); ?>
 
     <?= $form->field($model, 'height')->textInput() ?>
 
