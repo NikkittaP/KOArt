@@ -32,6 +32,8 @@ use Yii;
  */
 class Paintings extends \yii\db\ActiveRecord
 {
+    public $coverPhoto;
+
     /**
      * {@inheritdoc}
      */
@@ -46,7 +48,7 @@ class Paintings extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['author_id', 'name', 'description', 'width', 'height', 'ground_id', 'date', 'datetime_add', 'datetime_update'], 'required'],
+            [['author_id', 'name'], 'required'],
             [['author_id', 'width', 'height', 'ground_id'], 'integer'],
             [['description'], 'string'],
             [['date', 'datetime_add', 'datetime_update'], 'safe'],
@@ -54,6 +56,7 @@ class Paintings extends \yii\db\ActiveRecord
             [['name', 'shopURL'], 'string', 'max' => 255],
             [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => Authors::className(), 'targetAttribute' => ['author_id' => 'id']],
             [['ground_id'], 'exist', 'skipOnError' => true, 'targetClass' => Grounds::className(), 'targetAttribute' => ['ground_id' => 'id']],
+            [['coverPhoto'], 'safe'],
         ];
     }
 
@@ -76,6 +79,7 @@ class Paintings extends \yii\db\ActiveRecord
             'longitude' => 'Долгота',
             'datetime_add' => 'Дата и время добавления',
             'datetime_update' => 'Дата и время обновления',
+            'coverPhoto' => 'Фото',
         ];
     }
 
@@ -133,6 +137,11 @@ class Paintings extends \yii\db\ActiveRecord
     public function getPhotos()
     {
         return $this->hasMany(Photos::className(), ['painting_id' => 'id']);
+    }
+
+    public function getMainPhoto()
+    {
+        return $this->hasOne(Photos::className(), ['painting_id' => 'id'])->andOnCondition(['isMain' => '1']);
     }
 
     /**

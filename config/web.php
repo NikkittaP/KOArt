@@ -6,6 +6,7 @@ $db = require __DIR__ . '/db.php';
 $config = [
     'id' => 'basic',
     'name' => 'Katia Oskina Art',
+    'language' => 'ru',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'aliases' => [
@@ -51,6 +52,12 @@ $config = [
             'showScriptName' => false,
             'rules' => [
                 '<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>/<id>',
+            ],
+        ],
+        'view' => [
+            'theme' => [
+                'basePath' => '@app/themes/simple',
+                'baseUrl' => '@web',
             ],
         ],
     ],
