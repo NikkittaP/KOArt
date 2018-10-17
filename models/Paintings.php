@@ -33,6 +33,7 @@ use Yii;
 class Paintings extends \yii\db\ActiveRecord
 {
     public $coverPhoto;
+    public $coordinates;
 
     /**
      * {@inheritdoc}
@@ -56,7 +57,7 @@ class Paintings extends \yii\db\ActiveRecord
             [['name', 'shopURL'], 'string', 'max' => 255],
             [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => Authors::className(), 'targetAttribute' => ['author_id' => 'id']],
             [['ground_id'], 'exist', 'skipOnError' => true, 'targetClass' => Grounds::className(), 'targetAttribute' => ['ground_id' => 'id']],
-            [['coverPhoto'], 'safe'],
+            [['coverPhoto', 'coordinates'], 'safe'],
         ];
     }
 
@@ -80,6 +81,7 @@ class Paintings extends \yii\db\ActiveRecord
             'datetime_add' => 'Дата и время добавления',
             'datetime_update' => 'Дата и время обновления',
             'coverPhoto' => 'Фото',
+            'coordinates' => 'Координаты',
         ];
     }
 

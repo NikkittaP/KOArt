@@ -8,6 +8,7 @@ use app\models\search\PaintingsSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\VarDumper;
 
 /**
  * PaintingsController implements the CRUD actions for Paintings model.
@@ -66,6 +67,8 @@ class PaintingsController extends Controller
     {
         $model = new Paintings();
 
+        //VarDumper::dump( Yii::$app->request->post(), $depth = 10, $highlight = true);
+        //exit();
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }

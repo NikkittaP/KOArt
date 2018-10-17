@@ -1,8 +1,9 @@
 <?php
 
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use kartik\form\ActiveForm;
 use kartik\number\NumberControl;
+use kartik\date\DatePicker;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Paintings */
@@ -21,17 +22,31 @@ use kartik\number\NumberControl;
 
     <?php
     echo $form->field($model, 'width')->
-    input('number', ['min'=>1, 'max'=> 1000, 'step'=>1, 'placeholder'=>'Ширина от 1 до 1000']); ?>
+    input('number', ['min'=>1, 'max'=> 1000, 'step'=>1, 'placeholder'=>'Ширина от 1 до 1000']);
+    ?>
 
-    <?= $form->field($model, 'height')->textInput() ?>
+    <?php
+    echo $form->field($model, 'height')->
+    input('number', ['min'=>1, 'max'=> 1000, 'step'=>1, 'placeholder'=>'Высота от 1 до 1000']);
+    ?>
 
     <?= $form->field($model, 'ground_id')->textInput() ?>
 
     <?= $form->field($model, 'shopURL')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'date')->textInput() ?>
+    <?php
+    echo $form->field($model, 'date')->widget(DatePicker::classname(), [
+        'options' => ['placeholder' => 'Дата создания ...'],
+        'pluginOptions' => [
+            'autoclose'=>true,
+            'format' => 'dd-M-yyyy'
+        ]
+    ]);
+    ?>
 
-    <?= $form->field($model, 'latitude')->textInput() ?>
+    <?php
+    echo $form->field($model, 'coordinates')->widget(\msvdev\widgets\mappicker\MapInput::className(), ['service' => 'yandex']);
+    ?>
 
     <?= $form->field($model, 'longitude')->textInput() ?>
 
