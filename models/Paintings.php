@@ -3,6 +3,9 @@
 namespace app\models;
 
 use Yii;
+use yii\db\ActiveRecord;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "paintings".
@@ -34,6 +37,12 @@ class Paintings extends \yii\db\ActiveRecord
 {
     public $coverPhoto;
     public $coordinates;
+    public $groundName;
+    public $photo_upload;
+    public $artGenreName;
+    public $artStyleName;
+    public $materials;
+    public $price;
 
     /**
      * {@inheritdoc}
@@ -57,7 +66,7 @@ class Paintings extends \yii\db\ActiveRecord
             [['name', 'shopURL'], 'string', 'max' => 255],
             [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => Authors::className(), 'targetAttribute' => ['author_id' => 'id']],
             [['ground_id'], 'exist', 'skipOnError' => true, 'targetClass' => Grounds::className(), 'targetAttribute' => ['ground_id' => 'id']],
-            [['coverPhoto', 'coordinates'], 'safe'],
+            [['coverPhoto', 'coordinates', 'groundName', 'photo_upload', 'artGenreName', 'artStyleName', 'materials', 'price'], 'safe'],
         ];
     }
 
@@ -82,6 +91,27 @@ class Paintings extends \yii\db\ActiveRecord
             'datetime_update' => 'Дата и время обновления',
             'coverPhoto' => 'Фото',
             'coordinates' => 'Координаты',
+            'groundName' => 'Основа',
+            'photo_upload' => 'Загрузка фото',
+            'artGenreName' => 'Жанр',
+            'artStyleName' => 'Стиль',
+            'materials' => 'Материалы',
+            'price' => 'Стоимость'
+        ];
+    }
+
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['datetime_add', 'datetime_update'],
+                    ActiveRecord::EVENT_BEFORE_UPDATE => ['datetime_update'],
+                ],
+                // если вместо метки времени UNIX используется datetime:
+                'value' => new Expression('NOW()'),
+            ],
         ];
     }
 

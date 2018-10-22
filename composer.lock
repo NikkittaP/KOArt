@@ -4,8 +4,65 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "45695c37c5bbbf5a9bc32df543ee54fc",
+    "content-hash": "bf993ddfe8319b4f8042ad9815aaa369",
     "packages": [
+        {
+            "name": "2amigos/yii2-selectize-widget",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/2amigos/yii2-selectize-widget.git",
+                "reference": "9762a34d1095f15b60f46b876dad245011755bfc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/2amigos/yii2-selectize-widget/zipball/9762a34d1095f15b60f46b876dad245011755bfc",
+                "reference": "9762a34d1095f15b60f46b876dad245011755bfc",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/selectize": "~0.12.0",
+                "yiisoft/yii2": "~2.0.0",
+                "yiisoft/yii2-bootstrap": "~2.0.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "yii2-extension",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "dosamigos\\selectize\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "2amigOS! Consulting Group",
+                    "email": "hola@2amigos.us",
+                    "homepage": "http://2amigos.us",
+                    "role": "Developer"
+                }
+            ],
+            "description": "The selectize.js widget for the Yii framework",
+            "homepage": "https://github.com/2amigos/yii2-selectize-widget",
+            "keywords": [
+                "2amigos",
+                "selectize",
+                "widget",
+                "yii",
+                "yii 2",
+                "yii2"
+            ],
+            "time": "2017-09-19T22:02:33+00:00"
+        },
         {
             "name": "bower-asset/bootstrap",
             "version": "v4.1.3",
@@ -64,6 +121,25 @@
             ]
         },
         {
+            "name": "bower-asset/microplugin",
+            "version": "v0.0.3",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:brianreavis/microplugin.js.git",
+                "reference": "d8671e6cc769938648f8735610534427cdeeaf67"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/brianreavis/microplugin.js/zipball/d8671e6cc769938648f8735610534427cdeeaf67",
+                "reference": "d8671e6cc769938648f8735610534427cdeeaf67",
+                "shasum": null
+            },
+            "type": "bower-asset",
+            "license": [
+                "Apache License, Version 2.0"
+            ]
+        },
+        {
             "name": "bower-asset/punycode",
             "version": "v1.3.2",
             "source": {
@@ -78,6 +154,49 @@
                 "shasum": null
             },
             "type": "bower-asset"
+        },
+        {
+            "name": "bower-asset/selectize",
+            "version": "v0.12.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/selectize/selectize.js.git",
+                "reference": "eb0fca364f9bd6864ae197ea58c853f2717052a9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/selectize/selectize.js/zipball/eb0fca364f9bd6864ae197ea58c853f2717052a9",
+                "reference": "eb0fca364f9bd6864ae197ea58c853f2717052a9",
+                "shasum": null
+            },
+            "require": {
+                "bower-asset/jquery": ">=1.7.0",
+                "bower-asset/microplugin": "dev-0.0.x|0.0.x",
+                "bower-asset/sifter": "dev-0.5.x|0.5.x"
+            },
+            "type": "bower-asset",
+            "license": [
+                "Apache License, Version 2.0"
+            ]
+        },
+        {
+            "name": "bower-asset/sifter",
+            "version": "v0.5.3",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:brianreavis/sifter.js.git",
+                "reference": "2a9c84ec5ac63ceaa4516205e013113626d36a2d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/brianreavis/sifter.js/zipball/2a9c84ec5ac63ceaa4516205e013113626d36a2d",
+                "reference": "2a9c84ec5ac63ceaa4516205e013113626d36a2d",
+                "shasum": null
+            },
+            "type": "bower-asset",
+            "license": [
+                "Apache License, Version 2.0"
+            ]
         },
         {
             "name": "bower-asset/yii2-pjax",
@@ -207,6 +326,59 @@
                 "html"
             ],
             "time": "2018-02-23T01:58:20+00:00"
+        },
+        {
+            "name": "kartik-v/bootstrap-fileinput",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kartik-v/bootstrap-fileinput.git",
+                "reference": "86010b4468a2915c9414524df528aa1b361af1b3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kartik-v/bootstrap-fileinput/zipball/86010b4468a2915c9414524df528aa1b361af1b3",
+                "reference": "86010b4468a2915c9414524df528aa1b361af1b3",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.5.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "kartik\\plugins\\fileinput\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Kartik Visweswaran",
+                    "email": "kartikv2@gmail.com",
+                    "homepage": "http://www.krajee.com/"
+                }
+            ],
+            "description": "An enhanced HTML 5 file input for Bootstrap 3.x with features for file preview for many file types, multiple selection, ajax uploads, and more.",
+            "homepage": "https://github.com/kartik-v/bootstrap-fileinput",
+            "keywords": [
+                "ajax",
+                "bootstrap",
+                "delete",
+                "file",
+                "image",
+                "input",
+                "jquery",
+                "multiple",
+                "preview",
+                "progress",
+                "upload"
+            ],
+            "time": "2018-10-06T16:31:55+00:00"
         },
         {
             "name": "kartik-v/yii2-krajee-base",
@@ -416,6 +588,114 @@
             "time": "2018-10-09T11:34:49+00:00"
         },
         {
+            "name": "kartik-v/yii2-widget-fileinput",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kartik-v/yii2-widget-fileinput.git",
+                "reference": "7f76d784cc48733746ff90b53b8474dcf48ea6c4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kartik-v/yii2-widget-fileinput/zipball/7f76d784cc48733746ff90b53b8474dcf48ea6c4",
+                "reference": "7f76d784cc48733746ff90b53b8474dcf48ea6c4",
+                "shasum": ""
+            },
+            "require": {
+                "kartik-v/bootstrap-fileinput": "~4.4",
+                "kartik-v/yii2-krajee-base": ">=1.9"
+            },
+            "type": "yii2-extension",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "kartik\\file\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Kartik Visweswaran",
+                    "email": "kartikv2@gmail.com",
+                    "homepage": "http://www.krajee.com/"
+                }
+            ],
+            "description": "An enhanced FileInput widget for Bootstrap 3.x & 4.x with file preview, multiple selection, and more features (sub repo split from yii2-widgets)",
+            "homepage": "https://github.com/kartik-v/yii2-widget-fileinput",
+            "keywords": [
+                "extension",
+                "file",
+                "form",
+                "input",
+                "jquery",
+                "plugin",
+                "upload",
+                "widget",
+                "yii2"
+            ],
+            "time": "2018-09-19T13:09:42+00:00"
+        },
+        {
+            "name": "kartik-v/yii2-widget-select2",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kartik-v/yii2-widget-select2.git",
+                "reference": "0df692c8772c2b53406ae705492c8401ea6501d6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kartik-v/yii2-widget-select2/zipball/0df692c8772c2b53406ae705492c8401ea6501d6",
+                "reference": "0df692c8772c2b53406ae705492c8401ea6501d6",
+                "shasum": ""
+            },
+            "require": {
+                "kartik-v/yii2-krajee-base": ">=1.9"
+            },
+            "type": "yii2-extension",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "kartik\\select2\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Kartik Visweswaran",
+                    "email": "kartikv2@gmail.com",
+                    "homepage": "http://www.krajee.com/"
+                }
+            ],
+            "description": "Enhanced Yii2 wrapper for the Select2 jQuery plugin (sub repo split from yii2-widgets).",
+            "homepage": "https://github.com/kartik-v/yii2-widget-select2",
+            "keywords": [
+                "dropdown",
+                "extension",
+                "form",
+                "jquery",
+                "plugin",
+                "select2",
+                "widget",
+                "yii2"
+            ],
+            "time": "2018-10-03T07:09:03+00:00"
+        },
+        {
             "name": "msvdev/yii2-widget-mappicker",
             "version": "dev-master",
             "source": {
@@ -562,17 +842,59 @@
             "time": "2018-07-31T09:26:32+00:00"
         },
         {
+            "name": "twbs/bootstrap",
+            "version": "v3.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/twbs/bootstrap.git",
+                "reference": "6d03173a1aad98e75f7d33e65b411c519176c59a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/twbs/bootstrap/zipball/6d03173a1aad98e75f7d33e65b411c519176c59a",
+                "reference": "6d03173a1aad98e75f7d33e65b411c519176c59a",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Jacob Thornton",
+                    "email": "jacobthornton@gmail.com"
+                },
+                {
+                    "name": "Mark Otto",
+                    "email": "markdotto@gmail.com"
+                }
+            ],
+            "description": "Sleek, intuitive, and powerful mobile first front-end framework for faster and easier web development.",
+            "homepage": "http://getbootstrap.com",
+            "keywords": [
+                "bootstrap",
+                "css"
+            ],
+            "time": "2013-12-05T16:09:10+00:00"
+        },
+        {
             "name": "yiisoft/yii2",
             "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-framework.git",
-                "reference": "106c58715d2c3f68d4800f877a1a84c434af8cb1"
+                "reference": "6b44d0107c56c2563aec6894ac9e6a0798d52e75"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/106c58715d2c3f68d4800f877a1a84c434af8cb1",
-                "reference": "106c58715d2c3f68d4800f877a1a84c434af8cb1",
+                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/6b44d0107c56c2563aec6894ac9e6a0798d52e75",
+                "reference": "6b44d0107c56c2563aec6894ac9e6a0798d52e75",
                 "shasum": ""
             },
             "require": {
@@ -659,7 +981,50 @@
                 "framework",
                 "yii2"
             ],
-            "time": "2018-10-11T11:43:32+00:00"
+            "time": "2018-10-18T22:26:40+00:00"
+        },
+        {
+            "name": "yiisoft/yii2-bootstrap",
+            "version": "2.0.0-beta",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/yiisoft/yii2-bootstrap.git",
+                "reference": "d2518d1f6fb0b3e0e3aba50b9c35f56d580eb3c4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/yiisoft/yii2-bootstrap/zipball/d2518d1f6fb0b3e0e3aba50b9c35f56d580eb3c4",
+                "reference": "d2518d1f6fb0b3e0e3aba50b9c35f56d580eb3c4",
+                "shasum": ""
+            },
+            "require": {
+                "twbs/bootstrap": "3.0.*",
+                "yiisoft/yii2": "*"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "yii\\bootstrap\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Qiang Xue",
+                    "email": "qiang.xue@gmail.com",
+                    "homepage": "http://www.yiiframework.com/",
+                    "role": "Founder and project lead"
+                }
+            ],
+            "description": "The Twitter Bootstrap extension for the Yii framework",
+            "keywords": [
+                "bootstrap",
+                "yii2"
+            ],
+            "time": "2014-04-13T21:58:59+00:00"
         },
         {
             "name": "yiisoft/yii2-bootstrap4",
@@ -944,91 +1309,6 @@
             "time": "2016-04-07T12:29:16+00:00"
         },
         {
-            "name": "twbs/bootstrap",
-            "version": "v3.0.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/twbs/bootstrap.git",
-                "reference": "6d03173a1aad98e75f7d33e65b411c519176c59a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/twbs/bootstrap/zipball/6d03173a1aad98e75f7d33e65b411c519176c59a",
-                "reference": "6d03173a1aad98e75f7d33e65b411c519176c59a",
-                "shasum": ""
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.0.x-dev"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Jacob Thornton",
-                    "email": "jacobthornton@gmail.com"
-                },
-                {
-                    "name": "Mark Otto",
-                    "email": "markdotto@gmail.com"
-                }
-            ],
-            "description": "Sleek, intuitive, and powerful mobile first front-end framework for faster and easier web development.",
-            "homepage": "http://getbootstrap.com",
-            "keywords": [
-                "bootstrap",
-                "css"
-            ],
-            "time": "2013-12-05T16:09:10+00:00"
-        },
-        {
-            "name": "yiisoft/yii2-bootstrap",
-            "version": "2.0.0-beta",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/yiisoft/yii2-bootstrap.git",
-                "reference": "d2518d1f6fb0b3e0e3aba50b9c35f56d580eb3c4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-bootstrap/zipball/d2518d1f6fb0b3e0e3aba50b9c35f56d580eb3c4",
-                "reference": "d2518d1f6fb0b3e0e3aba50b9c35f56d580eb3c4",
-                "shasum": ""
-            },
-            "require": {
-                "twbs/bootstrap": "3.0.*",
-                "yiisoft/yii2": "*"
-            },
-            "type": "yii2-extension",
-            "autoload": {
-                "psr-4": {
-                    "yii\\bootstrap\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Qiang Xue",
-                    "email": "qiang.xue@gmail.com",
-                    "homepage": "http://www.yiiframework.com/",
-                    "role": "Founder and project lead"
-                }
-            ],
-            "description": "The Twitter Bootstrap extension for the Yii framework",
-            "keywords": [
-                "bootstrap",
-                "yii2"
-            ],
-            "time": "2014-04-13T21:58:59+00:00"
-        },
-        {
             "name": "yiisoft/yii2-debug",
             "version": "dev-master",
             "source": {
@@ -1177,7 +1457,10 @@
     "stability-flags": {
         "kartik-v/yii2-number": 20,
         "kartik-v/yii2-widget-activeform": 20,
-        "kartik-v/yii2-widget-datepicker": 20
+        "kartik-v/yii2-widget-datepicker": 20,
+        "kartik-v/yii2-widget-select2": 20,
+        "kartik-v/yii2-widget-fileinput": 20,
+        "kartik-v/bootstrap-fileinput": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
