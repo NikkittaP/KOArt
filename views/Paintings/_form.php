@@ -31,12 +31,14 @@ use app\models\Materials;
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
     <?php
-    echo $form->field($model, 'photo_upload')->widget(FileInput::classname(), [
-        'name' => 'photos[]',
+    /*
+    echo $form->field($model, 'photo_upload[]')->widget(FileInput::classname(), [
         'options'=>[
-            'multiple'=>true
+            'multiple'=>true,
+            'accept' => 'image/*'
         ],
         'pluginOptions' => [
+            'previewFileType' => 'image',
             'uploadUrl' => Url::to(['/photos/upload']),
             'uploadExtraData' => [
                 'album_id' => 20,
@@ -45,6 +47,7 @@ use app\models\Materials;
             'maxFileCount' => 10
         ]
     ]);
+    */
     ?>
 
     <?php

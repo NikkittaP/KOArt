@@ -69,7 +69,8 @@ class PaintingsController extends Controller
 
         //VarDumper::dump( Yii::$app->request->post(), $depth = 10, $highlight = true);
         //exit();
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
+            //&& $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
