@@ -2,13 +2,20 @@
 
 namespace app\controllers;
 
-use Yii;
+use app\models\ArtGenres;
+use app\models\ArtGenresToPainting;
+use app\models\ArtStyles;
+use app\models\ArtStylesToPainting;
+use app\models\Grounds;
+use app\models\Materials;
+use app\models\MaterialsToPainting;
 use app\models\Paintings;
+use app\models\Prices;
 use app\models\search\PaintingsSearch;
+use Yii;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
-use yii\helpers\VarDumper;
 
 /**
  * PaintingsController implements the CRUD actions for Paintings model.
@@ -69,8 +76,74 @@ class PaintingsController extends Controller
 
         //VarDumper::dump( Yii::$app->request->post(), $depth = 10, $highlight = true);
         //exit();
-        if ($model->load(Yii::$app->request->post())) {
-            //&& $model->save()) {
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+
+            // Основа картины
+            $groundModel = Grounds::find()->where(['name' => $model->groundName])->one();
+            if ($groundModel === null) {
+                $groundModel = new Grounds();
+                $groundModel->name = $model->groundName;
+                $groundModel->save();
+            }
+            $model->ground_id = $groundModel->id;
+
+            // Жанр картины
+            if (!empty($model->artGenreName)) {
+                foreach ($model->artGenreName as $key => $genreName) {
+                    $artGenreModel = ArtGenres::find()->where(['name' => $genreName])->one();
+                    if ($artGenreModel == null) {
+                        $artGenreModel = new ArtGenres();
+                        $artGenreModel->name = $genreName;
+                        $artGenreModel->save();
+                    }
+
+                    $artGenresToPaintingModel = new ArtGenresToPainting();
+                    $artGenresToPaintingModel->painting_id = $model->id;
+                    $artGenresToPaintingModel->art_genre_id = $artGenreModel->id;
+                    $artGenresToPaintingModel->save();
+                }
+            }
+
+            // Стиль картины
+            if (!empty($model->artStyleName)) {
+                foreach ($model->artStyleName as $key => $styleName) {
+                    $artStyleModel = ArtStyles::find()->where(['name' => $styleName])->one();
+                    if ($artStyleModel == null) {
+                        $artStyleModel = new ArtStyles();
+                        $artStyleModel->name = $styleName;
+                        $artStyleModel->save();
+                    }
+
+                    $artStylesToPaintingModel = new ArtStylesToPainting();
+                    $artStylesToPaintingModel->painting_id = $model->id;
+                    $artStylesToPaintingModel->art_style_id = $artStyleModel->id;
+                    $artStylesToPaintingModel->save();
+                }
+            }
+
+            // Материалы картины
+            if (!empty($model->materials)) {
+                foreach ($model->materials as $key => $material) {
+                    $materialModel = Materials::find()->where(['name' => $material])->one();
+                    if ($materialModel == null) {
+                        $materialModel = new Materials();
+                        $materialModel->name = $material;
+                        $materialModel->save();
+                    }
+
+                    $materialsToPaintingModel = new MaterialsToPainting();
+                    $materialsToPaintingModel->painting_id = $model->id;
+                    $materialsToPaintingModel->material_id = $materialModel->id;
+                    $materialsToPaintingModel->save();
+                }
+            }
+
+            // Стоимость картины
+            $price = new Prices();
+            $price->painting_id = $model->id;
+            $price->value = $model->price;
+            $price->save();
+
             return $this->redirect(['view', 'id' => $model->id]);
         }
 

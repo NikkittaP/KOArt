@@ -3,6 +3,9 @@
 namespace app\models;
 
 use Yii;
+use yii\db\ActiveRecord;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "prices".
@@ -30,7 +33,7 @@ class Prices extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['painting_id', 'value', 'datetime_add'], 'required'],
+            [['painting_id', 'value'], 'required'],
             [['painting_id'], 'integer'],
             [['value'], 'number'],
             [['datetime_add'], 'safe'],
@@ -48,6 +51,20 @@ class Prices extends \yii\db\ActiveRecord
             'painting_id' => 'Картина',
             'value' => 'Стоимость',
             'datetime_add' => 'Дата и время добавления',
+        ];
+    }
+
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['datetime_add'],
+                ],
+                // если вместо метки времени UNIX используется datetime:
+                'value' => new Expression('NOW()'),
+            ],
         ];
     }
 
