@@ -34,6 +34,35 @@ class PhotosController extends Controller
         ]);
     }
 
+    public function actionSelectmain($painting_id)
+    {
+        $paintingModel = Paintings::find()->where(['id' => $painting_id])->one();
+        $photos = Photos::find()->where(['painting_id' => $painting_id])->all();
+        $photoModel = new Photos();
+
+        if (isset($_POST['Photos']))
+        {
+            $id = $_POST['Photos']['isMain'];
+            foreach($photos as $photo)
+            {
+                if ($photo->id == $id)
+                    $photo->isMain = 1;
+                else 
+                    $photo->isMain = 0;
+
+                $photo->save();
+            }
+
+            return $this->redirect(['paintings/index']);
+        }
+
+        return $this->render('selectmain', [
+            'paintingModel' => $paintingModel,
+            'photos' => $photos,
+            'photoModel' => $photoModel,
+        ]);
+    }
+
     public function actionUpload()
     {
         $painting_id = $_POST['painting_id'];
@@ -48,11 +77,11 @@ class PhotosController extends Controller
                 $size = $currentPhoto['size'][0];
                 $ext = substr(strrchr($shortname, '.'), 1);
                 $newFileName = Yii::$app->security->generateRandomString(10) . "." . $ext;
-                $newFilePath = Yii::getAlias('@app') . "/photos" . "/" . $newFileName;
-                $newThumbFilePath = Yii::getAlias('@app') . "/photos/thumb/" . $newFileName;
+                $newFilePath = Yii::getAlias('@app') . "/web/photos" . "/" . $newFileName;
+                $newThumbFilePath = Yii::getAlias('@app') . "/web/photos/thumb/" . $newFileName;
                 if (move_uploaded_file($tmpFilePath, $newFilePath)) {
-                    if (!file_exists(Yii::getAlias('@app') . "/photos/thumb/")) {
-                        mkdir(Yii::getAlias('@app') . "/photos/thumb/", 0777, true);
+                    if (!file_exists(Yii::getAlias('@app') . "/web/photos/thumb/")) {
+                        mkdir(Yii::getAlias('@app') . "/web/photos/thumb/", 0777, true);
                     }
 
                     $imagine = Image::getImagine();

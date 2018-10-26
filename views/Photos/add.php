@@ -8,7 +8,7 @@ $this->title = 'Добавить фото к картине #' . $paintingModel-
 $this->params['breadcrumbs'][] = ['label' => 'Photos', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="photos-create">
+<div class="photos-add">
 
     <h1><?=Html::encode($this->title)?></h1>
 
@@ -30,6 +30,6 @@ $this->params['breadcrumbs'][] = $this->title;
     ]);
     ?>
     <br /><br />
-    <?= Html::a('Далее', ['selectMain', 'painting_id' => $paintingModel->id], ['class' => 'btn btn-primary float-right']) ?>
+    <?= Html::a('Далее', ['selectmain', 'painting_id' => $paintingModel->id], ['class' => 'btn btn-primary float-right']) ?>
     <br />
 </div>
