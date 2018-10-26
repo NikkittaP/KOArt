@@ -1,14 +1,12 @@
 <?php
 
 use yii\helpers\Html;
-use yii\helpers\Url;
 use kartik\form\ActiveForm;
 use yii\helpers\ArrayHelper;
 use kartik\number\NumberControl;
 use kartik\date\DatePicker;
 //use dosamigos\selectize\SelectizeDropDownList;
 use kartik\select2\Select2;
-use kartik\file\FileInput;
 
 use app\models\Grounds;
 use app\models\ArtGenres;
@@ -29,26 +27,6 @@ use app\models\Materials;
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
-
-    <?php
-    /*
-    echo $form->field($model, 'photo_upload[]')->widget(FileInput::classname(), [
-        'options'=>[
-            'multiple'=>true,
-            'accept' => 'image/*'
-        ],
-        'pluginOptions' => [
-            'previewFileType' => 'image',
-            'uploadUrl' => Url::to(['/photos/upload']),
-            'uploadExtraData' => [
-                'album_id' => 20,
-                'cat_id' => 'Nature'
-            ],
-            'maxFileCount' => 10
-        ]
-    ]);
-    */
-    ?>
 
     <?php
     echo $form->field($model, 'width')->
@@ -139,7 +117,7 @@ use app\models\Materials;
         'options' => ['placeholder' => 'Дата создания ...'],
         'pluginOptions' => [
             'autoclose'=>true,
-            'format' => 'dd-M-yyyy'
+            'format' => 'yyyy-mm-dd'
         ]
     ]);
     ?>

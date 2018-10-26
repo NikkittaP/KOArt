@@ -3,11 +3,14 @@
 namespace app\controllers;
 
 use app\models\Photos;
+use app\models\Paintings;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
+use yii\imagine\Image;
+use Imagine\Image\Box;
 
 class PhotosController extends Controller
 {
@@ -23,22 +26,46 @@ class PhotosController extends Controller
         ];
     }
 
+    public function actionAdd($painting_id)
+    {
+        $paintingModel = Paintings::find()->where(['id' => $painting_id])->one();
+        return $this->render('add', [
+            'paintingModel' => $paintingModel,
+        ]);
+    }
+
     public function actionUpload()
     {
+        $painting_id = $_POST['painting_id'];
+
         $result = [];
-        if (isset($_POST) && isset($_FILES['Paintings'])) {
-            $key = array_keys($_FILES['Paintings']['tmp_name']['photo_upload'])[0];
-            $tmpFilePath = $_FILES['Paintings']['tmp_name']['photo_upload'][$key];
+        if (isset($_POST) && isset($_FILES['photos'])) {
+            $currentPhoto = $_FILES['photos'];
+            $tmpFilePath = $currentPhoto['tmp_name'][0];
 
             if ($tmpFilePath != "") {
-                $key = array_keys($_FILES['Paintings']['name']['photo_upload'])[0];
-                $shortname = $_FILES['Paintings']['name']['photo_upload'][$key];
-                $key = array_keys($_FILES['Paintings']['size']['photo_upload'])[0];
-                $size = $_FILES['Paintings']['size']['photo_upload'][$key];
+                $shortname = $currentPhoto['name'][0];
+                $size = $currentPhoto['size'][0];
                 $ext = substr(strrchr($shortname, '.'), 1);
                 $newFileName = Yii::$app->security->generateRandomString(10) . "." . $ext;
-                //if (move_uploaded_file($tmpFilePath, Helper::UPLOAD_FOLDER . '/' . Helper::TEMP_FOLDER . '/' . $newFileName)) {
-                if (move_uploaded_file($tmpFilePath, Yii::getAlias('@app') . "/photos" . "/" . $newFileName)) {
+                $newFilePath = Yii::getAlias('@app') . "/photos" . "/" . $newFileName;
+                $newThumbFilePath = Yii::getAlias('@app') . "/photos/thumb/" . $newFileName;
+                if (move_uploaded_file($tmpFilePath, $newFilePath)) {
+                    if (!file_exists(Yii::getAlias('@app') . "/photos/thumb/")) {
+                        mkdir(Yii::getAlias('@app') . "/photos/thumb/", 0777, true);
+                    }
+
+                    $imagine = Image::getImagine();
+                    $image = $imagine->open($newFilePath);
+                    $image->thumbnail(new Box(300, 300))
+                    ->save($newThumbFilePath, ['quality' => 70]);
+                   
+                    $photoModel = new Photos();
+                    $photoModel->painting_id = $painting_id;
+                    $photoModel->filename = $newFileName;
+                    $photoModel->isMain = 0;
+                    $photoModel->save();
+
                     /*
                     $result = [
                         'initialPreview' => [
@@ -61,14 +88,7 @@ class PhotosController extends Controller
                         'error' => "Не удалось загрузить файл!",
                     ];
                 }
-
             }
-        } else {
-            /*
-            $result = [
-                'error' => "Все файлы уже были загружены",
-            ];
-            */
         }
 
         Yii::$app->response->format = trim(Response::FORMAT_JSON);

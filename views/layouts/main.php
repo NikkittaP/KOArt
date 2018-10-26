@@ -39,9 +39,9 @@ SimpleAsset::register($this);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav  ml-auto'],
         'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
+            ['label' => 'Картины', 'url' => ['/paintings/index']],
+           
+            /*
             Yii::$app->user->isGuest ? (
                 ['label' => 'Login', 'url' => ['/site/login']]
             ) : (
@@ -54,12 +54,14 @@ SimpleAsset::register($this);
                 . Html::endForm()
                 . '</li>'
             )
+            */
         ],
     ]);
     NavBar::end();
     ?>
 
     <div class="container">
+        <br />
         <?= Breadcrumbs::widget([
             'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
         ]) ?>
@@ -67,13 +69,18 @@ SimpleAsset::register($this);
         <?= $content ?>
     </div>
 
-<footer class="footer">
-    <div class="container">
-        <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
+    <footer class="footer">
+        <div class="container">
+            <p class="float-left">&copy; Katia Oskina Art 
+                <?php
+                $text = (date('Y')=="2018") ? date('Y') : "2018-".date('Y');
+                echo $text;
+                ?>
+            </p>
 
-        <p class="pull-right"><?= Yii::powered() ?></p>
-    </div>
-</footer>
+            <p class="float-right"><?= Yii::powered() ?></p>
+        </div>
+    </footer>
 
 <?php $this->endBody() ?>
 </body>

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bf993ddfe8319b4f8042ad9815aaa369",
+    "content-hash": "3711011afebedfcba862349106bc665c",
     "packages": [
         {
             "name": "2amigos/yii2-selectize-widget",
@@ -328,17 +328,75 @@
             "time": "2018-02-23T01:58:20+00:00"
         },
         {
+            "name": "imagine/imagine",
+            "version": "dev-develop",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/avalanche123/Imagine.git",
+                "reference": "96c13442ba08f025138b56c286309277644f8663"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/avalanche123/Imagine/zipball/96c13442ba08f025138b56c286309277644f8663",
+                "reference": "96c13442ba08f025138b56c286309277644f8663",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "2.2.*",
+                "symfony/phpunit-bridge": "^3.2 || ^4.0"
+            },
+            "suggest": {
+                "ext-gd": "to use the GD implementation",
+                "ext-gmagick": "to use the Gmagick implementation",
+                "ext-imagick": "to use the Imagick implementation"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-develop": "0.7-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Imagine\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bulat Shakirzyanov",
+                    "email": "mallluhuct@gmail.com",
+                    "homepage": "http://avalanche123.com"
+                }
+            ],
+            "description": "Image processing for PHP 5.3",
+            "homepage": "http://imagine.readthedocs.org/",
+            "keywords": [
+                "drawing",
+                "graphics",
+                "image manipulation",
+                "image processing"
+            ],
+            "time": "2018-10-25T07:10:11+00:00"
+        },
+        {
             "name": "kartik-v/bootstrap-fileinput",
             "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kartik-v/bootstrap-fileinput.git",
-                "reference": "86010b4468a2915c9414524df528aa1b361af1b3"
+                "reference": "7aa9bf7ef66bcae34b6bbb889bc8c5497ab9ae8b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kartik-v/bootstrap-fileinput/zipball/86010b4468a2915c9414524df528aa1b361af1b3",
-                "reference": "86010b4468a2915c9414524df528aa1b361af1b3",
+                "url": "https://api.github.com/repos/kartik-v/bootstrap-fileinput/zipball/7aa9bf7ef66bcae34b6bbb889bc8c5497ab9ae8b",
+                "reference": "7aa9bf7ef66bcae34b6bbb889bc8c5497ab9ae8b",
                 "shasum": ""
             },
             "type": "library",
@@ -378,7 +436,7 @@
                 "progress",
                 "upload"
             ],
-            "time": "2018-10-06T16:31:55+00:00"
+            "time": "2018-10-23T06:28:42+00:00"
         },
         {
             "name": "kartik-v/yii2-krajee-base",
@@ -487,12 +545,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/kartik-v/yii2-widget-activeform.git",
-                "reference": "6bc8bc7231a5c0b1b6e5c89497088266931f9075"
+                "reference": "a414886781d0e8d17555163a2683849a8aaedbbc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kartik-v/yii2-widget-activeform/zipball/6bc8bc7231a5c0b1b6e5c89497088266931f9075",
-                "reference": "6bc8bc7231a5c0b1b6e5c89497088266931f9075",
+                "url": "https://api.github.com/repos/kartik-v/yii2-widget-activeform/zipball/a414886781d0e8d17555163a2683849a8aaedbbc",
+                "reference": "a414886781d0e8d17555163a2683849a8aaedbbc",
                 "shasum": ""
             },
             "require": {
@@ -531,7 +589,7 @@
                 "widget",
                 "yii2"
             ],
-            "time": "2018-09-27T17:51:42+00:00"
+            "time": "2018-10-24T16:25:32+00:00"
         },
         {
             "name": "kartik-v/yii2-widget-datepicker",
@@ -648,12 +706,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/kartik-v/yii2-widget-select2.git",
-                "reference": "0df692c8772c2b53406ae705492c8401ea6501d6"
+                "reference": "d83b74022e2cba650072270738bdf63fb4ff007f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kartik-v/yii2-widget-select2/zipball/0df692c8772c2b53406ae705492c8401ea6501d6",
-                "reference": "0df692c8772c2b53406ae705492c8401ea6501d6",
+                "url": "https://api.github.com/repos/kartik-v/yii2-widget-select2/zipball/d83b74022e2cba650072270738bdf63fb4ff007f",
+                "reference": "d83b74022e2cba650072270738bdf63fb4ff007f",
                 "shasum": ""
             },
             "require": {
@@ -693,7 +751,7 @@
                 "widget",
                 "yii2"
             ],
-            "time": "2018-10-03T07:09:03+00:00"
+            "time": "2018-10-25T03:23:23+00:00"
         },
         {
             "name": "msvdev/yii2-widget-mappicker",
@@ -889,12 +947,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-framework.git",
-                "reference": "6b44d0107c56c2563aec6894ac9e6a0798d52e75"
+                "reference": "3b675b4459b01a299d705a89462b6bd4c7534bad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/6b44d0107c56c2563aec6894ac9e6a0798d52e75",
-                "reference": "6b44d0107c56c2563aec6894ac9e6a0798d52e75",
+                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/3b675b4459b01a299d705a89462b6bd4c7534bad",
+                "reference": "3b675b4459b01a299d705a89462b6bd4c7534bad",
                 "shasum": ""
             },
             "require": {
@@ -981,7 +1039,7 @@
                 "framework",
                 "yii2"
             ],
-            "time": "2018-10-18T22:26:40+00:00"
+            "time": "2018-10-26T10:13:27+00:00"
         },
         {
             "name": "yiisoft/yii2-bootstrap",
@@ -1032,12 +1090,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-bootstrap4.git",
-                "reference": "250d24240c14d11f5e87fe0c33ec67464ba316c6"
+                "reference": "84ce047a81922db610c1267a495208fc6f43d664"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-bootstrap4/zipball/250d24240c14d11f5e87fe0c33ec67464ba316c6",
-                "reference": "250d24240c14d11f5e87fe0c33ec67464ba316c6",
+                "url": "https://api.github.com/repos/yiisoft/yii2-bootstrap4/zipball/84ce047a81922db610c1267a495208fc6f43d664",
+                "reference": "84ce047a81922db610c1267a495208fc6f43d664",
                 "shasum": ""
             },
             "require": {
@@ -1093,7 +1151,7 @@
                 "bootstrap4",
                 "yii2"
             ],
-            "time": "2018-10-16T13:19:22+00:00"
+            "time": "2018-10-23T21:28:19+00:00"
         },
         {
             "name": "yiisoft/yii2-composer",
@@ -1148,6 +1206,54 @@
                 "yii2"
             ],
             "time": "2018-08-25T10:44:34+00:00"
+        },
+        {
+            "name": "yiisoft/yii2-imagine",
+            "version": "2.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/yiisoft/yii2-imagine.git",
+                "reference": "a8a1a068862a86e3395e665bc86e63d5c9b60841"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/yiisoft/yii2-imagine/zipball/a8a1a068862a86e3395e665bc86e63d5c9b60841",
+                "reference": "a8a1a068862a86e3395e665bc86e63d5c9b60841",
+                "shasum": ""
+            },
+            "require": {
+                "imagine/imagine": "~0.6.0 | ~0.7.1",
+                "yiisoft/yii2": "~2.0.0"
+            },
+            "type": "yii2-extension",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "yii\\imagine\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Antonio Ramirez",
+                    "email": "amigo.cobos@gmail.com"
+                }
+            ],
+            "description": "The Imagine integration for the Yii framework",
+            "keywords": [
+                "helper",
+                "image",
+                "imagine",
+                "yii2"
+            ],
+            "time": "2018-02-22T11:57:06+00:00"
         },
         {
             "name": "yiisoft/yii2-swiftmailer",
@@ -1460,7 +1566,8 @@
         "kartik-v/yii2-widget-datepicker": 20,
         "kartik-v/yii2-widget-select2": 20,
         "kartik-v/yii2-widget-fileinput": 20,
-        "kartik-v/bootstrap-fileinput": 20
+        "kartik-v/bootstrap-fileinput": 20,
+        "yiisoft/yii2-imagine": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

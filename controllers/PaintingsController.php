@@ -144,7 +144,7 @@ class PaintingsController extends Controller
             $price->value = $model->price;
             $price->save();
 
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['photos/add', 'painting_id' => $model->id]);
         }
 
         return $this->render('create', [
