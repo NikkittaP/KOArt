@@ -183,4 +183,8 @@ class Paintings extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Prices::className(), ['painting_id' => 'id']);
     }
+    public function getLastPrice($painting_id)
+    {
+        return Prices::find()->where(['painting_id' => $painting_id])->orderBy(['datetime_add' => SORT_DESC])->one();
+    }
 }

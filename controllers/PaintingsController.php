@@ -14,6 +14,7 @@ use app\models\Prices;
 use app\models\search\PaintingsSearch;
 use Yii;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
@@ -46,9 +47,16 @@ class PaintingsController extends Controller
         $searchModel = new PaintingsSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+        $artStyles = ArrayHelper::map(ArtStyles::find()->all(), 'id', 'name');
+        $artGenres = ArrayHelper::map(ArtGenres::find()->all(), 'id', 'name');
+        $materials = ArrayHelper::map(Materials::find()->all(), 'id', 'name');
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'artStyles' => $artStyles,
+            'artGenres' => $artGenres,
+            'materials' => $materials,
         ]);
     }
 
@@ -90,7 +98,12 @@ class PaintingsController extends Controller
             // Жанр картины
             if (!empty($model->artGenreName)) {
                 foreach ($model->artGenreName as $key => $genreName) {
-                    $artGenreModel = ArtGenres::find()->where(['name' => $genreName])->one();
+                    if (is_numeric($genreName)) {
+                        $artGenreModel = ArtGenres::find()->where(['id' => $genreName])->one();
+                    } else {
+                        $artGenreModel = ArtGenres::find()->where(['name' => $genreName])->one();
+                    }
+
                     if ($artGenreModel == null) {
                         $artGenreModel = new ArtGenres();
                         $artGenreModel->name = $genreName;
@@ -107,7 +120,12 @@ class PaintingsController extends Controller
             // Стиль картины
             if (!empty($model->artStyleName)) {
                 foreach ($model->artStyleName as $key => $styleName) {
-                    $artStyleModel = ArtStyles::find()->where(['name' => $styleName])->one();
+                    if (is_numeric($styleName)) {
+                        $artStyleModel = ArtStyles::find()->where(['id' => $styleName])->one();
+                    } else {
+                        $artStyleModel = ArtStyles::find()->where(['name' => $styleName])->one();
+                    }
+
                     if ($artStyleModel == null) {
                         $artStyleModel = new ArtStyles();
                         $artStyleModel->name = $styleName;
@@ -124,7 +142,12 @@ class PaintingsController extends Controller
             // Материалы картины
             if (!empty($model->materials)) {
                 foreach ($model->materials as $key => $material) {
-                    $materialModel = Materials::find()->where(['name' => $material])->one();
+                    if (is_numeric($material)) {
+                        $materialModel = Materials::find()->where(['id' => $material])->one();
+                    } else {
+                        $materialModel = Materials::find()->where(['name' => $material])->one();
+                    }
+
                     if ($materialModel == null) {
                         $materialModel = new Materials();
                         $materialModel->name = $material;
@@ -143,6 +166,14 @@ class PaintingsController extends Controller
             $price->painting_id = $model->id;
             $price->value = $model->price;
             $price->save();
+
+            // Координаты
+            if ($model->coordinates != null) {
+                $model->latitude = explode('@', $model->coordinates)[0];
+                $model->longitude = explode('@', $model->coordinates)[1];
+            }
+
+            $model->save();
 
             return $this->redirect(['photos/add', 'painting_id' => $model->id]);
         }
