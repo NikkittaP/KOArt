@@ -6,8 +6,8 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\Paintings */
 
-$this->title = 'Create Paintings';
-$this->params['breadcrumbs'][] = ['label' => 'Paintings', 'url' => ['index']];
+$this->title = 'Добавить картину';
+$this->params['breadcrumbs'][] = ['label' => 'Картины', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="paintings-create">
@@ -17,5 +17,5 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $this->render('_form', [
         'model' => $model,
     ]) ?>
-
+    <br /><br /><br />
 </div>

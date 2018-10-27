@@ -47,7 +47,7 @@ use app\models\Materials;
         'options' => ['placeholder' => 'Жанр картины ...', 'multiple' => true],
         'pluginOptions' => [
             'tags' => true,
-            'maximumInputLength' => 10
+            'maximumInputLength' => 30
         ],
     ]);
     ?>
@@ -61,7 +61,7 @@ use app\models\Materials;
         'options' => ['placeholder' => 'Стиль картины ...', 'multiple' => true],
         'pluginOptions' => [
             'tags' => true,
-            'maximumInputLength' => 10
+            'maximumInputLength' => 30
         ],
     ]);
     ?>
@@ -74,7 +74,7 @@ use app\models\Materials;
         'pluginOptions' => [
             'tags' => true,
             'tokenSeparators' => [',', ' '],
-            'maximumInputLength' => 10
+            'maximumInputLength' => 30
         ],
     ]);
     ?>
@@ -88,7 +88,7 @@ use app\models\Materials;
         'options' => ['placeholder' => 'Использованные материалы ...', 'multiple' => true],
         'pluginOptions' => [
             'tags' => true,
-            'maximumInputLength' => 10
+            'maximumInputLength' => 30
         ],
     ]);
     ?>
@@ -127,7 +127,7 @@ use app\models\Materials;
     ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Далее', ['class' => 'btn btn-primary float-right']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

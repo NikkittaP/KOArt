@@ -42,7 +42,7 @@ class PaintingsSearch extends Paintings
      */
     public function search($params)
     {
-        $query = Paintings::find();
+        $query = Paintings::find()->orderBy('id DESC');
 
         // add conditions that should always apply here
 
