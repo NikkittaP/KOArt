@@ -2,6 +2,7 @@
 
 use kartik\grid\GridView;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\search\ArtGenresSearchPaintings */
@@ -106,6 +107,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
             },
             'contentOptions' => ['style' => 'width: 70px;'],
+        ],
+        [
+            'label' => 'Действия',
+            'format' => 'html',
+            'value' => function ($model) {
+                return Html::a('Обновить', ['update', 'id' => $model->id], ['class' => 'profile-link']);
+            }
         ],
     ],
 ]);?>
