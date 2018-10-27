@@ -18,14 +18,8 @@ use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
-/**
- * PaintingsController implements the CRUD actions for Paintings model.
- */
 class PaintingsController extends Controller
 {
-    /**
-     * {@inheritdoc}
-     */
     public function behaviors()
     {
         return [
@@ -38,10 +32,6 @@ class PaintingsController extends Controller
         ];
     }
 
-    /**
-     * Lists all Paintings models.
-     * @return mixed
-     */
     public function actionIndex()
     {
         $searchModel = new PaintingsSearch();
@@ -60,12 +50,6 @@ class PaintingsController extends Controller
         ]);
     }
 
-    /**
-     * Displays a single Paintings model.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     public function actionView($id)
     {
         return $this->render('view', [
@@ -73,17 +57,10 @@ class PaintingsController extends Controller
         ]);
     }
 
-    /**
-     * Creates a new Paintings model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
     public function actionCreate()
     {
         $model = new Paintings();
 
-        //VarDumper::dump( Yii::$app->request->post(), $depth = 10, $highlight = true);
-        //exit();
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
 
             // Основа картины
@@ -183,16 +160,30 @@ class PaintingsController extends Controller
         ]);
     }
 
-    /**
-     * Updates an existing Paintings model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $model->price = Prices::find()->where(['painting_id' => $id])->orderBy(['datetime_add' => SORT_DESC])->one()->value;
+
+        $artGenresToPaintings = ArtGenresToPainting::find()->where(['painting_id' => $id])->all();
+        $model->artGenreName = [];
+        foreach ($artGenresToPaintings as $artGenreToPainting) {
+            $model->artGenreName[] = $artGenreToPainting->art_genre_id;
+        }
+
+        $artStylesToPaintings = ArtStylesToPainting::find()->where(['painting_id' => $id])->all();
+        $model->artStyleName = [];
+        foreach ($artStylesToPaintings as $artStyleToPainting) {
+            $model->artStyleName[] = $artStyleToPainting->art_style_id;
+        }
+
+        $materialsToPaintings = MaterialsToPainting::find()->where(['painting_id' => $id])->all();
+        $model->materials = [];
+        foreach ($materialsToPaintings as $materialToPainting) {
+            $model->materials[] = $materialToPainting->material_id;
+        }
+
+        $model->coordinates = $model->latitude.'@'.$model->longitude;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -203,13 +194,6 @@ class PaintingsController extends Controller
         ]);
     }
 
-    /**
-     * Deletes an existing Paintings model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
@@ -217,13 +201,6 @@ class PaintingsController extends Controller
         return $this->redirect(['index']);
     }
 
-    /**
-     * Finds the Paintings model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return Paintings the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     protected function findModel($id)
     {
         if (($model = Paintings::findOne($id)) !== null) {

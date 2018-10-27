@@ -42,9 +42,11 @@ use app\models\Materials;
     $items =  ArrayHelper::map( ArtGenres ::find()->all(), 'id', 'name');
     echo $form->field($model, 'artGenreName')->widget(Select2::className(), [
         'data' => $items,
-        //'value' => ['red', 'green'], // initial value
         'maintainOrder' => true,
-        'options' => ['placeholder' => 'Жанр картины ...', 'multiple' => true],
+        'options' => [
+            'placeholder' => 'Жанр картины ...',
+            'multiple' => true
+        ],
         'pluginOptions' => [
             'tags' => true,
             'maximumInputLength' => 30
@@ -56,7 +58,6 @@ use app\models\Materials;
     $items =  ArrayHelper::map( ArtStyles ::find()->all(), 'id', 'name');
     echo $form->field($model, 'artStyleName')->widget(Select2::className(), [
         'data' => $items,
-        //'value' => ['red', 'green'], // initial value
         'maintainOrder' => true,
         'options' => ['placeholder' => 'Стиль картины ...', 'multiple' => true],
         'pluginOptions' => [
@@ -83,7 +84,6 @@ use app\models\Materials;
     $items =  ArrayHelper::map( Materials ::find()->all(), 'id', 'name');
     echo $form->field($model, 'materials')->widget(Select2::className(), [
         'data' => $items,
-        //'value' => ['red', 'green'], // initial value
         'maintainOrder' => true,
         'options' => ['placeholder' => 'Использованные материалы ...', 'multiple' => true],
         'pluginOptions' => [
