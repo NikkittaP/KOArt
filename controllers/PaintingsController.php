@@ -159,7 +159,7 @@ class PaintingsController extends Controller
 
             return $this->redirect(['photos/add', 'painting_id' => $model->id]);
         }
-
+        
         return $this->render('create', [
             'model' => $model,
         ]);
