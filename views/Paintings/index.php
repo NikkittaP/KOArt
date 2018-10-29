@@ -27,25 +27,30 @@ $this->params['breadcrumbs'][] = $this->title;
     'columns' => [
         [
             'attribute' => 'id',
-            'contentOptions' => ['style' => 'width: 70px;text-align:center'],
+            'headerOptions'=>['style'=>'max-width: 70px;text-align:center;vertical-align: middle;'],
+            'contentOptions' => ['style' => 'width: 70px;text-align:center;'],
         ],
         [
             'attribute' => 'date',
+            'headerOptions'=>['style'=>'vertical-align: middle;'],
             'contentOptions' => ['style' => 'width: 100px;'],
         ],
         [
             'attribute' => 'coverPhoto',
+            'headerOptions'=>['style'=>'vertical-align: middle;'],
+            'contentOptions' => ['style' => 'width: 100px;'],
             'format' => 'html',
             'value' => function ($model) {
                 return Html::img(Yii::$app->request->BaseUrl . '/photos/thumb/' . $model->mainPhoto->filename,
                     ['width' => '100px']);
             },
-            'contentOptions' => ['style' => 'width: 100px;'],
         ],
         [
             'attribute' => 'name',
+            'headerOptions'=>['style'=>'vertical-align: middle;'],
         ],
         //'description:ntext',
+        /*
         [
             'attribute' => 'width',
             'contentOptions' => ['style' => 'width: 70px;'],
@@ -54,51 +59,75 @@ $this->params['breadcrumbs'][] = $this->title;
             'attribute' => 'height',
             'contentOptions' => ['style' => 'width: 70px;'],
         ],
+        */
+        [
+            'attribute' => 'size',
+            'headerOptions'=>['style'=>'max-width: 110px;overflow:auto;white-space: normal;word-wrap: break-word;text-align:center;vertical-align: middle;'],
+            'contentOptions' => ['style' => 'width: 110px;text-align:center;'],
+            'value' => function ($model) {
+                return $model->width.'x'.$model->height;
+            },
+        ],
         [
             'attribute' => 'ground_id',
+            'headerOptions'=>['style'=>'vertical-align: middle;'],
+            'contentOptions' => ['style' => 'width: 70px;'],
             'value' => function ($model) {
                 return $model->ground->name;
             },
-            'contentOptions' => ['style' => 'width: 70px;'],
         ],
         [
             'attribute' => 'artStyleName',
+            'headerOptions'=>['style'=>'vertical-align: middle;'],
+            'contentOptions' => ['style' => 'width:70px;'],
             'format' => 'html',
             'value' => function ($model) use ($artStyles) {
+                if (count($model->artStylesToPaintings)==0)
+                    return null;
+                
                 $list = '';
                 foreach ($model->artStylesToPaintings as $artStyle) {
                     $list .= $artStyles[$artStyle->art_style_id] . '<br />';
                 }
                 return $list;
             },
-            'contentOptions' => ['style' => 'padding:2px;width:70px;']
         ],
         [
             'attribute' => 'artGenreName',
+            'headerOptions'=>['style'=>'vertical-align: middle;'],
+            'contentOptions' => ['style' => 'width:70px;'],
             'format' => 'html',
             'value' => function ($model) use ($artGenres) {
+                if (count($model->artGenresToPaintings)==0)
+                    return null;
+                
                 $list = '';
                 foreach ($model->artGenresToPaintings as $artGenre) {
                     $list .= $artGenres[$artGenre->art_genre_id] . '<br />';
                 }
                 return $list;
             },
-            'contentOptions' => ['style' => 'padding:2px;width:70px;']
         ],
         [
             'attribute' => 'materials',
+            'headerOptions'=>['style'=>'vertical-align: middle;'],
+            'contentOptions' => ['style' => 'width:70px;'],
             'format' => 'html',
             'value' => function ($model) use ($materials) {
+                if (count($model->materialsToPaintings)==0)
+                    return null;
+                
                 $list = '';
                 foreach ($model->materialsToPaintings as $material) {
                     $list .= $materials[$material->material_id] . '<br />';
                 }
                 return $list;
             },
-            'contentOptions' => ['style' => 'padding:2px;width:70px;']
         ],
         [
             'attribute' => 'price',
+            'headerOptions'=>['style'=>'vertical-align: middle;'],
+            'contentOptions' => ['style' => 'width: 70px;'],
             'value' => function ($model) {
                 $price = $model->getLastPrice($model->id)->value;
                 if (isset($price)) {
@@ -106,10 +135,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
 
             },
-            'contentOptions' => ['style' => 'width: 70px;'],
         ],
         [
             'label' => 'Действия',
+            'headerOptions'=>['style'=>'vertical-align: middle;'],
             'format' => 'html',
             'value' => function ($model) {
                 return Html::a('Обновить', ['update', 'id' => $model->id], ['class' => 'profile-link']);

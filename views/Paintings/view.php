@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /* @var $model app\models\Paintings */
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Paintings', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Картины', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="paintings-view">
@@ -15,26 +15,19 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) ?>
+        <?= Html::a('Обновить', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
     </p>
 
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
             'id',
-            'author_id',
+            'author.name',
             'name',
             'description:ntext',
             'width',
             'height',
-            'ground_id',
+            'ground.name',
             'shopURL',
             'date',
             'latitude',

@@ -43,6 +43,7 @@ class Paintings extends \yii\db\ActiveRecord
     public $artStyleName;
     public $materials;
     public $price;
+    public $size;
 
     /**
      * {@inheritdoc}
@@ -66,7 +67,7 @@ class Paintings extends \yii\db\ActiveRecord
             [['name', 'shopURL'], 'string', 'max' => 255],
             [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => Authors::className(), 'targetAttribute' => ['author_id' => 'id']],
             [['ground_id'], 'exist', 'skipOnError' => true, 'targetClass' => Grounds::className(), 'targetAttribute' => ['ground_id' => 'id']],
-            [['coverPhoto', 'coordinates', 'groundName', 'photo_upload', 'artGenreName', 'artStyleName', 'materials', 'price'], 'safe'],
+            [['coverPhoto', 'coordinates', 'groundName', 'photo_upload', 'artGenreName', 'artStyleName', 'materials', 'price', 'size'], 'safe'],
         ];
     }
 
@@ -96,7 +97,8 @@ class Paintings extends \yii\db\ActiveRecord
             'artGenreName' => 'Жанр',
             'artStyleName' => 'Стиль',
             'materials' => 'Материалы',
-            'price' => 'Стоимость'
+            'price' => 'Стоимость',
+            'size' => 'Размер (ШxВ, мм)'
         ];
     }
 

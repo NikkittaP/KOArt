@@ -59,6 +59,7 @@ class PaintingsSearch extends Paintings
         }
 
         // grid filtering conditions
+        /*
         $query->andFilterWhere([
             'id' => $this->id,
             'author_id' => $this->author_id,
@@ -75,6 +76,7 @@ class PaintingsSearch extends Paintings
         $query->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'description', $this->description])
             ->andFilterWhere(['like', 'shopURL', $this->shopURL]);
+        */
 
         return $dataProvider;
     }

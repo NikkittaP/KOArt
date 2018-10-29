@@ -36,6 +36,7 @@ class PaintingsController extends Controller
     {
         $searchModel = new PaintingsSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->sort = false;
 
         $artStyles = ArrayHelper::map(ArtStyles::find()->all(), 'id', 'name');
         $artGenres = ArrayHelper::map(ArtGenres::find()->all(), 'id', 'name');
