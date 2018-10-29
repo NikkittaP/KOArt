@@ -46,11 +46,14 @@ use app\models\Paintings;
             
             $sizeCount = [];
             foreach ($sizesModel as $sizeModel) {
-                $key = $sizeModel->width.'x'.$sizeModel->height;
-                if (!array_key_exists($key, $sizeCount))
-                    $sizeCount[$key] = 0;
+                if (is_numeric($sizeModel->width) && is_numeric($sizeModel->height))
+                {
+                    $key = $sizeModel->width.'x'.$sizeModel->height;
+                    if (!array_key_exists($key, $sizeCount))
+                        $sizeCount[$key] = 0;
 
-                $sizeCount[$key]++;
+                    $sizeCount[$key]++;
+                }
             }
 
             arsort($sizeCount);
@@ -61,7 +64,9 @@ use app\models\Paintings;
                 $sizes[$key] = $key;
             }
 
-            echo $form->field($model, 'size')->dropdownlist($sizes);
+            echo $form->field($model, 'size')->dropdownlist($sizes, [
+                'prompt'=>'- Выбрать размер -'
+            ]);
             ?>
 
             <?php

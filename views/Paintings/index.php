@@ -65,7 +65,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'headerOptions'=>['style'=>'max-width: 110px;overflow:auto;white-space: normal;word-wrap: break-word;text-align:center;vertical-align: middle;'],
             'contentOptions' => ['style' => 'width: 110px;text-align:center;'],
             'value' => function ($model) {
-                return $model->width.'x'.$model->height;
+                if (is_numeric($model->width) && is_numeric($model->height))
+                    return $model->width.'x'.$model->height;
+                else
+                    return null;
             },
         ],
         [
@@ -82,7 +85,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'contentOptions' => ['style' => 'width:70px;'],
             'format' => 'html',
             'value' => function ($model) use ($artStyles) {
-                if (count($model->artStylesToPaintings)==0)
+                if (count($model->artStylesToPaintings) == 0)
                     return null;
                 
                 $list = '';
@@ -98,7 +101,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'contentOptions' => ['style' => 'width:70px;'],
             'format' => 'html',
             'value' => function ($model) use ($artGenres) {
-                if (count($model->artGenresToPaintings)==0)
+                if (count($model->artGenresToPaintings) == 0)
                     return null;
                 
                 $list = '';
@@ -114,7 +117,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'contentOptions' => ['style' => 'width:70px;'],
             'format' => 'html',
             'value' => function ($model) use ($materials) {
-                if (count($model->materialsToPaintings)==0)
+                if (count($model->materialsToPaintings) == 0)
                     return null;
                 
                 $list = '';
