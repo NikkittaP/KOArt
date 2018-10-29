@@ -6,6 +6,7 @@ use app\models\ArtGenres;
 use app\models\ArtGenresToPainting;
 use app\models\ArtStyles;
 use app\models\ArtStylesToPainting;
+use app\models\AuthorComments;
 use app\models\Grounds;
 use app\models\Materials;
 use app\models\MaterialsToPainting;
@@ -166,6 +167,14 @@ class PaintingsController extends Controller
                     $model->latitude = explode('@', $model->coordinates)[0];
                     $model->longitude = explode('@', $model->coordinates)[1];
                 }
+
+                // Комментарии автора
+                $authorComments = new AuthorComments();
+                $authorComments->painting_id = $model->id;
+                $authorComments->comments = $model->authorComments_comments;
+                $authorComments->material_costs = $model->authorComments_material_costs;
+                $authorComments->time_costs = $model->authorComments_time_costs;
+                $authorComments->save();
 
                 $model->save();
 
@@ -341,6 +350,18 @@ class PaintingsController extends Controller
                     $model->longitude = explode('@', $model->coordinates)[1];
                 }
 
+                // Комментарии автора
+                $authorComments = AuthorComments::find()->where(['painting_id' => $model->id])->one();
+                if ($authorComments === null)
+                {
+                    $authorComments = new AuthorComments();
+                    $authorComments->painting_id = $model->id;
+                }
+                $authorComments->comments = $model->authorComments_comments;
+                $authorComments->material_costs = $model->authorComments_material_costs;
+                $authorComments->time_costs = $model->authorComments_time_costs;
+                $authorComments->save();
+
                 $model->save();
 
                 //return $this->redirect(['update', 'id' => $model->id]);
@@ -372,8 +393,11 @@ class PaintingsController extends Controller
 
         $model->coordinates = $model->latitude . '@' . $model->longitude;
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        $authorComments = AuthorComments::find()->where(['painting_id' => $id])->one();
+        if ($authorComments !== null) {
+            $model->authorComments_comments = $authorComments->comments;
+            $model->authorComments_material_costs = $authorComments->material_costs;
+            $model->authorComments_time_costs = $authorComments->time_costs;
         }
 
         return $this->render('update', [

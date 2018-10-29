@@ -194,6 +194,20 @@ use app\models\Paintings;
     </div>
     <br />
 
+    <div class="card border-info">
+        <div class="card-header bg-info text-white">
+            <h5>Скрытые комментарии от автора</h5>
+        </div>
+        <div class="card-body text-info">
+
+        <?= $form->field($model, 'authorComments_comments')->textarea(['rows' => 6]) ?>
+        <?= $form->field($model, 'authorComments_material_costs')->textarea(['rows' => 3]) ?>
+        <?= $form->field($model, 'authorComments_time_costs')->textarea(['rows' => 3]) ?>
+            
+        </div>
+    </div>
+    <br />
+
     <div class="form-group">
         <?= Html::submitButton('Далее', ['class' => 'btn btn-primary float-right']) ?>
     </div>

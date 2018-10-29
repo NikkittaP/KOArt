@@ -44,6 +44,9 @@ class Paintings extends \yii\db\ActiveRecord
     public $materials;
     public $price;
     public $size;
+    public $authorComments_comments;
+    public $authorComments_material_costs;
+    public $authorComments_time_costs;
 
     /**
      * {@inheritdoc}
@@ -67,7 +70,7 @@ class Paintings extends \yii\db\ActiveRecord
             [['name', 'shopURL'], 'string', 'max' => 255],
             [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => Authors::className(), 'targetAttribute' => ['author_id' => 'id']],
             [['ground_id'], 'exist', 'skipOnError' => true, 'targetClass' => Grounds::className(), 'targetAttribute' => ['ground_id' => 'id']],
-            [['coverPhoto', 'coordinates', 'groundName', 'photo_upload', 'artGenreName', 'artStyleName', 'materials', 'price', 'size'], 'safe'],
+            [['coverPhoto', 'coordinates', 'groundName', 'photo_upload', 'artGenreName', 'artStyleName', 'materials', 'price', 'size', 'authorComments_comments', 'authorComments_material_costs', 'authorComments_time_costs'], 'safe'],
         ];
     }
 
@@ -98,7 +101,10 @@ class Paintings extends \yii\db\ActiveRecord
             'artStyleName' => 'Стиль',
             'materials' => 'Материалы',
             'price' => 'Стоимость',
-            'size' => 'Размер (ШxВ, мм)'
+            'size' => 'Размер (ШxВ, мм)',
+            'authorComments_comments' => 'Комментарии автора',
+            'authorComments_material_costs' => 'Затраты материалов',
+            'authorComments_time_costs' => 'Затраты времени'
         ];
     }
 
@@ -138,7 +144,7 @@ class Paintings extends \yii\db\ActiveRecord
      */
     public function getAuthorComments()
     {
-        return $this->hasMany(AuthorComments::className(), ['painting_id' => 'id']);
+        return $this->hasOne(AuthorComments::className(), ['painting_id' => 'id']);
     }
 
     /**
