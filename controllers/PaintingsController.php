@@ -52,6 +52,13 @@ class PaintingsController extends Controller
         ]);
     }
 
+    public function actionShow($id)
+    {
+        return $this->render('show', [
+            'painting' => $this->findModel($id),
+        ]);
+    }
+
     public function actionView($id)
     {
         return $this->render('view', [

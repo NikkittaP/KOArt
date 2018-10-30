@@ -24,17 +24,17 @@ $this->title = 'Katia Oskina Art';
         <h1>KOArt</h1>
     </div>
 
-    <div class="container-fluid" style="max-width: 800px;">
+    <div class="container-fluid" style="max-width: 1250px;">
         <div class="d-flex flex-row flex-wrap justify-content-center">
             <?php
             $i = 0;
             foreach ($paintings as $painting) {
-                if ($i == 3 || $i == 6) {
+                if ($i == 4 || $i == 8) {
                     echo '</div>';
                     echo '<div class="d-flex flex-row flex-wrap justify-content-center">';
                 }
                 echo '<div class="d-flex flex-column">';
-                echo Html::img(Yii::$app->request->BaseUrl . '/photos/thumb/' . $painting->mainPhoto->filename, ['class' => 'img-fluid']);
+                echo Html::a(Html::img(Yii::$app->request->BaseUrl . '/photos/thumb/' . $painting->mainPhoto->filename, ['class' => 'img-fluid']), ['paintings/show', 'id' => $painting->id], ['style' => 'margin: 5px;', 'class' => 'black-link']);
                 echo '</div>';
 
                 $i++;
@@ -43,31 +43,6 @@ $this->title = 'Katia Oskina Art';
         </div>
     </div>
 
-    <!--
-    <div class="album text-muted">
-      <div class="container">
-        <div class="row justify-content-center">
-            <?php
-            $i = 0;
-            foreach ($paintings as $painting) {
-                if ($i == 3 || $i == 6) {
-                    echo '</div>';
-                    echo '<div class="row justify-content-center">';
-                }
-                echo '<div class="card">';
-                echo Html::img(Yii::$app->request->BaseUrl . '/photos/thumb/' . $painting->mainPhoto->filename);
-                echo '</div>';
-
-                $i++;
-            }
-            ?>
-        </div>
-        </div>
-        </div>
-
-        
-    </div>
-    -->
     <br /><br /><br />
     <div class="row justify-content-center">
         <?php

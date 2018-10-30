@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6678dbe6997bae6a6a924d9f680c3ff5",
+    "content-hash": "14e36530f7dd31331426098e66229e26",
     "packages": [
         {
             "name": "2amigos/yii2-selectize-widget",
@@ -78,6 +78,28 @@
                 "shasum": null
             },
             "type": "bower-asset"
+        },
+        {
+            "name": "bower-asset/fancybox",
+            "version": "v3.3.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fancyapps/fancybox.git",
+                "reference": "059c44062a033665cb635364320713cbc52de651"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fancyapps/fancybox/zipball/059c44062a033665cb635364320713cbc52de651",
+                "reference": "059c44062a033665cb635364320713cbc52de651",
+                "shasum": null
+            },
+            "require": {
+                "bower-asset/jquery": ">=1.9.0"
+            },
+            "type": "bower-asset",
+            "license": [
+                "GPL-3.0"
+            ]
         },
         {
             "name": "bower-asset/inputmask",
@@ -1066,6 +1088,51 @@
                 "yii2"
             ],
             "time": "2018-04-05T08:24:39+00:00"
+        },
+        {
+            "name": "newerton/yii2-fancybox-3",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/newerton/yii2-fancybox-3.git",
+                "reference": "3e42c3e981afab250f2557697cfd509118aa9524"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/newerton/yii2-fancybox-3/zipball/3e42c3e981afab250f2557697cfd509118aa9524",
+                "reference": "3e42c3e981afab250f2557697cfd509118aa9524",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/fancybox": "~3.3.5",
+                "php": ">=5.6.0",
+                "yiisoft/yii2": "*"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "newerton\\fancybox3\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Newerton Vargas de Araujo",
+                    "email": "newerton.araujo@gmail.com"
+                }
+            ],
+            "description": "fancyBox is a tool that offers a nice and elegant way to add zooming functionality for images, html content and multi-media on your webpages.",
+            "keywords": [
+                "extension",
+                "fancyapps",
+                "fancybox",
+                "fancybox3",
+                "yii2"
+            ],
+            "time": "2018-04-20T16:51:49+00:00"
         },
         {
             "name": "nivans/yii2-bs4-breadcrumbs",
