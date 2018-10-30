@@ -144,7 +144,11 @@ $this->params['breadcrumbs'][] = $this->title;
             'headerOptions'=>['style'=>'vertical-align: middle;'],
             'format' => 'html',
             'value' => function ($model) {
-                return Html::a('Обновить', ['update', 'id' => $model->id], ['class' => 'profile-link']);
+                return  Html::a('Обновить', ['update', 'id' => $model->id], ['class' => 'profile-link']).
+                        '<br />'.
+                        Html::a('Добавить фото', ['photos/add', 'painting_id' => $model->id], ['class' => 'profile-link']).
+                        '<br />'.
+                        Html::a('Выбрать основное фото', ['photos/selectmain', 'painting_id' => $model->id], ['class' => 'profile-link']);
             }
         ],
     ],

@@ -46,7 +46,7 @@ class Photos extends \yii\db\ActiveRecord
             'id' => 'ID',
             'painting_id' => 'Картина',
             'filename' => 'Название файла',
-            'isMain' => 'Является главной',
+            'isMain' => '',
         ];
     }
 

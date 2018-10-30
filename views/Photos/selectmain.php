@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use kartik\form\ActiveForm;
 
 $this->title = 'Выбрать основное фото к картине #' . $paintingModel->id . ' "' . $paintingModel->name . '"';
-$this->params['breadcrumbs'][] = ['label' => 'Фото', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Картины', 'url' => ['paintings/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="photos-selectmain">
