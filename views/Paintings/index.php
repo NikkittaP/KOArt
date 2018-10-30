@@ -10,6 +10,8 @@ use yii\helpers\Url;
 
 $this->title = 'Картины';
 $this->params['breadcrumbs'][] = $this->title;
+
+//$dataProvider->pagination->pageSize=2;
 ?>
 <div class="paintings-index">
 
@@ -41,6 +43,9 @@ $this->params['breadcrumbs'][] = $this->title;
             'contentOptions' => ['style' => 'width: 100px;'],
             'format' => 'html',
             'value' => function ($model) {
+                if ($model->mainPhoto->filename === null)
+                    return null;
+                
                 return Html::img(Yii::$app->request->BaseUrl . '/photos/thumb/' . $model->mainPhoto->filename,
                     ['width' => '100px']);
             },

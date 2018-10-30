@@ -1,53 +1,85 @@
 <?php
+use kartik\icons\Icon;
+use yii\helpers\Html;
+use yii\widgets\LinkPager;
+use yii\helpers\VarDumper;
 
 /* @var $this yii\web\View */
 
-$this->title = 'My Yii Application';
+$this->title = 'Katia Oskina Art';
 ?>
 <div class="site-index">
-
     <div class="jumbotron">
-        <h1>Congratulations!</h1>
-
-        <p class="lead">You have successfully created your Yii-powered application.</p>
-
-        <p><a class="btn btn-lg btn-success" href="http://www.yiiframework.com">Get started with Yii</a></p>
+        <?php
+        echo Html::a(
+            Icon::show('instagram', ['framework' => Icon::FAB, 'class'=>'fa-3x']),
+            "https://www.instagram.com/katia.oskina/",
+            ['class' => 'black-link', 'target' => '_blank']);
+        ?>
+        <br /><br />
+        <h1>Katerina Oskina Art</h1>
+        <h1>Katia Oskina Art</h1>
+        <h1>Kate Oskina Art</h1>
+        <h1>Oskina Art</h1>
+        <h1>KOArt</h1>
     </div>
 
-    <div class="body-content">
+    <div class="container" style="max-width: 800px;">
+        <div class="d-flex flex-row">
+            <?php
+            $i = 0;
+            foreach ($paintings as $painting) {
+                if ($i == 3 || $i == 6) {
+                    echo '</div>';
+                    echo '<div class="d-flex flex-row">';
+                }
+                echo '<div class="d-flex flex-column">';
+                echo Html::img(Yii::$app->request->BaseUrl . '/photos/thumb/' . $painting->mainPhoto->filename, ['class' => 'img-fluid']);
+                echo '</div>';
 
-        <div class="row">
-            <div class="col-lg-4">
-                <h2>Heading</h2>
+                $i++;
+            }
+            ?>
+        </div>
+    </div>
 
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
+    <!--
+    <div class="album text-muted">
+      <div class="container">
+        <div class="row justify-content-center">
+            <?php
+            $i = 0;
+            foreach ($paintings as $painting) {
+                if ($i == 3 || $i == 6) {
+                    echo '</div>';
+                    echo '<div class="row justify-content-center">';
+                }
+                echo '<div class="card">';
+                echo Html::img(Yii::$app->request->BaseUrl . '/photos/thumb/' . $painting->mainPhoto->filename);
+                echo '</div>';
 
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/doc/">Yii Documentation &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/forum/">Yii Forum &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/extensions/">Yii Extensions &raquo;</a></p>
-            </div>
+                $i++;
+            }
+            ?>
+        </div>
+        </div>
         </div>
 
+        
+    </div>
+    -->
+    <br /><br /><br />
+    <div class="row justify-content-center">
+        <?php
+        echo LinkPager::widget([
+            'pagination' => $pagination,
+            'options' => [
+                'class' => 'pagination',
+            ],
+            'linkContainerOptions' => ['class' => 'page-item'],
+            'linkOptions' => ['class' => 'page-link'],
+            'disabledListItemSubTagOptions' => ['class' => 'page-link'],
+        ]);
+        ?>
     </div>
 </div>

@@ -7,6 +7,20 @@ body {
     margin-bottom: 60px;
 }
 
+.black-link,
+.black-link:hover {
+    text-decoration: none;
+    color: #000000;
+}
+
+.flex-column {
+    max-width: 260px;
+}
+
+.img-fluid {
+    margin: 5px;
+}
+
 .container {
     max-width: 1500px;
 }
