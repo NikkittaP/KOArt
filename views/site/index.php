@@ -24,14 +24,14 @@ $this->title = 'Katia Oskina Art';
         <h1>KOArt</h1>
     </div>
 
-    <div class="container" style="max-width: 800px;">
-        <div class="d-flex flex-row">
+    <div class="container-fluid" style="max-width: 800px;">
+        <div class="d-flex flex-row flex-wrap justify-content-center">
             <?php
             $i = 0;
             foreach ($paintings as $painting) {
                 if ($i == 3 || $i == 6) {
                     echo '</div>';
-                    echo '<div class="d-flex flex-row">';
+                    echo '<div class="d-flex flex-row flex-wrap justify-content-center">';
                 }
                 echo '<div class="d-flex flex-column">';
                 echo Html::img(Yii::$app->request->BaseUrl . '/photos/thumb/' . $painting->mainPhoto->filename, ['class' => 'img-fluid']);
