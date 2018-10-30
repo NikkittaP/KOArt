@@ -130,3 +130,10 @@ a.desc:after {
 .nav>li>form>button.logout:focus {
     outline: none;
 }
+
+.custom-control-label::before,
+.custom-control-label::after {
+    top: .5rem;
+    width: 2rem;
+    height: 2rem;
+}

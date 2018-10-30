@@ -56,6 +56,9 @@ class PhotosController extends Controller
             return $this->redirect(['paintings/index']);
         }
 
+        $photoMain = Photos::find()->where(['painting_id' => $painting_id, 'isMain' => 1])->one();
+        $photoModel->isMain = $photoMain->id;
+
         return $this->render('selectmain', [
             'paintingModel' => $paintingModel,
             'photos' => $photos,
