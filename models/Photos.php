@@ -16,9 +16,8 @@ use Yii;
  */
 class Photos extends \yii\db\ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
+    public $selected;
+
     public static function tableName()
     {
         return 'photos';
@@ -34,6 +33,7 @@ class Photos extends \yii\db\ActiveRecord
             [['painting_id', 'isMain'], 'integer'],
             [['filename'], 'string', 'max' => 255],
             [['painting_id'], 'exist', 'skipOnError' => true, 'targetClass' => Paintings::className(), 'targetAttribute' => ['painting_id' => 'id']],
+            [['selected'], 'safe'],
         ];
     }
 
@@ -47,6 +47,7 @@ class Photos extends \yii\db\ActiveRecord
             'painting_id' => 'Картина',
             'filename' => 'Название файла',
             'isMain' => '',
+            'selected' => '',
         ];
     }
 

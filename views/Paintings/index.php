@@ -148,7 +148,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         '<br />'.
                         Html::a('Добавить фото', ['photos/add', 'painting_id' => $model->id], ['class' => 'profile-link']).
                         '<br />'.
-                        Html::a('Выбрать основное фото', ['photos/selectmain', 'painting_id' => $model->id], ['class' => 'profile-link']);
+                        Html::a('Выбрать основное фото', ['photos/selectmain', 'painting_id' => $model->id], ['class' => 'profile-link']).
+                        '<br />'.
+                        Html::a('Удалить фото', ['photos/delete', 'painting_id' => $model->id], ['class' => 'profile-link']);
             }
         ],
     ],

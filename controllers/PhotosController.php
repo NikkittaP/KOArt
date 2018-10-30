@@ -14,18 +14,6 @@ use Imagine\Image\Box;
 
 class PhotosController extends Controller
 {
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
-
     public function actionAdd($painting_id)
     {
         $paintingModel = Paintings::find()->where(['id' => $painting_id])->one();
@@ -60,6 +48,36 @@ class PhotosController extends Controller
         $photoModel->isMain = $photoMain->id;
 
         return $this->render('selectmain', [
+            'paintingModel' => $paintingModel,
+            'photos' => $photos,
+            'photoModel' => $photoModel,
+        ]);
+    }
+
+    public function actionDelete($painting_id)
+    {
+        $paintingModel = Paintings::find()->where(['id' => $painting_id])->one();
+        $photos = Photos::find()->where(['painting_id' => $painting_id])->all();
+        $photoModel = new Photos();
+
+        if (isset($_POST['Photos']))
+        {
+            $ids = $_POST['Photos']['selected'];
+            foreach($photos as $photo)
+            {
+                if (in_array($photo->id, $ids))
+                {
+                    unlink(Yii::getAlias('@app') . '/web/photos/thumb/' . $photo->filename);
+                    unlink(Yii::getAlias('@app') . "/web/photos/".$photo->filename);
+
+                    $photo->delete();
+                }
+            }
+
+            return $this->redirect(['photos/selectmain', 'painting_id' => $paintingModel->id]);
+        }
+
+        return $this->render('delete', [
             'paintingModel' => $paintingModel,
             'photos' => $photos,
             'photoModel' => $photoModel,
