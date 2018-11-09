@@ -18,10 +18,6 @@ $this->title = 'Katia Oskina Art';
         ?>
         <br /><br />
         <h1>Katerina Oskina Art</h1>
-        <h1>Katia Oskina Art</h1>
-        <h1>Kate Oskina Art</h1>
-        <h1>Oskina Art</h1>
-        <h1>KOArt</h1>
     </div>
 
     <div class="container justify-content-center" style="width:80%">
