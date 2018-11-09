@@ -3,6 +3,7 @@ use kartik\icons\Icon;
 use yii\helpers\Html;
 use yii\widgets\LinkPager;
 use yii\helpers\VarDumper;
+use app\models\Materials;
 
 /* @var $this yii\web\View */
 
@@ -33,11 +34,35 @@ $this->title = 'Katia Oskina Art';
         ]); 
         
         foreach ($paintings as $painting) {
+            $size_string = '';
+            if (is_numeric($painting->width) && is_numeric($painting->height))
+                $size_string =$painting->width.'x'.$painting->height.'<br />';
+
+            $materials = $painting->materialsToPaintings;
+            $material_string = '';
+            foreach ($materials as $material) {
+                $material_string .= Materials::find()->where(['id' => $material->material_id])->one()->name.', ';
+            }
+            $material_string = substr($material_string, 0, -2);
+
+            $ground_string = '';
+            if (is_numeric($painting->ground_id))
+                $ground_string = ' на '.$painting->ground->name;
+
             echo '
             <div class="masonry-item">';
             echo '
             '.Html::a('
+            <div class="painting-group">
                 '.Html::img(Yii::$app->request->BaseUrl . '/photos/thumb/' . $painting->mainPhoto->filename, []).'
+                <div class="painting-overlay">
+                    <h3>'.$painting->name.'</h3>
+                    <p>
+                    '.$size_string.'
+                    '.$material_string.$ground_string.'
+                    </p>
+                </div>
+            </div>
             ', ['paintings/show', 'id' => $painting->id], ['class' => 'black-link']);
             echo '
             </div>';

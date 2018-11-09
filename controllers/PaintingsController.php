@@ -258,7 +258,7 @@ class PaintingsController extends Controller
                         if (!in_array($selectedID, $savedIDsArray)) {
                             $artGenresToPaintingModel = new ArtGenresToPainting();
                             $artGenresToPaintingModel->painting_id = $model->id;
-                            $artGenresToPaintingModel->art_genre_id = $artGenreModel->id;
+                            $artGenresToPaintingModel->art_genre_id = $selectedID;
                             $artGenresToPaintingModel->save();
                         }
                     }
@@ -297,7 +297,7 @@ class PaintingsController extends Controller
                         if (!in_array($selectedID, $savedIDsArray)) {
                             $artStylesToPaintingModel = new ArtStylesToPainting();
                             $artStylesToPaintingModel->painting_id = $model->id;
-                            $artStylesToPaintingModel->art_style_id = $artStyleModel->id;
+                            $artStylesToPaintingModel->art_style_id = $selectedID;
                             $artStylesToPaintingModel->save();
                         }
                     }
@@ -336,7 +336,7 @@ class PaintingsController extends Controller
                         if (!in_array($selectedID, $savedIDsArray)) {
                             $materialsToPaintingModel = new MaterialsToPainting();
                             $materialsToPaintingModel->painting_id = $model->id;
-                            $materialsToPaintingModel->material_id = $materialModel->id;
+                            $materialsToPaintingModel->material_id = $selectedID;
                             $materialsToPaintingModel->save();
                         }
                     }
