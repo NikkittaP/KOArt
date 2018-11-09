@@ -56,7 +56,7 @@ class SiteController extends Controller
         $pagination = new Pagination(['totalCount' => $count]);
         $pagination->setPageSize(9);
         $paintings = $query->offset($pagination->offset)
-            ->limit(9)
+            ->limit(15)
             ->all();
 
         return $this->render('index',[
