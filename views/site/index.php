@@ -24,23 +24,31 @@ $this->title = 'Katia Oskina Art';
         <h1>KOArt</h1>
     </div>
 
-    <div class="container-fluid" style="max-width: 1250px;">
-        <div class="d-flex flex-row flex-wrap justify-content-center">
-            <?php
-            $i = 0;
-            foreach ($paintings as $painting) {
-                if ($i == 4 || $i == 8) {
-                    echo '</div>';
-                    echo '<div class="d-flex flex-row flex-wrap justify-content-center">';
-                }
-                echo '<div class="d-flex flex-column">';
-                echo Html::a(Html::img(Yii::$app->request->BaseUrl . '/photos/thumb/' . $painting->mainPhoto->filename, ['class' => 'img-fluid']), ['paintings/show', 'id' => $painting->id], ['style' => 'margin: 5px;', 'class' => 'black-link']);
-                echo '</div>';
-
-                $i++;
-            }
-            ?>
-        </div>
+    <div class="container justify-content-center" style="width:80%">
+        <?php
+        \yii2masonry\yii2masonry::begin([
+        'clientOptions' => [
+            'columnWidth' => '.masonry-grid-sizer',
+            'itemSelector' => '.masonry-item',
+            'percentPosition' => true,
+            'initLayout' => false,
+            'resize' => false
+        ]
+        ]); 
+        
+        foreach ($paintings as $painting) {
+            echo '
+            <div class="masonry-item">';
+            echo '
+            '.Html::a('
+                '.Html::img(Yii::$app->request->BaseUrl . '/photos/thumb/' . $painting->mainPhoto->filename, []).'
+            ', ['paintings/show', 'id' => $painting->id], ['class' => 'black-link']);
+            echo '
+            </div>';
+        }
+        
+        \yii2masonry\yii2masonry::end();
+        ?>
     </div>
 
     <br /><br /><br />

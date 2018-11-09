@@ -26,7 +26,7 @@ SimpleAsset::register($this);
 </head>
 <body>
 <?php $this->beginBody() ?>
-
+<div class="d-flex flex-column h-100">
     <?php
     NavBar::begin([
         'brandLabel' => Yii::$app->name,
@@ -60,28 +60,30 @@ SimpleAsset::register($this);
     NavBar::end();
     ?>
 
-    <div class="container">
-        <br />
-        <?= Breadcrumbs::widget([
-            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-        ]) ?>
-        <?= Alert::widget() ?>
-        <?= $content ?>
-    </div>
+    <div class="d-flex flex-column flex-grow-1">
+        <div class="container h-100 flex-grow-1">
+            <br />
+            <?= Breadcrumbs::widget([
+                'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
+            ]) ?>
+            <?= Alert::widget() ?>
+            <?= $content ?>
+        </div>
 
-    <footer class="footer">
-        <div class="container">
-            <p class="float-left">&copy; Katia Oskina Art 
+        <div class="footer text-center">
+            <h5>&copy; Katia Oskina Art 
                 <?php
                 $text = (date('Y')=="2018") ? date('Y') : "2018-".date('Y');
                 echo $text;
                 ?>
-            </p>
+            </h5>
 
+            <!--
             <p class="float-right"><?= Yii::powered() ?></p>
+            -->
         </div>
-    </footer>
-
+    </div>
+</div>
 <?php $this->endBody() ?>
 </body>
 </html>
