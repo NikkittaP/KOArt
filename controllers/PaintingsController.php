@@ -71,6 +71,9 @@ class PaintingsController extends Controller
         $model = new Paintings();
 
         if ($model->load(Yii::$app->request->post())) {
+            if ($model->date != '' && strlen($model->date) == 7) {
+                $model->date .= '-00';
+            }
             if ($model->save()) {
                 // Размеры картины
                 if ($model->size_horizontal != '') {
@@ -202,6 +205,10 @@ class PaintingsController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post())) {
+            if ($model->date != '' && strlen($model->date) == 7) {
+                $model->date .= '-00';
+            }
+
             if ($model->save()) {
                 // Размеры картины
                 if ($model->size_horizontal != '') {
@@ -365,8 +372,7 @@ class PaintingsController extends Controller
 
                 // Комментарии автора
                 $authorComments = AuthorComments::find()->where(['painting_id' => $model->id])->one();
-                if ($authorComments === null)
-                {
+                if ($authorComments === null) {
                     $authorComments = new AuthorComments();
                     $authorComments->painting_id = $model->id;
                 }

@@ -10,7 +10,25 @@ if (is_numeric($painting->width) && is_numeric($painting->height))
     $size = ' ('.$painting->width.'x'.$painting->height.')';
 $date = '';
 if ($painting->date !== null)
-    $date = ', '.Yii::$app->formatter->format($painting->date, 'date');
+{
+    $str = substr($painting->date, 0, 7);
+    $year = explode('-', $str)[0];
+    $month = explode('-', $str)[1];
+    if ($month=='01') $month = 'Январь';
+    if ($month=='02') $month = 'Феварль';
+    if ($month=='03') $month = 'Март';
+    if ($month=='04') $month = 'Апрель';
+    if ($month=='05') $month = 'Май';
+    if ($month=='06') $month = 'Июнь';
+    if ($month=='07') $month = 'Июль';
+    if ($month=='08') $month = 'Август';
+    if ($month=='09') $month = 'Сентябрь';
+    if ($month=='10') $month = 'Октябрь';
+    if ($month=='11') $month = 'Ноябрь';
+    if ($month=='12') $month = 'Декабрь';
+    $date = ', '.$month.' '.$year;
+}
+
 $this->title = $painting->name.$size.$date;
 ?>
 <div class="container">

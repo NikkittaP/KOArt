@@ -35,7 +35,10 @@ $this->params['breadcrumbs'][] = $this->title;
         [
             'attribute' => 'date',
             'headerOptions'=>['style'=>'vertical-align: middle;'],
-            'contentOptions' => ['style' => 'width: 100px;'],
+            'contentOptions' => ['style' => 'width: 100px;text-align:center;'],
+            'value' => function ($model) {
+                return substr($model->date, 0, 7);
+            }
         ],
         [
             'attribute' => 'coverPhoto',

@@ -203,7 +203,10 @@ use app\models\Paintings;
                 'options' => ['placeholder' => 'Дата создания ...'],
                 'pluginOptions' => [
                     'autoclose'=>true,
-                    'format' => 'yyyy-mm-dd'
+                    'startView'=>'year',
+                    'minViewMode'=>'months',
+                    'format' => 'yyyy-mm',
+                    'endDate' => '+0d'
                 ]
             ]);
             ?>
