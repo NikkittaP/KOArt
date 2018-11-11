@@ -41,13 +41,15 @@ $this->params['breadcrumbs'][] = $this->title;
             'attribute' => 'coverPhoto',
             'headerOptions'=>['style'=>'vertical-align: middle;'],
             'contentOptions' => ['style' => 'width: 100px;'],
-            'format' => 'html',
+            'format' => 'raw',
             'value' => function ($model) {
                 if ($model->mainPhoto->filename === null)
                     return null;
                 
-                return Html::img(Yii::$app->request->BaseUrl . '/photos/thumb/' . $model->mainPhoto->filename,
-                    ['width' => '100px']);
+                return Html::a(
+                    Html::img(Yii::$app->request->BaseUrl . '/photos/thumb/' . $model->mainPhoto->filename,
+                    ['width' => '100px']),
+                    ['paintings/show', 'id' => $model->id], ['class' => 'black-link', 'target' => '_blank']);
             },
         ],
         [
