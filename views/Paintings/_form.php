@@ -98,6 +98,7 @@ use app\models\Paintings;
                 ],
                 'pluginOptions' => [
                     'tags' => true,
+                    'tokenSeparators' => [','],
                     'maximumInputLength' => 30
                 ],
             ]);
@@ -111,6 +112,7 @@ use app\models\Paintings;
                 'options' => ['placeholder' => 'Стиль картины ...', 'multiple' => true],
                 'pluginOptions' => [
                     'tags' => true,
+                    'tokenSeparators' => [','],
                     'maximumInputLength' => 30
                 ],
             ]);
@@ -123,7 +125,7 @@ use app\models\Paintings;
                 'options' => ['placeholder' => 'Основа картины ...'],
                 'pluginOptions' => [
                     'tags' => true,
-                    'tokenSeparators' => [',', ' '],
+                    'tokenSeparators' => [','],
                     'maximumInputLength' => 30
                 ],
             ]);
@@ -137,6 +139,7 @@ use app\models\Paintings;
                 'options' => ['placeholder' => 'Использованные материалы ...', 'multiple' => true],
                 'pluginOptions' => [
                     'tags' => true,
+                    'tokenSeparators' => [','],
                     'maximumInputLength' => 30
                 ],
             ]);
