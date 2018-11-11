@@ -63,7 +63,8 @@ class Paintings extends \yii\db\ActiveRecord
     {
         return [
             [['author_id', 'name'], 'required'],
-            [['author_id', 'width', 'height', 'ground_id'], 'integer'],
+            [['author_id', 'ground_id'], 'integer'],
+            [['width', 'height'], 'number'],
             [['description'], 'string'],
             [['date', 'datetime_add', 'datetime_update'], 'safe'],
             [['latitude', 'longitude'], 'number'],
@@ -84,8 +85,8 @@ class Paintings extends \yii\db\ActiveRecord
             'author_id' => 'Автор',
             'name' => 'Название',
             'description' => 'Описание',
-            'width' => 'Ширина',
-            'height' => 'Высота',
+            'width' => 'Ширина, см',
+            'height' => 'Высота, см',
             'ground_id' => 'Основа',
             'shopURL' => 'Ссылка в магазин',
             'date' => 'Дата создания',
@@ -101,7 +102,7 @@ class Paintings extends \yii\db\ActiveRecord
             'artStyleName' => 'Стиль',
             'materials' => 'Материалы',
             'price' => 'Стоимость',
-            'size' => 'Размер (ШxВ, мм)',
+            'size' => 'Размер (ШxВ, см)',
             'authorComments_comments' => 'Комментарии автора',
             'authorComments_material_costs' => 'Затраты материалов',
             'authorComments_time_costs' => 'Затраты времени'

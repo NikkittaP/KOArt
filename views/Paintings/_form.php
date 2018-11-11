@@ -71,12 +71,12 @@ use app\models\Paintings;
 
             <?php
             echo $form->field($model, 'width')->
-            input('number', ['min'=>1, 'max'=> 1000, 'step'=>1, 'placeholder'=>'Ширина от 1 до 1000']);
+            input('number', ['min'=>1, 'max'=> 1000, 'step'=>'any', 'placeholder'=>'Ширина от 1 до 1000']);
             ?>
 
             <?php
             echo $form->field($model, 'height')->
-            input('number', ['min'=>1, 'max'=> 1000, 'step'=>1, 'placeholder'=>'Высота от 1 до 1000']);
+            input('number', ['min'=>1, 'max'=> 1000, 'step'=>'any', 'placeholder'=>'Высота от 1 до 1000']);
             ?>
         </div>
     </div>
