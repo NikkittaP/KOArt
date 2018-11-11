@@ -103,6 +103,7 @@ class Paintings extends \yii\db\ActiveRecord
             'artStyleName' => 'Стиль',
             'materials' => 'Материалы',
             'price' => 'Стоимость',
+            'size' => 'Размер (ШxВ, см)',
             'size_horizontal' => '[Альбомная ориентация] Размер (ШxВ, см)',
             'size_vertical' => '[Портретная ориентация] Размер (ШxВ, см)',
             'authorComments_comments' => 'Комментарии автора',
