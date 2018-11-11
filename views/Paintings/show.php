@@ -18,8 +18,7 @@ $this->title = $painting->name.$size.$date;
     <h1><?= Html::encode($this->title) ?></h1>
     <br /><br />
 
-    <div class="row">
-    <div class="col-lg-12">
+    <div class="container justify-content-center" style="width:80%">
         <?php
         echo newerton\fancybox3\FancyBox::widget([
             'target' => '[data-fancybox]',
@@ -83,25 +82,32 @@ $this->title = $painting->name.$size.$date;
             ]
         ]);
 
+        \yii2masonry\yii2masonry::begin([
+        'clientOptions' => [
+            'columnWidth' => '.masonry-grid-sizer',
+            'itemSelector' => '.masonry-item',
+            'percentPosition' => true,
+            'initLayout' => false,
+            'resize' => false
+        ]
+        ]); 
+        
         $photos = Photos::find()->where(['painting_id' => $painting->id])->orderBy(['isMain' => SORT_DESC])->all();
-        $items = [];
         foreach ($photos as $photo) {
-            echo Html::a(Html::img(Url::to('@web/photos/thumb/')  . $photo->filename), Url::to('@web/photos/') . $photo->filename, ['data-fancybox' => 'gallery']);
-
-        /*
-            $imagine = Image::getImagine();
-            $image = $imagine->open(Yii::getAlias('@app') . '/web/photos/' . $photo->filename);
-            $items[] = [
-                'image' => Url::to('@web/photos/') . $photo->filename,
-                'title' => $painting->name,
-                'caption' => $painting->name,
-                'size' => $image->getSize()->getWidth().'x'.$image->getSize()->getHeight(),
-                'thumb' => Url::to('@web/photos/thumb/')  . $photo->filename
-            ];
-            */
+            echo '
+            <div class="masonry-item">';
+            echo '
+            '.Html::a('
+            <div class="painting-group">
+                '.Html::img(Url::to('@web/photos/thumb/')  . $photo->filename).'
+            </div>
+            ', Url::to('@web/photos/') . $photo->filename, ['class' => 'black-link', 'data-fancybox' => 'gallery']);
+            echo '
+            </div>';
         }
+        
+        \yii2masonry\yii2masonry::end();
         ?>
-    </div>
     </div>
 
     <br /><br />
