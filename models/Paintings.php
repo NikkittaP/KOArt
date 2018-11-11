@@ -43,7 +43,8 @@ class Paintings extends \yii\db\ActiveRecord
     public $artStyleName;
     public $materials;
     public $price;
-    public $size;
+    public $size_horizontal;
+    public $size_vertical;
     public $authorComments_comments;
     public $authorComments_material_costs;
     public $authorComments_time_costs;
@@ -71,7 +72,7 @@ class Paintings extends \yii\db\ActiveRecord
             [['name', 'shopURL'], 'string', 'max' => 255],
             [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => Authors::className(), 'targetAttribute' => ['author_id' => 'id']],
             [['ground_id'], 'exist', 'skipOnError' => true, 'targetClass' => Grounds::className(), 'targetAttribute' => ['ground_id' => 'id']],
-            [['coverPhoto', 'coordinates', 'groundName', 'photo_upload', 'artGenreName', 'artStyleName', 'materials', 'price', 'size', 'authorComments_comments', 'authorComments_material_costs', 'authorComments_time_costs'], 'safe'],
+            [['coverPhoto', 'coordinates', 'groundName', 'photo_upload', 'artGenreName', 'artStyleName', 'materials', 'price', 'size_horizontal', 'size_vertical', 'authorComments_comments', 'authorComments_material_costs', 'authorComments_time_costs'], 'safe'],
         ];
     }
 
@@ -102,7 +103,8 @@ class Paintings extends \yii\db\ActiveRecord
             'artStyleName' => 'Стиль',
             'materials' => 'Материалы',
             'price' => 'Стоимость',
-            'size' => 'Размер (ШxВ, см)',
+            'size_horizontal' => '[Альбомная ориентация] Размер (ШxВ, см)',
+            'size_vertical' => '[Портретная ориентация] Размер (ШxВ, см)',
             'authorComments_comments' => 'Комментарии автора',
             'authorComments_material_costs' => 'Затраты материалов',
             'authorComments_time_costs' => 'Затраты времени'

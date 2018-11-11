@@ -42,8 +42,29 @@ use app\models\Paintings;
         </div>
         <div class="card-body">
             <?php
-            $sizesModel = Paintings::find()->select(['width', 'height'])->all();
-            
+            $sizesModelHorizontal = Paintings::find()->select(['width', 'height'])->where(new \yii\db\Expression('`width` >= `height`'))->orderBy('height ASC, width ASC')->all();
+            $sizesHorizontal = [];
+            foreach ($sizesModelHorizontal as $sizeModelHorizontal) {
+                $key = $sizeModelHorizontal->width.'x'.$sizeModelHorizontal->height;
+                $sizesHorizontal[$key] = $key;
+            }
+
+            $sizesModelVertical = Paintings::find()->select(['width', 'height'])->where(new \yii\db\Expression('`width` < `height`'))->orderBy('height ASC, width ASC')->all();
+            $sizesVertical = [];
+            foreach ($sizesModelVertical as $sizeModelVertical) {
+                $key = $sizeModelVertical->width.'x'.$sizeModelVertical->height;
+                $sizesVertical[$key] = $key;
+            }
+
+            echo $form->field($model, 'size_horizontal')->dropdownlist($sizesHorizontal, [
+                'prompt'=>'- Выбрать альбомный размер -'
+            ]);
+            echo '<b>ИЛИ</b><br /><br />';
+            echo $form->field($model, 'size_vertical')->dropdownlist($sizesVertical, [
+                'prompt'=>'- Выбрать портретный размер -'
+            ]);
+            echo '<b>ИЛИ</b><br /><br />';
+            /*
             $sizeCount = [];
             foreach ($sizesModel as $sizeModel) {
                 if (is_numeric($sizeModel->width) && is_numeric($sizeModel->height))
@@ -63,10 +84,7 @@ use app\models\Paintings;
             {
                 $sizes[$key] = $key;
             }
-
-            echo $form->field($model, 'size')->dropdownlist($sizes, [
-                'prompt'=>'- Выбрать размер -'
-            ]);
+            */
             ?>
 
             <?php

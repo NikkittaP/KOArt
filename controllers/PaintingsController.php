@@ -73,9 +73,12 @@ class PaintingsController extends Controller
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save()) {
                 // Размеры картины
-                if ($model->size != '') {
-                    $model->width = explode('x', $model->size)[0];
-                    $model->height = explode('x', $model->size)[1];
+                if ($model->size_horizontal != '') {
+                    $model->width = explode('x', $model->size_horizontal)[0];
+                    $model->height = explode('x', $model->size_horizontal)[1];
+                } else if ($model->size_vertical != '') {
+                    $model->width = explode('x', $model->size_vertical)[0];
+                    $model->height = explode('x', $model->size_vertical)[1];
                 } else {
                     if (is_numeric($model->width) && is_numeric($model->height)) {
                     } else {
@@ -201,9 +204,12 @@ class PaintingsController extends Controller
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save()) {
                 // Размеры картины
-                if ($model->size != '') {
-                    $model->width = explode('x', $model->size)[0];
-                    $model->height = explode('x', $model->size)[1];
+                if ($model->size_horizontal != '') {
+                    $model->width = explode('x', $model->size_horizontal)[0];
+                    $model->height = explode('x', $model->size_horizontal)[1];
+                } else if ($model->size_vertical != '') {
+                    $model->width = explode('x', $model->size_vertical)[0];
+                    $model->height = explode('x', $model->size_vertical)[1];
                 } else {
                     if (is_numeric($model->width) && is_numeric($model->height)) {
                     } else {
