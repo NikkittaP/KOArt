@@ -14,7 +14,7 @@ use yii\db\Expression;
  * @property int $author_id Автор
  * @property string $name Название
  * @property string $description Описание
- * @property int $width Ширина
+ * @property int $width Длина
  * @property int $height Высота
  * @property int $ground_id Основа
  * @property string $shopURL Ссылка в магазин

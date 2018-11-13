@@ -89,7 +89,7 @@ use app\models\Paintings;
 
             <?php
             echo $form->field($model, 'width')->
-            input('number', ['min'=>1, 'max'=> 1000, 'step'=>'any', 'placeholder'=>'Ширина от 1 до 1000']);
+            input('number', ['min'=>1, 'max'=> 1000, 'step'=>'any', 'placeholder'=>'Длина от 1 до 1000']);
             ?>
 
             <?php
