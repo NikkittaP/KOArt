@@ -26,6 +26,24 @@ class PhotosController extends Controller
     {
         $paintingModel = Paintings::find()->where(['id' => $painting_id])->one();
         $photos = Photos::find()->where(['painting_id' => $painting_id])->all();
+
+        if (count($photos) == 0)
+        {
+            Yii::$app->session->setFlash('warning', "Сначала необходимо добавить хотя бы 1 фото");
+            return $this->redirect(['photos/add', 'painting_id' => $painting_id]);
+        }
+        else if (count($photos) == 1)
+        {
+            foreach($photos as $photo)
+            {
+                $photo->isMain = 1;
+                $photo->save();
+            }
+            
+            Yii::$app->session->setFlash('warning', "Единственное фото назначено основным");
+            return $this->redirect(['paintings/index']);
+        }
+
         $photoModel = new Photos();
 
         if (isset($_POST['Photos']))
