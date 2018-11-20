@@ -154,6 +154,7 @@ class PhotosController extends Controller
         return $result;
     }
 
+    /*
     public function actionFiltersource()
     {
         $uploadedDir = Yii::getAlias('@app') . "/web/photos" . "/";
@@ -217,6 +218,7 @@ class PhotosController extends Controller
             closedir($handle);
         }
     }
+    */
 
     protected function findModel($id)
     {
