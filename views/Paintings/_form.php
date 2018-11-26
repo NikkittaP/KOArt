@@ -42,14 +42,14 @@ use app\models\Paintings;
         </div>
         <div class="card-body">
             <?php
-            $sizesModelHorizontal = Paintings::find()->select(['width', 'height'])->where(new \yii\db\Expression('`width` >= `height`'))->orderBy('height ASC, width ASC')->all();
+            $sizesModelHorizontal = Paintings::find()->select(['width', 'height'])->where(new \yii\db\Expression('`width` >= `height`'))->orderBy('width ASC, height ASC')->all();
             $sizesHorizontal = [];
             foreach ($sizesModelHorizontal as $sizeModelHorizontal) {
                 $key = $sizeModelHorizontal->width.'x'.$sizeModelHorizontal->height;
                 $sizesHorizontal[$key] = $key;
             }
 
-            $sizesModelVertical = Paintings::find()->select(['width', 'height'])->where(new \yii\db\Expression('`width` < `height`'))->orderBy('height ASC, width ASC')->all();
+            $sizesModelVertical = Paintings::find()->select(['width', 'height'])->where(new \yii\db\Expression('`width` < `height`'))->orderBy('width ASC, height ASC')->all();
             $sizesVertical = [];
             foreach ($sizesModelVertical as $sizeModelVertical) {
                 $key = $sizeModelVertical->width.'x'.$sizeModelVertical->height;
