@@ -11,7 +11,7 @@ use yii\helpers\Url;
 $this->title = 'Картины';
 $this->params['breadcrumbs'][] = $this->title;
 
-$dataProvider->pagination->pageSize=2;
+//$dataProvider->pagination->pageSize=2;
 ?>
 <div class="paintings-index">
 
