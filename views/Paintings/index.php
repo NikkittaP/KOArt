@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?=GridView::widget([
     'dataProvider' => $dataProvider,
-    //'filterModel' => $searchModel,
+    'filterModel' => $searchModel,
     'layout' => "{summary}\n{pager}\n{items}\n{pager}",
     'formatter' => ['class' => 'yii\i18n\Formatter','nullDisplay' => '&ndash;'],
     'columns' => [
@@ -86,6 +86,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'attribute' => 'ground_id',
             'headerOptions'=>['style'=>'vertical-align: middle;'],
             'contentOptions' => ['style' => 'width: 70px;'],
+            'filter'=>false,
             'value' => function ($model) {
                 return $model->ground->name;
             },

@@ -59,24 +59,15 @@ class PaintingsSearch extends Paintings
         }
 
         // grid filtering conditions
-        /*
+        
         $query->andFilterWhere([
             'id' => $this->id,
-            'author_id' => $this->author_id,
             'width' => $this->width,
             'height' => $this->height,
-            'ground_id' => $this->ground_id,
-            'date' => $this->date,
-            'latitude' => $this->latitude,
-            'longitude' => $this->longitude,
-            'datetime_add' => $this->datetime_add,
-            'datetime_update' => $this->datetime_update,
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name])
-            ->andFilterWhere(['like', 'description', $this->description])
-            ->andFilterWhere(['like', 'shopURL', $this->shopURL]);
-        */
+            ->andFilterWhere(['like', 'date', $this->date]);
 
         return $dataProvider;
     }
