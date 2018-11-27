@@ -11,7 +11,7 @@ use yii\helpers\Url;
 $this->title = 'Картины';
 $this->params['breadcrumbs'][] = $this->title;
 
-//$dataProvider->pagination->pageSize=2;
+$dataProvider->pagination->pageSize=2;
 ?>
 <div class="paintings-index">
 
@@ -25,6 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?=GridView::widget([
     'dataProvider' => $dataProvider,
     //'filterModel' => $searchModel,
+    'layout' => "{summary}\n{pager}\n{items}\n{pager}",
     'formatter' => ['class' => 'yii\i18n\Formatter','nullDisplay' => '&ndash;'],
     'columns' => [
         [

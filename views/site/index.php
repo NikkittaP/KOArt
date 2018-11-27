@@ -21,20 +21,6 @@ $this->title = 'Katia Oskina Art';
         <h1>Katerina Oskina Art</h1>
     </div>
 
-    <div class="row justify-content-center">
-        <?php
-        echo LinkPager::widget([
-            'pagination' => $pagination,
-            'options' => [
-                'class' => 'pagination',
-            ],
-            'linkContainerOptions' => ['class' => 'page-item'],
-            'linkOptions' => ['class' => 'page-link'],
-            'disabledListItemSubTagOptions' => ['class' => 'page-link'],
-        ]);
-        ?>
-    </div>
-
     <div class="container justify-content-center" style="width:80%">
         <?php
         \yii2masonry\yii2masonry::begin([
