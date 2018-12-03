@@ -4,6 +4,8 @@ use kartik\grid\GridView;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
+use app\models\Paintings;
+
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\search\ArtGenresSearchPaintings */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -16,7 +18,57 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="paintings-index">
 
     <h1><?=Html::encode($this->title)?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+
+    <br />
+    <?php
+    $sizesModelHorizontal = Paintings::find()->select(['width', 'height'])->where(new \yii\db\Expression('`width` >= `height`'))->orderBy('width ASC, height ASC')->all();
+    $sizesHorizontal = [];
+    foreach ($sizesModelHorizontal as $sizeModelHorizontal) {
+        $key = $sizeModelHorizontal->width.'x'.$sizeModelHorizontal->height;
+        if (!array_key_exists($key, $sizesHorizontal))
+            $sizesHorizontal[$key] = 1;
+        else 
+            $sizesHorizontal[$key]++;
+    }
+
+    $sizesModelVertical = Paintings::find()->select(['width', 'height'])->where(new \yii\db\Expression('`width` < `height`'))->orderBy('width ASC, height ASC')->all();
+    $sizesVertical = [];
+    foreach ($sizesModelVertical as $sizeModelVertical) {
+        $key = $sizeModelVertical->width.'x'.$sizeModelVertical->height;
+        if (!array_key_exists($key, $sizesVertical))
+            $sizesVertical[$key] = 1;
+        else 
+            $sizesVertical[$key]++;
+    }
+    ?>
+    <h5>Количество картин по размерам:</h5>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Альбомная ориентация</th>
+                <th>Портретная ориентация</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                <?php
+                foreach ($sizesHorizontal as $key=>$value) {
+                    echo '[<b>'.$value.'</b>] '.$key.'<br />';
+                }
+                ?>
+                </td>
+                <td>
+                <?php
+                foreach ($sizesVertical as $key=>$value) {
+                    echo '[<b>'.$value.'</b>] '.$key.'<br />';
+                }
+                ?>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
 
     <p>
         <?=Html::a('Добавить картину', ['create'], ['class' => 'btn btn-success'])?>
