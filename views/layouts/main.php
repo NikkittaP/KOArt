@@ -39,6 +39,7 @@ SimpleAsset::register($this);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav  ml-auto'],
         'items' => [
+            ['label' => 'Статистика', 'url' => ['/paintings/stats']],
             ['label' => 'Картины', 'url' => ['/paintings/index']],
            
             /*

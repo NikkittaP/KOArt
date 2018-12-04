@@ -52,6 +52,72 @@ class PaintingsController extends Controller
         ]);
     }
 
+    public function actionStats()
+    {
+        $sizesModelHorizontal = Paintings::find()->select(['width', 'height'])->where(new \yii\db\Expression('`width` >= `height`'))->orderBy('width ASC, height ASC')->all();
+        $sizesHorizontal = [];
+        foreach ($sizesModelHorizontal as $sizeModelHorizontal) {
+            $key = $sizeModelHorizontal->width.'x'.$sizeModelHorizontal->height;
+            if (!array_key_exists($key, $sizesHorizontal))
+                $sizesHorizontal[$key] = 1;
+            else 
+                $sizesHorizontal[$key]++;
+        }
+    
+        $sizesModelVertical = Paintings::find()->select(['width', 'height'])->where(new \yii\db\Expression('`width` < `height`'))->orderBy('width ASC, height ASC')->all();
+        $sizesVertical = [];
+        foreach ($sizesModelVertical as $sizeModelVertical) {
+            $key = $sizeModelVertical->width.'x'.$sizeModelVertical->height;
+            if (!array_key_exists($key, $sizesVertical))
+                $sizesVertical[$key] = 1;
+            else 
+                $sizesVertical[$key]++;
+        }
+
+        $sizesHorizontalGroups = [];
+        foreach ($sizesHorizontal as $key=>$value) {
+            $width = explode('x', $key)[0];
+            for($i=0; $i<1000; $i=$i+10)
+            {
+                if ($width >= $i && $width < $i+10)
+                {
+                    $groupKey = $i.'-'.($i+10);
+                    if (!array_key_exists($groupKey, $sizesHorizontalGroups))
+                        $sizesHorizontalGroups[$groupKey] = 0;
+
+                    $sizesHorizontalGroups[$groupKey] += $value;
+
+                    break;
+                }
+            }
+        }
+
+        $sizesVerticalGroups = [];
+        foreach ($sizesVertical as $key=>$value) {
+            $width = explode('x', $key)[0];
+            for($i=0; $i<1000; $i=$i+10)
+            {
+                if ($width >= $i && $width < $i+10)
+                {
+                    $groupKey = $i.'-'.($i+10);
+                    if (!array_key_exists($groupKey, $sizesVerticalGroups))
+                        $sizesVerticalGroups[$groupKey] = 0;
+
+                    $sizesVerticalGroups[$groupKey] += $value;
+
+                    break;
+                }
+            }
+        }
+
+        return $this->render('stats', [
+            'sizesHorizontal' => $sizesHorizontal,
+            'sizesHorizontalGroups' => $sizesHorizontalGroups,
+            'sizesVertical' => $sizesVertical,
+            'sizesVerticalGroups' => $sizesVerticalGroups,
+        ]);
+    }
+
     public function actionShow($id)
     {
         return $this->render('show', [
