@@ -65,9 +65,15 @@ $config = [
             // cookie/session, so removing the prefix immediately returns to English.
             'enableLanguagePersistence' => false,
             'rules' => [
+                '' => 'site/index',
                 'about' => 'site/about',
                 'contact' => 'site/contact',
                 'login' => 'site/login',
+                'series/<id:\d+>' => 'series/show',
+                // Any single-segment slug maps to a section page; SiteController
+                // 404s unknown slugs. Must stay AFTER the named routes above so
+                // about/contact/login/series win first.
+                '<slug:[a-z0-9-]+>' => 'site/section',
                 '<controller:\w+>/<action:\w+>/<id:\d+>/<page:\d+>/<per-page:\d+>' => '<controller>/<action>',
                 '<controller:\w+>/<id:\d+>' => '<controller>/view',
                 '<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',

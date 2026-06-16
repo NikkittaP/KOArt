@@ -27,6 +27,7 @@ class Sections extends \yii\db\ActiveRecord
         return [
             [['slug', 'title'], 'required'],
             [['sort'], 'integer'],
+            [['description'], 'string'],
             [['slug'], 'string', 'max' => 64],
             [['title'], 'string', 'max' => 128],
             [['slug'], 'unique'],
@@ -39,6 +40,7 @@ class Sections extends \yii\db\ActiveRecord
             'id' => 'ID',
             'slug' => 'Slug (в URL)',
             'title' => 'Название',
+            'description' => 'Описание (интро раздела)',
             'sort' => 'Порядок',
         ];
     }

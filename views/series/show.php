@@ -1,78 +1,63 @@
 <?php
+
+/**
+ * Series "blog" detail page (Phase 3 port of design_mockups_v2/series/*.html).
+ * Back link to the parent section, title + meta line, series description,
+ * then full-width images with per-work descriptions interleaved as text
+ * blocks (only when a work actually has a description).
+ *
+ * @var \yii\web\View $this
+ * @var \app\models\Series $series
+ * @var \app\models\Paintings[] $paintings
+ */
+
+use app\helpers\PaintingPresenter;
+use app\helpers\RichText;
 use yii\helpers\Html;
-use yii\widgets\LinkPager;
+use yii\helpers\Url;
 
-use kartik\icons\Icon;
-
-use app\models\Materials;
-
-/* @var $this yii\web\View */
-
-//$this->title = \Yii::t('app', 'Серия работ').' "'.$series->name.'"';
 $this->title = $series->name;
-$this->params['breadcrumbs'][] = $this->title;
+
+$section = $series->section;
+$backUrl = $section
+    ? ($section->slug === 'artworks' ? Url::to(['/']) : Url::to(['site/section', 'slug' => $section->slug]))
+    : Url::to(['/']);
+$backLabel = $section ? $section->title : 'Back';
+
+$metaLine = PaintingPresenter::seriesMetaLine($series, $paintings);
+$contactEmail = Yii::$app->params['contactEmail'];
 ?>
+<a class="back" href="<?= $backUrl ?>">← <?= Html::encode($backLabel) ?></a>
+<header class="shead pj">
+    <h1><?= Html::encode($series->name) ?></h1>
+    <?php if ($metaLine): ?><p class="meta"><?= Html::encode($metaLine) ?></p><?php endif; ?>
+</header>
 
-<div class="container">
-    <h1><?=Html::encode($this->title)?></h1>
+<?php if ($series->description): ?>
+    <div class="series-intro"><?= RichText::purify($series->description) ?></div>
+<?php endif; ?>
 
-    <p class="text-justify">
-        <?=Html::encode($series->description);?>
-    </p>
-
-    <section class="tiles">
+<div class="blogflow">
+    <?php foreach ($paintings as $p): ?>
         <?php
-        foreach ($paintings as $painting) {
-            $styleNum = 8;
-        
-            $size_string = '';
-            if (is_numeric($painting->width) && is_numeric($painting->height))
-                $size_string =$painting->width.'x'.$painting->height;
-
-            $materials = $painting->materialsToPaintings;
-            $material_string = '';
-            foreach ($materials as $material) {
-                $material_string .= Materials::find()->where(['id' => $material->material_id])->one()->name.', ';
-            }
-            $material_string = substr($material_string, 0, -2);
-
-            $ground_string = '';
-            if (is_numeric($painting->ground_id))
-                $ground_string = ' на '.$painting->ground->name;
-
-            echo '
-            <article class="style'.$styleNum.'">';
-            echo '<span class="image2">';
-            echo Html::img(Yii::$app->request->BaseUrl . '/paintings_photo/thumb_squared/' . $painting->mainPhoto->filename, []);
-            echo '</span>';
-            echo '
-            '.Html::a('', ['paintings/show', 'id' => $painting->id]);
-            /*
-            echo '
-            <br />
-            <span>'.$painting->name.', '.$size_string.'
-            <br />
-            '.$material_string.$ground_string.'</span>
-            */
-            echo '</article>';
+        $lg = PaintingPresenter::photoUrl($p, 'lg') ?: PaintingPresenter::photoUrl($p, 'sm');
+        $mat = PaintingPresenter::materialsLabel($p);
+        $year = PaintingPresenter::yearLabel($p);
+        $size = PaintingPresenter::sizeLabel($p);
+        $descPlain = PaintingPresenter::descPlain($p);
+        if (!$lg) {
+            continue;
         }
         ?>
-    </section>
+        <figure data-full="<?= Html::encode($lg) ?>" data-title="<?= Html::encode($p->name) ?>" data-mat="<?= Html::encode($mat) ?>" data-year="<?= Html::encode($year) ?>" data-size="<?= Html::encode($size) ?>" data-desc="<?= Html::encode($descPlain) ?>">
+            <img src="<?= Html::encode($lg) ?>" alt="<?= Html::encode($p->name) ?>" loading="lazy">
+        </figure>
+        <?php if ($p->description): ?>
+            <div class="blogtext"><?= RichText::purify($p->description) ?></div>
+        <?php endif; ?>
+    <?php endforeach; ?>
+</div>
 
-    <br /><br /><br />
-    <div style="text-align:center;">
-        <?php
-        echo LinkPager::widget([
-            'pagination' => $pagination,
-            'firstPageLabel' => true,
-            'lastPageLabel' => true,
-            'options' => [
-                'class' => 'pagination',
-            ],
-            'linkContainerOptions' => ['class' => 'page-item'],
-            'linkOptions' => ['class' => 'page-link'],
-            'disabledListItemSubTagOptions' => ['class' => 'page-link'],
-        ]);
-        ?>
-    </div>
+<div class="series-foot">
+    <a class="inquire" href="mailto:<?= Html::encode($contactEmail) ?>">Enquire about prints &amp; licensing</a>
 </div>

@@ -73,6 +73,11 @@ class SeriesController extends Controller
         ]);
     }
 
+    /**
+     * Public series "blog" page (Phase 3): back link to its section, title +
+     * meta line (year range · technique · N works), description, then
+     * full-width images interleaved with per-work description text.
+     */
     public function actionShow($id)
     {
         $series = Series::find()->where(['id' => $id])->one();
@@ -80,20 +85,23 @@ class SeriesController extends Controller
         if ($series === null)
             throw new NotFoundHttpException('The requested page does not exist.');
 
-        if ($series->isVisible === 0)
+        if ((int) $series->isVisible === 0)
             throw new NotFoundHttpException('The requested page does not exist.');
 
-        $query = Paintings::find()->joinWith('paintingsToSeries')->where(['series_id' => $id, 'isVisible' => 1])->orderBy('id DESC');
-        $count = $query->count();
-        $pagination = new Pagination(['totalCount' => $count, 'pageSize' => '18']);
-        $paintings = $query->offset($pagination->offset)
-            ->limit($pagination->limit)
+        $paintings = Paintings::find()
+            ->joinWith('paintingsToSeries')
+            ->where(['paintings_to_series.series_id' => $id, 'paintings.isVisible' => 1])
+            ->orderBy(['paintings.sort_order' => SORT_ASC, 'paintings.id' => SORT_ASC])
             ->all();
 
-        return $this->render('show',[
+        $this->layout = '@app/views/layouts/public';
+        if ($series->section) {
+            $this->view->params['activeNav'] = $series->section->slug;
+        }
+
+        return $this->render('show', [
             'series' => $series,
             'paintings' => $paintings,
-            'pagination' => $pagination,
         ]);
     }
 

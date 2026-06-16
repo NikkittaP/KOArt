@@ -4,12 +4,16 @@ namespace app\controllers;
 
 use app\models\ContactForm;
 use app\models\LoginForm;
+use app\models\Paintings;
+use app\models\PaintingsToSeries;
+use app\models\Sections;
 use app\models\Series;
 use Yii;
 use yii\data\Pagination;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class SiteController extends Controller
@@ -57,33 +61,59 @@ class SiteController extends Controller
     }
 
     /**
-     * Displays homepage.
+     * Homepage = the "artworks" section (Phase 3 public design).
      *
      * @return string
      */
     public function actionIndex()
     {
-        /*
-        $query = Paintings::find()->orderBy('id DESC');
-        $count = $query->count();
-        $pagination = new Pagination(['totalCount' => $count]);
-        $pagination->setPageSize(18);
-        $paintings = $query->offset($pagination->offset)
-        ->limit(18)
-        ->all();
-         */
+        return $this->renderSection('artworks');
+    }
 
-        $query = Series::find()->orderBy('id DESC');
-        $count = $query->count();
-        $pagination = new Pagination(['totalCount' => $count]);
-        $pagination->setPageSize(9);
-        $series = $query->offset($pagination->offset)
-            ->limit(9)->where(['isVisible' => 1])
+    /**
+     * One of the other public nav sections: commercial-illustrations,
+     * picturebooks, sketchbooks. Slug is supplied by the matching
+     * urlManager rule in config/web.php.
+     *
+     * @return string
+     */
+    public function actionSection($slug)
+    {
+        return $this->renderSection($slug);
+    }
+
+    /**
+     * Shared rendering for the hybrid section page: an optional series-card
+     * grid on top, an optional mosaic of loose (non-series) works below.
+     */
+    private function renderSection($slug)
+    {
+        $section = Sections::find()->where(['slug' => $slug])->one();
+        if (!$section) {
+            throw new NotFoundHttpException('The requested section does not exist.');
+        }
+        $intro = (string) $section->description;
+
+        $series = Series::find()
+            ->where(['section_id' => $section->id, 'isVisible' => 1])
+            ->orderBy(['sort_order' => SORT_ASC, 'id' => SORT_ASC])
             ->all();
 
-        return $this->render('index', [
+        $loosePaintingIds = PaintingsToSeries::find()->select('painting_id');
+        $paintings = Paintings::find()
+            ->where(['section_id' => $section->id, 'isVisible' => 1])
+            ->andWhere(['not in', 'id', $loosePaintingIds])
+            ->orderBy(['sort_order' => SORT_ASC, 'id' => SORT_ASC])
+            ->all();
+
+        $this->layout = '@app/views/layouts/public';
+        $this->view->params['activeNav'] = $section->slug;
+
+        return $this->render('section', [
+            'section' => $section,
+            'intro' => $intro,
             'series' => $series,
-            'pagination' => $pagination,
+            'paintings' => $paintings,
         ]);
     }
 
@@ -146,6 +176,9 @@ class SiteController extends Controller
      */
     public function actionAbout()
     {
+        $this->layout = '@app/views/layouts/public';
+        $this->view->params['activeNav'] = 'about';
+
         return $this->render('about');
     }
 }
