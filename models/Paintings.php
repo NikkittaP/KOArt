@@ -66,7 +66,8 @@ class Paintings extends \yii\db\ActiveRecord
     {
         return [
             [['author_id', 'name'], 'required'],
-            [['author_id', 'ground_id'], 'integer'],
+            [['author_id', 'ground_id', 'section_id', 'sort_order'], 'integer'],
+            [['section_id'], 'exist', 'skipOnError' => true, 'targetClass' => Sections::className(), 'targetAttribute' => ['section_id' => 'id']],
             [['width', 'height'], 'number'],
             [['description'], 'string'],
             [['date', 'datetime_add', 'datetime_update'], 'safe'],
@@ -114,6 +115,8 @@ class Paintings extends \yii\db\ActiveRecord
             'authorComments_time_costs' => 'Затраты времени',
             'seriesName' => 'Серия',
             'isVisible' => 'Отображать на сайте',
+            'section_id' => 'Раздел',
+            'sort_order' => 'Порядок сортировки',
         ];
     }
 
@@ -208,5 +211,13 @@ class Paintings extends \yii\db\ActiveRecord
     public function getPaintingsToSeries()
     {
         return $this->hasMany(PaintingsToSeries::className(), ['painting_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSection()
+    {
+        return $this->hasOne(Sections::className(), ['id' => 'section_id']);
     }
 }

@@ -42,6 +42,8 @@ class Series extends \yii\db\ActiveRecord
             [['description'], 'string'],
             [['cover_filename'], 'string', 'max' => 255],
 			[['isVisible'], 'boolean'],
+            [['section_id', 'sort_order'], 'integer'],
+            [['section_id'], 'exist', 'skipOnError' => true, 'targetClass' => Sections::className(), 'targetAttribute' => ['section_id' => 'id']],
         ];
     }
 
@@ -56,6 +58,8 @@ class Series extends \yii\db\ActiveRecord
             'description' => 'Описание серии',
             'cover_filename' => 'Файл обложки',
             'isVisible' => 'Отображать на сайте',
+            'section_id' => 'Раздел',
+            'sort_order' => 'Порядок сортировки',
         ];
     }
 
@@ -65,6 +69,14 @@ class Series extends \yii\db\ActiveRecord
     public function getPaintingsToSeries()
     {
         return $this->hasMany(PaintingsToSeries::className(), ['series_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSection()
+    {
+        return $this->hasOne(Sections::className(), ['id' => 'section_id']);
     }
 
     /**
