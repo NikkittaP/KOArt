@@ -29,10 +29,29 @@ phpunit.phar
 tests/_output/*
 tests/_support/_generated
 
+#vagrant folder
 /.vagrant
-/photos
-/web/photos
 
-.pc
-composer.json
-composer.lock
+# === Secrets — never commit. Copy the *.example file and fill in locally. ===
+/.env
+/config/db.php
+/config/web.php
+/models/User.php
+
+# === User content & generated images (live only on the server / locally) ===
+/web/paintings_photo/
+/web/series_cover/
+/web/about_photo/
+/web/uploads/
+
+# === Yii runtime & published assets ===
+/web/assets/
+/runtime/logs/*
+/runtime/cache/*
+/runtime/debug/*
+
+# === OSPanel per-project config (local only) ===
+/.osp/
+
+# === Editor ===
+/.vscode

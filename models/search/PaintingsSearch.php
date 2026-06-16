@@ -2,10 +2,9 @@
 
 namespace app\models\search;
 
-use Yii;
+use app\models\Paintings;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Paintings;
 
 /**
  * PaintingsSearch represents the model behind the search form of `app\models\Paintings`.
@@ -40,10 +39,14 @@ class PaintingsSearch extends Paintings
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params, $series_id = -1)
     {
-        $query = Paintings::find()->orderBy('id DESC');
-
+        if ($series_id == -1)
+            $query = Paintings::find()->orderBy('id DESC');
+        else 
+        {
+            $query = Paintings::find()->joinWith('paintingsToSeries')->where(['series_id' => $series_id])->indexBy('id');
+        }
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
@@ -59,13 +62,12 @@ class PaintingsSearch extends Paintings
         }
 
         // grid filtering conditions
-        
         $query->andFilterWhere([
             'id' => $this->id,
             'width' => $this->width,
-            'height' => $this->height,
+            'height' => $this->height
         ]);
-
+        
         $query->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'date', $this->date]);
 

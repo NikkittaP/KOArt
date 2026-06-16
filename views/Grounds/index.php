@@ -7,16 +7,17 @@ use yii\grid\GridView;
 /* @var $searchModel app\models\search\GroundsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Grounds';
+$this->title = 'Основы';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<div class="intranet">
 <div class="grounds-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a('Create Grounds', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Добавить основу', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= GridView::widget([
@@ -31,4 +32,5 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
+</div>
 </div>

@@ -12,6 +12,7 @@ $this->title = 'Статистика по картинам';
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
+<div class="intranet">
 <div class="paintings-stats">
 
     <h1><?=Html::encode($this->title)?></h1>
@@ -58,4 +59,5 @@ $this->params['breadcrumbs'][] = $this->title;
         </tbody>
     </table>
     <br />
+</div>
 </div>

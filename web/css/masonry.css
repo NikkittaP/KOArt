@@ -1,0 +1,47 @@
+/* clearfix */
+
+.js-masonry {
+    width: 30%;
+}
+
+.js-masonry:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+
+.masonry-item {
+    float: left;
+    display: inline-block;
+    width: 40%;
+}
+
+@media screen and (min-width: 768px) {
+    .masonry-item {
+        float: left;
+        display: inline-block;
+        width: 40%;
+    }
+}
+
+.masonry-grid-sizer,
+.masonry-main-item {
+    width: 100%;
+}
+
+@media screen and (min-width: 768px) {
+    .masonry-grid-sizer,
+    .masonry-main-item {
+        width: 100%;
+    }
+}
+
+.masonry-main-item a,
+.masonry-main-item a>div,
+.masonry-main-item a>div>img {
+    width: 100%;
+}
+
+.mini-image {
+    width: 100%;
+}

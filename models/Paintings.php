@@ -48,6 +48,8 @@ class Paintings extends \yii\db\ActiveRecord
     public $authorComments_comments;
     public $authorComments_material_costs;
     public $authorComments_time_costs;
+    public $seriesName;
+
 
     /**
      * {@inheritdoc}
@@ -72,7 +74,8 @@ class Paintings extends \yii\db\ActiveRecord
             [['name', 'shopURL'], 'string', 'max' => 255],
             [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => Authors::className(), 'targetAttribute' => ['author_id' => 'id']],
             [['ground_id'], 'exist', 'skipOnError' => true, 'targetClass' => Grounds::className(), 'targetAttribute' => ['ground_id' => 'id']],
-            [['coverPhoto', 'coordinates', 'groundName', 'photo_upload', 'artGenreName', 'artStyleName', 'materials', 'price', 'size_horizontal', 'size_vertical', 'authorComments_comments', 'authorComments_material_costs', 'authorComments_time_costs'], 'safe'],
+            [['coverPhoto', 'coordinates', 'groundName', 'photo_upload', 'artGenreName', 'artStyleName', 'materials', 'price', 'size_horizontal', 'size_vertical', 'authorComments_comments', 'authorComments_material_costs', 'authorComments_time_costs', 'seriesName'], 'safe'],
+			[['isVisible'], 'boolean'],
         ];
     }
 
@@ -108,7 +111,9 @@ class Paintings extends \yii\db\ActiveRecord
             'size_vertical' => '[Портретная ориентация] Размер (ДxВ, см)',
             'authorComments_comments' => 'Комментарии автора',
             'authorComments_material_costs' => 'Затраты материалов',
-            'authorComments_time_costs' => 'Затраты времени'
+            'authorComments_time_costs' => 'Затраты времени',
+            'seriesName' => 'Серия',
+            'isVisible' => 'Отображать на сайте',
         ];
     }
 
@@ -198,5 +203,10 @@ class Paintings extends \yii\db\ActiveRecord
     public function getLastPrice($painting_id)
     {
         return Prices::find()->where(['painting_id' => $painting_id])->orderBy(['datetime_add' => SORT_DESC])->one();
+    }
+    
+    public function getPaintingsToSeries()
+    {
+        return $this->hasMany(PaintingsToSeries::className(), ['painting_id' => 'id']);
     }
 }

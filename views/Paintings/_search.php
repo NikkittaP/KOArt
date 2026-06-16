@@ -8,22 +8,23 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
+<div class="intranet">
 <div class="paintings-search">
 
     <?php $form = ActiveForm::begin([
-        'action' => ['index'],
-        'method' => 'get',
-    ]); ?>
+    'action' => ['index'],
+    'method' => 'get',
+]);?>
 
-    <?= $form->field($model, 'id') ?>
+    <?=$form->field($model, 'id')?>
 
-    <?= $form->field($model, 'author_id') ?>
+    <?=$form->field($model, 'author_id')?>
 
-    <?= $form->field($model, 'name') ?>
+    <?=$form->field($model, 'name')?>
 
-    <?= $form->field($model, 'description') ?>
+    <?=$form->field($model, 'description')?>
 
-    <?= $form->field($model, 'width') ?>
+    <?=$form->field($model, 'width')?>
 
     <?php // echo $form->field($model, 'height') ?>
 
@@ -42,10 +43,11 @@ use yii\widgets\ActiveForm;
     <?php // echo $form->field($model, 'datetime_update') ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
-        <?= Html::resetButton('Reset', ['class' => 'btn btn-default']) ?>
+        <?=Html::submitButton('Search', ['class' => 'btn btn-primary'])?>
+        <?=Html::resetButton('Reset', ['class' => 'btn btn-default'])?>
     </div>
 
-    <?php ActiveForm::end(); ?>
+    <?php ActiveForm::end();?>
 
+</div>
 </div>

@@ -6,8 +6,8 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\Grounds */
 
-$this->title = 'Create Grounds';
-$this->params['breadcrumbs'][] = ['label' => 'Grounds', 'url' => ['index']];
+$this->title = 'Добавить основу';
+$this->params['breadcrumbs'][] = ['label' => 'Основы', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="grounds-create">

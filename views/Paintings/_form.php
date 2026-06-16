@@ -13,17 +13,26 @@ use app\models\ArtGenres;
 use app\models\ArtStyles;
 use app\models\Materials;
 use app\models\Paintings;
+use app\models\Series;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Paintings */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="paintings-form">
+<div class="intranet-form">
 
     <?php $form = ActiveForm::begin(); ?>
 
     <?= $form->field($model, 'author_id')->hiddenInput(['value'=> 1])->label(false); ?>
+
+    <div class="form-group">
+        <?= Html::submitButton('Далее', ['class' => 'btn btn-primary float-right']) ?>
+    </div>
+
+    <br />
+    <br />
+
     <div class="card border-dark">
         <div class="card-header">
             <h5>Базовая информация</h5>
@@ -32,6 +41,22 @@ use app\models\Paintings;
             <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
             <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
+
+            <?= $form->field($model, 'isVisible')->checkbox(['class' => 'intranet_checkbox']) ?>
+
+            <?php
+            $items =  ArrayHelper::map( Series::find()->all(), 'id', 'name');
+            echo $form->field($model, 'seriesName')->widget(Select2::className(), [
+                'data' => $items,
+                'maintainOrder' => true,
+                'options' => ['placeholder' => 'Серия работ ...', 'multiple' => true],
+                'pluginOptions' => [
+                    'tags' => true,
+                    'tokenSeparators' => [','],
+                    'maximumInputLength' => 30
+                ],
+            ]);
+            ?>
         </div>
     </div>
     <br />
@@ -175,7 +200,7 @@ use app\models\Paintings;
             echo $form->field($model, 'price')->widget(NumberControl::classname(), [
                 'maskedInputOptions' => [
                     'prefix' => '$ ',
-                    'suffix' => ' ¢',
+                    //'suffix' => ' ¢',
                     'allowMinus' => false
                 ],
                 'displayOptions' => [

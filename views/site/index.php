@@ -1,89 +1,54 @@
 <?php
-use kartik\icons\Icon;
 use yii\helpers\Html;
 use yii\widgets\LinkPager;
-use yii\helpers\VarDumper;
-use app\models\Materials;
 
 /* @var $this yii\web\View */
 
-$this->title = 'Katia Oskina Art';
+$this->title = 'Oskina.Art';
 ?>
-<div class="site-index">
-    <div class="jumbotron">
+
+<div class="container">
+    <section class="tiles">
         <?php
-        echo Html::a(
-            Icon::show('instagram', ['framework' => Icon::FAB, 'class'=>'fa-3x']),
-            "https://www.instagram.com/katia.oskina/",
-            ['class' => 'black-link', 'target' => '_blank']);
-        ?>
-        <br /><br />
-        <h1>Katerina Oskina Art</h1>
-    </div>
+    foreach ($series as $series_) {
+        $styleNum = 7;
 
-    <div class="container justify-content-center" style="width:80%">
-        <?php
-        \yii2masonry\yii2masonry::begin([
-        'clientOptions' => [
-            'columnWidth' => '.masonry-grid-sizer',
-            'itemSelector' => '.masonry-item',
-            'percentPosition' => true,
-            'initLayout' => false,
-            'resize' => false
-        ]
-        ]); 
-        
-        foreach ($paintings as $painting) {
-            $size_string = '';
-            if (is_numeric($painting->width) && is_numeric($painting->height))
-                $size_string =$painting->width.'x'.$painting->height.'<br />';
+        $seriesDescription = mb_strlen($series_->description) > 150 ? mb_substr($series_->description, 0, 150) . "..." : $series_->description;
 
-            $materials = $painting->materialsToPaintings;
-            $material_string = '';
-            foreach ($materials as $material) {
-                $material_string .= Materials::find()->where(['id' => $material->material_id])->one()->name.', ';
-            }
-            $material_string = substr($material_string, 0, -2);
-
-            $ground_string = '';
-            if (is_numeric($painting->ground_id))
-                $ground_string = ' на '.$painting->ground->name;
-
-            echo '
-            <div class="masonry-item">';
-            echo '
-            '.Html::a('
-            <div class="painting-group">
-                '.Html::img(Yii::$app->request->BaseUrl . '/photos/thumb/' . $painting->mainPhoto->filename, []).'
-                <div class="painting-overlay">
-                    <h3>'.$painting->name.'</h3>
-                    <p>
-                    '.$size_string.'
-                    '.$material_string.$ground_string.'
-                    </p>
-                </div>
+        echo '
+            <article class="style' . $styleNum . '">';
+        echo '<span class="image">';
+        echo Html::img(Yii::$app->request->BaseUrl . '/series_cover/thumb/' . $series_->cover_filename, []);
+        echo '</span>';
+        echo '
+            ' . Html::a('
+            <h2>' . $series_->name . '</h2>
+            <div class="content">
+                <p>
+                    ' . $seriesDescription . '
+                </p>
             </div>
-            ', ['paintings/show', 'id' => $painting->id], ['class' => 'black-link']);
-            echo '
-            </div>';
-        }
-        
-        \yii2masonry\yii2masonry::end();
-        ?>
-    </div>
+            ', ['series/show', 'id' => $series_->id]);
+        echo '
+            </article>';
+    }
+    ?>
+    </section>
 
     <br /><br /><br />
-    <div class="row justify-content-center">
+    <div style="text-align:center;">
         <?php
-        echo LinkPager::widget([
-            'pagination' => $pagination,
-            'options' => [
-                'class' => 'pagination',
-            ],
-            'linkContainerOptions' => ['class' => 'page-item'],
-            'linkOptions' => ['class' => 'page-link'],
-            'disabledListItemSubTagOptions' => ['class' => 'page-link'],
-        ]);
-        ?>
+    echo LinkPager::widget([
+        'pagination' => $pagination,
+        'firstPageLabel' => true,
+        'lastPageLabel' => true,
+        'options' => [
+            'class' => 'pagination',
+        ],
+        'linkContainerOptions' => ['class' => 'page-item'],
+        'linkOptions' => ['class' => 'page-link'],
+        'disabledListItemSubTagOptions' => ['class' => 'page-link'],
+    ]);
+    ?>
     </div>
 </div>

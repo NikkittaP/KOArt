@@ -11,9 +11,12 @@ use app\models\Grounds;
 use app\models\Materials;
 use app\models\MaterialsToPainting;
 use app\models\Paintings;
+use app\models\PaintingsToSeries;
 use app\models\Prices;
 use app\models\search\PaintingsSearch;
+use app\models\Series;
 use Yii;
+use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
@@ -24,6 +27,17 @@ class PaintingsController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['index', 'stats', 'view', 'create', 'update', 'delete'],
+                'rules' => [
+                    [
+                        'actions' => ['index', 'stats', 'view', 'create', 'update', 'delete'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -35,20 +49,32 @@ class PaintingsController extends Controller
 
     public function actionIndex()
     {
+        $post = \Yii::$app->request->post();
+        if (isset($post['isPost'])) {
+            if (isset($post['selected_series'])) {
+                $selectedSeries = (int) $post['selected_series'];
+            }
+        } else {
+            $selectedSeries = -1;
+        }
+
         $searchModel = new PaintingsSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $selectedSeries);
         $dataProvider->sort = false;
 
         $artStyles = ArrayHelper::map(ArtStyles::find()->all(), 'id', 'name');
         $artGenres = ArrayHelper::map(ArtGenres::find()->all(), 'id', 'name');
         $materials = ArrayHelper::map(Materials::find()->all(), 'id', 'name');
+        $series = ArrayHelper::map(Series::find()->all(), 'id', 'name');
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'artStyles' => $artStyles,
             'artGenres' => $artGenres,
+            'series' => $series,
             'materials' => $materials,
+            'selectedSeries' => $selectedSeries,
         ]);
     }
 
@@ -57,33 +83,36 @@ class PaintingsController extends Controller
         $sizesModelHorizontal = Paintings::find()->select(['width', 'height'])->where(new \yii\db\Expression('`width` >= `height`'))->orderBy('width ASC, height ASC')->all();
         $sizesHorizontal = [];
         foreach ($sizesModelHorizontal as $sizeModelHorizontal) {
-            $key = $sizeModelHorizontal->width.'x'.$sizeModelHorizontal->height;
-            if (!array_key_exists($key, $sizesHorizontal))
+            $key = $sizeModelHorizontal->width . 'x' . $sizeModelHorizontal->height;
+            if (!array_key_exists($key, $sizesHorizontal)) {
                 $sizesHorizontal[$key] = 1;
-            else 
+            } else {
                 $sizesHorizontal[$key]++;
+            }
+
         }
-    
+
         $sizesModelVertical = Paintings::find()->select(['width', 'height'])->where(new \yii\db\Expression('`width` < `height`'))->orderBy('width ASC, height ASC')->all();
         $sizesVertical = [];
         foreach ($sizesModelVertical as $sizeModelVertical) {
-            $key = $sizeModelVertical->width.'x'.$sizeModelVertical->height;
-            if (!array_key_exists($key, $sizesVertical))
+            $key = $sizeModelVertical->width . 'x' . $sizeModelVertical->height;
+            if (!array_key_exists($key, $sizesVertical)) {
                 $sizesVertical[$key] = 1;
-            else 
+            } else {
                 $sizesVertical[$key]++;
+            }
+
         }
 
         $sizesHorizontalGroups = [];
-        foreach ($sizesHorizontal as $key=>$value) {
+        foreach ($sizesHorizontal as $key => $value) {
             $width = explode('x', $key)[0];
-            for($i=0; $i<1000; $i=$i+10)
-            {
-                if ($width >= $i && $width < $i+10)
-                {
-                    $groupKey = $i.'-'.($i+10);
-                    if (!array_key_exists($groupKey, $sizesHorizontalGroups))
+            for ($i = 0; $i < 1000; $i = $i + 10) {
+                if ($width >= $i && $width < $i + 10) {
+                    $groupKey = $i . '-' . ($i + 10);
+                    if (!array_key_exists($groupKey, $sizesHorizontalGroups)) {
                         $sizesHorizontalGroups[$groupKey] = 0;
+                    }
 
                     $sizesHorizontalGroups[$groupKey] += $value;
 
@@ -93,15 +122,14 @@ class PaintingsController extends Controller
         }
 
         $sizesVerticalGroups = [];
-        foreach ($sizesVertical as $key=>$value) {
+        foreach ($sizesVertical as $key => $value) {
             $width = explode('x', $key)[0];
-            for($i=0; $i<1000; $i=$i+10)
-            {
-                if ($width >= $i && $width < $i+10)
-                {
-                    $groupKey = $i.'-'.($i+10);
-                    if (!array_key_exists($groupKey, $sizesVerticalGroups))
+            for ($i = 0; $i < 1000; $i = $i + 10) {
+                if ($width >= $i && $width < $i + 10) {
+                    $groupKey = $i . '-' . ($i + 10);
+                    if (!array_key_exists($groupKey, $sizesVerticalGroups)) {
                         $sizesVerticalGroups[$groupKey] = 0;
+                    }
 
                     $sizesVerticalGroups[$groupKey] += $value;
 
@@ -120,8 +148,99 @@ class PaintingsController extends Controller
 
     public function actionShow($id)
     {
+        $series = Series::find()->joinWith('paintingsToSeries')->where(['painting_id' => $id])->one();
+        $painting = $this->findModel($id);
+
+        if ($painting->isVisible === 0)
+            throw new NotFoundHttpException('The requested page does not exist.');
+
+        if ($series === null)
+            throw new NotFoundHttpException('The requested page does not exist.');
+
+        if ($series->isVisible === 0)
+            throw new NotFoundHttpException('The requested page does not exist.');
+
+        $sizeLabel = '';
+        if (is_numeric($painting->width) && is_numeric($painting->height)) {
+            $sizeLabel = $painting->width . \Yii::t('app', 'х') . $painting->height . \Yii::t('app', 'см');
+        }
+
+        $dateLabel = '';
+        if ($painting->date !== null) {
+            $str = substr($painting->date, 0, 7);
+            $year = explode('-', $str)[0];
+            $month = explode('-', $str)[1];
+            if ($month == '01') {
+                $month = \Yii::t('app', 'Январь');
+            }
+
+            if ($month == '02') {
+                $month = \Yii::t('app', 'Феварль');
+            }
+
+            if ($month == '03') {
+                $month = \Yii::t('app', 'Март');
+            }
+
+            if ($month == '04') {
+                $month = \Yii::t('app', 'Апрель');
+            }
+
+            if ($month == '05') {
+                $month = \Yii::t('app', 'Май');
+            }
+
+            if ($month == '06') {
+                $month = \Yii::t('app', 'Июнь');
+            }
+
+            if ($month == '07') {
+                $month = \Yii::t('app', 'Июль');
+            }
+
+            if ($month == '08') {
+                $month = \Yii::t('app', 'Август');
+            }
+
+            if ($month == '09') {
+                $month = \Yii::t('app', 'Сентябрь');
+            }
+
+            if ($month == '10') {
+                $month = \Yii::t('app', 'Октябрь');
+            }
+
+            if ($month == '11') {
+                $month = \Yii::t('app', 'Ноябрь');
+            }
+
+            if ($month == '12') {
+                $month = \Yii::t('app', 'Декабрь');
+            }
+
+            $dateLabel = $month . ' ' . $year;
+        }
+
+        $materialsLabel = '';
+        if (count($painting->materialsToPaintings) != 0) {
+            $materials = ArrayHelper::map(Materials::find()->all(), 'id', 'name');
+            $i = 0;
+            foreach ($painting->materialsToPaintings as $material) {
+                if ($i != 0) {
+                    $materialsLabel .= ', ' . mb_convert_case($materials[$material->material_id], MB_CASE_LOWER, "UTF-8");
+                } else {
+                    $materialsLabel .= mb_convert_case($materials[$material->material_id], MB_CASE_LOWER, "UTF-8");
+                }
+                $i++;
+            }
+        }
+
         return $this->render('show', [
-            'painting' => $this->findModel($id),
+            'painting' => $painting,
+            'series' => $series,
+            'sizeLabel' => $sizeLabel,
+            'dateLabel' => $dateLabel,
+            'materialsLabel' => $materialsLabel,
         ]);
     }
 
@@ -141,6 +260,28 @@ class PaintingsController extends Controller
                 $model->date .= '-00';
             }
             if ($model->save()) {
+                // Серия для картины
+                if (!empty($model->seriesName)) {
+                    foreach ($model->seriesName as $key => $serName) {
+                        if (is_numeric($serName)) {
+                            $seriesModel = Series::find()->where(['id' => $serName])->one();
+                        } else {
+                            $seriesModel = Series::find()->where(['name' => $serName])->one();
+                        }
+
+                        if ($seriesModel == null) {
+                            $seriesModel = new Series();
+                            $seriesModel->name = $serName;
+                            $seriesModel->save();
+                        }
+
+                        $paintingsToSeriesModel = new PaintingsToSeries();
+                        $paintingsToSeriesModel->painting_id = $model->id;
+                        $paintingsToSeriesModel->series_id = $seriesModel->id;
+                        $paintingsToSeriesModel->save();
+                    }
+                }
+
                 // Размеры картины
                 if ($model->size_horizontal != '') {
                     $model->width = explode('x', $model->size_horizontal)[0];
@@ -276,6 +417,45 @@ class PaintingsController extends Controller
             }
 
             if ($model->save()) {
+                // Серия для картины
+                if (!empty($model->seriesName)) {
+                    $selectedIDs = [];
+                    foreach ($model->seriesName as $key => $seriesName) {
+                        if (is_numeric($seriesName)) {
+                            $seriesModel = Series::find()->where(['id' => $seriesName])->one();
+                        } else {
+                            $seriesModel = Series::find()->where(['name' => $seriesName])->one();
+                        }
+
+                        if ($seriesModel == null) {
+                            $seriesModel = new Series();
+                            $seriesModel->name = $seriesName;
+                            $seriesModel->save();
+                        }
+
+                        $selectedIDs[] = $seriesModel->id;
+                    }
+
+                    $savedIDs = PaintingsToSeries::find()->where(['painting_id' => $model->id])->all();
+                    // Удаляем ненужные записи из БД
+                    foreach ($savedIDs as $savedID) {
+                        if (!in_array($savedID->series_id, $selectedIDs)) {
+                            $savedID->delete();
+                        }
+
+                    }
+                    $savedIDsArray = ArrayHelper::map(PaintingsToSeries::find()->where(['painting_id' => $model->id])->all(), 'id', 'series_id');
+                    // Добавляем новые записи из БД
+                    foreach ($selectedIDs as $selectedID) {
+                        if (!in_array($selectedID, $savedIDsArray)) {
+                            $paintingsToSeriesModel = new PaintingsToSeries();
+                            $paintingsToSeriesModel->painting_id = $model->id;
+                            $paintingsToSeriesModel->series_id = $selectedID;
+                            $paintingsToSeriesModel->save();
+                        }
+                    }
+                }
+
                 // Размеры картины
                 if ($model->size_horizontal != '') {
                     $model->width = explode('x', $model->size_horizontal)[0];
@@ -452,6 +632,12 @@ class PaintingsController extends Controller
                 //return $this->redirect(['update', 'id' => $model->id]);
                 return $this->redirect(['paintings/index']);
             }
+        }
+
+        $paintingsToSeries = PaintingsToSeries::find()->where(['painting_id' => $id])->all();
+        $model->seriesName = [];
+        foreach ($paintingsToSeries as $paintingsToSeries_) {
+            $model->seriesName[] = $paintingsToSeries_->series_id;
         }
 
         $model->price = Prices::find()->where(['painting_id' => $id])->orderBy(['datetime_add' => SORT_DESC])->one()->value;

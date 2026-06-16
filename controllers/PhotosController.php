@@ -5,7 +5,11 @@ namespace app\controllers;
 use app\models\Paintings;
 use app\models\Photos;
 use Imagine\Image\Box;
+use Imagine\Image\ImageInterface;
+use Imagine\Image\Point;
+use Imagine\Filter\Basic\Autorotate;
 use Yii;
+use yii\filters\AccessControl;
 use yii\imagine\Image;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -13,6 +17,23 @@ use yii\web\Response;
 
 class PhotosController extends Controller
 {
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['add', 'selectmain', 'delete', 'upload', 'resizeImage'],
+                'rules' => [
+                    [
+                        'actions' => ['add', 'selectmain', 'delete', 'upload', 'resizeImage'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
     public function actionAdd($painting_id)
     {
         $paintingModel = Paintings::find()->where(['id' => $painting_id])->one();
@@ -76,8 +97,11 @@ class PhotosController extends Controller
             $ids = $_POST['Photos']['selected'];
             foreach ($photos as $photo) {
                 if (in_array($photo->id, $ids)) {
-                    unlink(Yii::getAlias('@app') . '/web/photos/thumb/' . $photo->filename);
-                    unlink(Yii::getAlias('@app') . "/web/photos/" . $photo->filename);
+                    unlink(Yii::getAlias('@app') . '/web/paintings_photo/original/' . $photo->filename);
+                    unlink(Yii::getAlias('@app') . '/web/paintings_photo/original_site/' . $photo->filename);
+                    unlink(Yii::getAlias('@app') . '/web/paintings_photo/preview/' . $photo->filename);
+                    unlink(Yii::getAlias('@app') . '/web/paintings_photo/thumb_squared/' . $photo->filename);
+                    unlink(Yii::getAlias('@app') . '/web/paintings_photo/thumb_tiny/' . $photo->filename);
 
                     $photo->delete();
                 }
@@ -93,6 +117,41 @@ class PhotosController extends Controller
         ]);
     }
 
+    /**
+     * Image resize
+     * @param string $input Full path to source image
+     * @param string $output Full path to result image
+     * @param int $width Width of result image
+     * @param int $height Height of result image
+     */
+    public function resizeImage($input, $output, $width, $height)
+    {
+        $imagine = Image::getImagine();
+        $size = new Box($width, $height);
+        $mode = ImageInterface::THUMBNAIL_INSET;
+        $image = $imagine->open($input);
+        
+        $filterAutorotate = new Autorotate();
+        $filterAutorotate->apply($image);
+
+        $resizeimg = $image->thumbnail($size, $mode);
+        $sizeR = $resizeimg->getSize();
+        $widthR = $sizeR->getWidth();
+        $heightR = $sizeR->getHeight();
+
+        $preserve = $imagine->create($size);
+        $startX = $startY = 0;
+        if ($widthR < $width) {
+            $startX = ($width - $widthR) / 2;
+        }
+        if ($heightR < $height) {
+            $startY = ($height - $heightR) / 2;
+        }
+        $preserve
+            ->paste($resizeimg, new Point($startX, $startY))
+            ->save($output);
+    }
+
     public function actionUpload()
     {
         $painting_id = $_POST['painting_id'];
@@ -106,42 +165,37 @@ class PhotosController extends Controller
                 $shortname = $currentPhoto['name'][0];
                 $size = $currentPhoto['size'][0];
                 $ext = substr(strrchr($shortname, '.'), 1);
-                $newFileName = Yii::$app->security->generateRandomString(10) . "." . $ext;
-                $newFilePath = Yii::getAlias('@app') . "/web/photos" . "/" . $newFileName;
-                $newThumbFilePath = Yii::getAlias('@app') . "/web/photos/thumb/" . $newFileName;
-                if (move_uploaded_file($tmpFilePath, $newFilePath)) {
-                    if (!file_exists(Yii::getAlias('@app') . "/web/photos/thumb/")) {
-                        mkdir(Yii::getAlias('@app') . "/web/photos/thumb/", 0777, true);
-                    }
+                $newFileName = Yii::$app->security->generateRandomString(10) . "." . strtolower($ext);
 
+                $originalFilePath = Yii::getAlias('@app') . "/web/paintings_photo/original/" . $newFileName;
+
+                $originalSiteFilePath = Yii::getAlias('@app') . "/web/paintings_photo/original_site/" . $newFileName;
+                $previewFilePath = Yii::getAlias('@app') . "/web/paintings_photo/preview/" . $newFileName;
+                $thumbSquaredFilePath = Yii::getAlias('@app') . "/web/paintings_photo/thumb_squared/" . $newFileName;
+                $thumbTinyFilePath = Yii::getAlias('@app') . "/web/paintings_photo/thumb_tiny/" . $newFileName;
+               
+                if (move_uploaded_file($tmpFilePath, $originalFilePath)) {
                     $imagine = Image::getImagine();
-                    $image = $imagine->open($newFilePath);
-                    $image->thumbnail(new Box(300, 300))
-                        ->save($newThumbFilePath, ['quality' => 70]);
+                    $image = $imagine->open($originalFilePath);
+
+                    $filterAutorotate = new Autorotate();
+                    $filterAutorotate->apply($image);
+
+                    $image->thumbnail(new Box(2000, 2000))
+                        ->save($originalSiteFilePath);
+                        
+                    $image->thumbnail(new Box(900, 900))
+                        ->save($previewFilePath);
+                    
+                    $this->resizeImage($originalFilePath, $thumbSquaredFilePath, 700, 700);
+
+                    $image->thumbnail(new Box(100, 100), ImageInterface::THUMBNAIL_OUTBOUND)->save($thumbTinyFilePath);
 
                     $photoModel = new Photos();
                     $photoModel->painting_id = $painting_id;
                     $photoModel->filename = $newFileName;
                     $photoModel->isMain = 0;
                     $photoModel->save();
-
-                    /*
-                $result = [
-                'initialPreview' => [
-                "<img src='/photos/". $newFileName ."' class='file-preview-image' alt='". $newFileName ."' title='". $newFileName ."'>"
-                // initial preview thumbnails for server uploaded files if you want it displayed immediately after upload
-                ],
-                'initialPreviewConfig' => [
-                "{ caption: '".$newFileName."', width: '120px', url: 'http://localhost/avatar/delete', key: 100, extra: {id: 100}}",
-                // configuration for each item in initial preview
-                ],
-                'initialPreviewThumbTags' => [
-                "{ '{CUSTOM_TAG_NEW}': ' ', '{CUSTOM_TAG_INIT}': '<span class=\'custom-css\'>CUSTOM MARKUP</span>' }"
-                // initial preview thumbnail tags configuration that will be replaced dynamically while rendering
-                ],
-                'append' => true, // whether to append content to the initial preview (or set false to overwrite)
-                ];
-                 */
                 } else {
                     $result = [
                         'error' => "Не удалось загрузить файл!",
@@ -155,70 +209,121 @@ class PhotosController extends Controller
     }
 
     /*
+	public function resizeImage2($input, $output, $width, $height)
+    {
+        $imagine = Image::getImagine();
+        $size = new Box($width, $height);
+        $mode = ImageInterface::THUMBNAIL_INSET;
+        $resizeimg = $imagine
+            ->open($input)
+            ->thumbnail($size, $mode);
+        $sizeR = $resizeimg->getSize();
+        $widthR = $sizeR->getWidth();
+        $heightR = $sizeR->getHeight();
+
+        $preserve = $imagine->create($size);
+        $startX = $startY = 0;
+        if ($widthR < $width) {
+            $startX = ($width - $widthR) / 2;
+        }
+        if ($heightR < $height) {
+            $startY = ($height - $heightR) / 2;
+        }
+        $preserve
+            ->paste($resizeimg, new Point($startX, $startY))
+            ->save($output);
+    }
+
+    public function actionAsd()
+    {
+        $directory = Yii::getAlias('@app') . "/web/paintings_photo/original/";
+        $directory = Yii::getAlias('@app') . "/web/series_cover/original/";
+        $images = glob($directory . "/*.png");
+		print_r($images);
+
+        foreach ($images as $image) {
+            $photo_tiny = Yii::getAlias('@app') . "/web/paintings_photo/thumb_test/" . basename($image);
+            $thumb_squared= Yii::getAlias('@app') . "/web/paintings_photo/thumb_squared/" . basename($image);
+            $series_cover_thumb= Yii::getAlias('@app') . "/web/series_cover/thumb/" . basename($image);
+
+
+            if (!file_exists($series_cover_thumb)) {
+
+                    $this->resizeImage2($image, $series_cover_thumb, 700, 700);
+					
+            //$imagine = Image::getImagine();
+            //$image_original = $imagine->open($image);
+           // $thumbnail = $image_original->thumbnail(new Box(100, 100), ImageInterface::THUMBNAIL_OUTBOUND)->save($photo_tiny);
+            }
+        }
+        exit();
+
+    }
+
     public function actionFiltersource()
     {
-        $uploadedDir = Yii::getAlias('@app') . "/web/photos" . "/";
-        $sourceDir = Yii::getAlias('@app') . "/web/photos" . "/src" . "/";
+    $uploadedDir = Yii::getAlias('@app') . "/web/photos" . "/";
+    $sourceDir = Yii::getAlias('@app') . "/web/photos" . "/src" . "/";
 
-        $existing = [];
+    $existing = [];
 
-        if ($handle = opendir($uploadedDir)) {
-            while (false !== ($entry = readdir($handle))) {
-                if ($entry != "." && $entry != "..") {
-                    $file_parts = pathinfo($entry);
+    if ($handle = opendir($uploadedDir)) {
+    while (false !== ($entry = readdir($handle))) {
+    if ($entry != "." && $entry != "..") {
+    $file_parts = pathinfo($entry);
 
-                    if ($file_parts['extension'] == "jpg") {
-                        //echo "$entry"."<br />";
-                        $imagine = Image::getImagine();
-                        $image = $imagine->open($uploadedDir . $entry);
-                        $size = $image->getSize();
-                        $width = $size->getWidth();
-                        $height = $size->getHeight();
-                        $filesize = filesize($uploadedDir . $entry);
-                        //echo $width.'x'.$height."<br />";
-                        //echo $filesize."<br />";
+    if ($file_parts['extension'] == "jpg") {
+    //echo "$entry"."<br />";
+    $imagine = Image::getImagine();
+    $image = $imagine->open($uploadedDir . $entry);
+    $size = $image->getSize();
+    $width = $size->getWidth();
+    $height = $size->getHeight();
+    $filesize = filesize($uploadedDir . $entry);
+    //echo $width.'x'.$height."<br />";
+    //echo $filesize."<br />";
 
-                        $existing[$entry]['width'] = $width;
-                        $existing[$entry]['height'] = $height;
-                        $existing[$entry]['filesize'] = $filesize;
-                    }
-                }
-            }
-            closedir($handle);
-        }
-
-        if ($handle = opendir($sourceDir)) {
-            if (!file_exists($sourceDir . 'used/')) {
-                mkdir($sourceDir . 'used/', 0777, true);
-            }
-
-            while (false !== ($entry = readdir($handle))) {
-                if ($entry != "." && $entry != "..") {
-                    $file_parts = pathinfo($entry);
-
-                    if ($file_parts['extension'] == "jpg") {
-                        $imagine = Image::getImagine();
-                        $image = $imagine->open($sourceDir . $entry);
-                        $size = $image->getSize();
-                        $width = $size->getWidth();
-                        $height = $size->getHeight();
-                        $filesize = filesize($sourceDir . $entry);
-
-                        foreach ($existing as $name => $data) {
-                            if ($data['width'] == $width &&
-                                $data['height'] == $height &&
-                                $data['filesize'] == $filesize) {
-                                rename($sourceDir . $entry, $sourceDir . 'used/' . $entry);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            closedir($handle);
-        }
+    $existing[$entry]['width'] = $width;
+    $existing[$entry]['height'] = $height;
+    $existing[$entry]['filesize'] = $filesize;
     }
-    */
+    }
+    }
+    closedir($handle);
+    }
+
+    if ($handle = opendir($sourceDir)) {
+    if (!file_exists($sourceDir . 'used/')) {
+    mkdir($sourceDir . 'used/', 0777, true);
+    }
+
+    while (false !== ($entry = readdir($handle))) {
+    if ($entry != "." && $entry != "..") {
+    $file_parts = pathinfo($entry);
+
+    if ($file_parts['extension'] == "jpg") {
+    $imagine = Image::getImagine();
+    $image = $imagine->open($sourceDir . $entry);
+    $size = $image->getSize();
+    $width = $size->getWidth();
+    $height = $size->getHeight();
+    $filesize = filesize($sourceDir . $entry);
+
+    foreach ($existing as $name => $data) {
+    if ($data['width'] == $width &&
+    $data['height'] == $height &&
+    $data['filesize'] == $filesize) {
+    rename($sourceDir . $entry, $sourceDir . 'used/' . $entry);
+    break;
+    }
+    }
+    }
+    }
+    }
+    closedir($handle);
+    }
+    }
+     */
 
     protected function findModel($id)
     {

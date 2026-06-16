@@ -7,6 +7,7 @@ $this->title = 'Удалить фото к картине #' . $paintingModel->i
 $this->params['breadcrumbs'][] = ['label' => 'Картины', 'url' => ['paintings/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<div class="intranet">
 <div class="photos-delete">
 
     <h1><?=Html::encode($this->title)?></h1>
@@ -16,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
         
         $list = [];
         foreach ($photos as $photo) {
-            $list[$photo->id] = "<img src='/photos/thumb/".$photo->filename."' /><br /><br />";
+            $list[$photo->id] = Html::img(Yii::$app->request->BaseUrl . '/paintings_photo/thumb_squared/' . $photo->filename, [])."<br /><br />";
         }
         
         echo  $form->field($photoModel, 'selected[]')->checkboxList($list, [
@@ -38,4 +39,5 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php
     ActiveForm::end();
     ?>
+</div>
 </div>

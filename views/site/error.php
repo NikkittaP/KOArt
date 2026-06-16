@@ -9,7 +9,8 @@ use yii\helpers\Html;
 
 $this->title = $name;
 ?>
-<div class="site-error">
+
+<div class="container">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
@@ -18,10 +19,10 @@ $this->title = $name;
     </div>
 
     <p>
-        The above error occurred while the Web server was processing your request.
+        <?=\Yii::t('app', 'Вышеупомянутая ошибка произошла во время обработки вашего запроса веб-сервером.');?>
     </p>
     <p>
-        Please contact us if you think this is a server error. Thank you.
+        <?=\Yii::t('app', 'Свяжитесь с нами, если вы считаете, что это ошибка сервера. Спасибо.');?>
     </p>
 
 </div>
