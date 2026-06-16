@@ -1,16 +1,12 @@
 <?php
 
-// Copy this file to web.php and set a real cookieValidationKey. web.php is gitignored.
-// Generate a key with: php -r "echo bin2hex(random_bytes(16));"
-// (cookieValidationKey will move to a .env file in the next Phase 1 step.)
-
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'basic',
     'name' => 'Oskina.Art',
-    'language' => 'ru',
+    'language' => 'en',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'aliases' => [
@@ -20,8 +16,8 @@ $config = [
     'components' => [
         'request' => [
             'baseUrl' => '',
-            // !!! set a secret key here (required by cookie validation)
-            'cookieValidationKey' => 'CHANGE_ME',
+            // Secret key from .env (see .env.example). No secret in this file.
+            'cookieValidationKey' => $_ENV['COOKIE_VALIDATION_KEY'] ?? '',
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
@@ -35,6 +31,9 @@ $config = [
         ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
+            // send all mails to a file by default. You have to set
+            // 'useFileTransport' to false and configure a transport
+            // for the mailer to send real emails.
             'useFileTransport' => true,
         ],
         'log' => [
@@ -52,7 +51,19 @@ $config = [
             'class' => 'codemix\localeurls\UrlManager',
             'enablePrettyUrl' => true,
             'showScriptName' => false,
+            // English is the default language and has NO code in the URL.
+            // Russian (added later) will live under /ru/. To add it, just keep
+            // 'ru' in this list and provide ru content/translations.
             'languages' => ['en', 'ru'],
+            // Default language ('en') never shows a /en/ prefix; visiting /en/...
+            // redirects to the clean URL.
+            'enableDefaultLanguageUrlCode' => false,
+            // Do not auto-redirect by browser Accept-Language: everyone gets
+            // English unless they explicitly request /ru/.
+            'enableLanguageDetection' => false,
+            // Language is determined ONLY by the URL. Don't remember /ru/ in a
+            // cookie/session, so removing the prefix immediately returns to English.
+            'enableLanguagePersistence' => false,
             'rules' => [
                 'about' => 'site/about',
                 'contact' => 'site/contact',
@@ -94,14 +105,19 @@ $config = [
 ];
 
 if (YII_ENV_DEV) {
+    // configuration adjustments for 'dev' environment
     $config['bootstrap'][] = 'debug';
     $config['modules']['debug'] = [
         'class' => 'yii\debug\Module',
+        // uncomment the following to add your IP if you are not connecting from localhost.
+        //'allowedIPs' => ['127.0.0.1', '::1'],
     ];
 
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
         'class' => 'yii\gii\Module',
+        // uncomment the following to add your IP if you are not connecting from localhost.
+        //'allowedIPs' => ['127.0.0.1', '::1'],
     ];
 }
 
