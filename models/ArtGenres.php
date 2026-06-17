@@ -27,10 +27,17 @@ class ArtGenres extends \yii\db\ActiveRecord
      */
     public function rules()
     {
-        return [
+        $rules = [
             [['name'], 'required'],
             [['name'], 'string', 'max' => 255],
         ];
+        // name_en is added by a migration; guard so the model also works before
+        // the migration has been applied.
+        if ($this->hasAttribute('name_en')) {
+            $rules[] = [['name_en'], 'string', 'max' => 255];
+            $rules[] = [['name_en'], 'default', 'value' => null];
+        }
+        return $rules;
     }
 
     /**
@@ -40,8 +47,22 @@ class ArtGenres extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Название',
+            'name' => 'Название (RU)',
+            'name_en' => 'Name (EN)',
         ];
+    }
+
+    /**
+     * Name in the current UI language: English when the admin is in EN and an
+     * English name exists, otherwise the Russian/source name.
+     */
+    public function displayName()
+    {
+        if (strncmp(Yii::$app->language, 'en', 2) === 0
+            && $this->hasAttribute('name_en') && !empty($this->name_en)) {
+            return $this->name_en;
+        }
+        return $this->name;
     }
 
     /**

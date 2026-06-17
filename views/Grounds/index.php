@@ -1,36 +1,51 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\search\GroundsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Основы';
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = Yii::t('admin', 'Grounds');
+$grounds = $dataProvider->getModels();
 ?>
-<div class="intranet">
-<div class="grounds-index">
-
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
-    <p>
-        <?= Html::a('Добавить основу', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'name',
-
-            ['class' => 'yii\grid\ActionColumn'],
-        ],
-    ]); ?>
+<div class="apagehead">
+    <div>
+        <div class="crumb"><?= Yii::t('admin', 'Taxonomy') ?></div>
+        <h1><?= Yii::t('admin', 'Grounds') ?></h1>
+    </div>
+    <div class="actions">
+        <?= Html::a(Yii::t('admin', '+ Add ground'), ['create'], ['class' => 'btn accent']) ?>
+    </div>
 </div>
+
+<div class="table-scroll">
+<table class="atable">
+    <thead>
+    <tr>
+        <th style="width:60px">ID</th>
+        <th><?= Yii::t('admin', 'Name (RU)') ?></th>
+        <th><?= Yii::t('admin', 'Name (EN)') ?></th>
+        <th style="width:200px"><?= Yii::t('admin', 'Actions') ?></th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($grounds as $g): ?>
+        <tr>
+            <td><?= (int) $g->id ?></td>
+            <td><?= Html::encode($g->name) ?></td>
+            <td><?= ($g->hasAttribute('name_en') && $g->name_en) ? Html::encode($g->name_en) : '<span style="color:var(--faint)">—</span>' ?></td>
+            <td>
+                <div class="rowact">
+                    <?= Html::a(Yii::t('admin', 'Edit'), ['update', 'id' => $g->id], ['class' => 'btn ghost sm']) ?>
+                    <?= Html::a(Yii::t('admin', 'Delete'), ['delete', 'id' => $g->id], [
+                        'class' => 'btn danger sm',
+                        'data' => ['confirm' => Yii::t('admin', 'Delete this item?'), 'method' => 'post'],
+                    ]) ?>
+                </div>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+</table>
 </div>

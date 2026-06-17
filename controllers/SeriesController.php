@@ -2,14 +2,15 @@
 
 namespace app\controllers;
 
+use app\helpers\RichText;
 use app\models\Paintings;
 use app\models\search\SeriesSearch;
 use app\models\Series;
+use yii\helpers\ArrayHelper;
 
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
 use yii\data\Pagination;
@@ -17,8 +18,13 @@ use yii\data\Pagination;
 /**
  * SeriesController implements the CRUD actions for Series model.
  */
-class SeriesController extends Controller
+class SeriesController extends AdminBaseController
 {
+    public $adminNav = 'series';
+
+    /** actionShow is the PUBLIC series "blog" page — keep public layout/lang. */
+    protected $publicActions = ['show'];
+
     /**
      * {@inheritdoc}
      */
@@ -27,10 +33,10 @@ class SeriesController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['index', 'view', 'create', 'update', 'delete'],
+                'only' => ['index', 'view', 'create', 'update', 'delete', 'move'],
                 'rules' => [
                     [
-                        'actions' => ['index', 'view', 'create', 'update', 'delete'],
+                        'actions' => ['index', 'view', 'create', 'update', 'delete', 'move'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -40,6 +46,7 @@ class SeriesController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                    'move' => ['POST'],
                 ],
             ],
         ];
@@ -51,13 +58,73 @@ class SeriesController extends Controller
      */
     public function actionIndex()
     {
+        $post = Yii::$app->request->post();
+        $query = Yii::$app->request->queryParams;
+
+        $selectedSection = -1;
+        if (isset($post['isPost']) && isset($post['selected_section'])) {
+            $selectedSection = (int) $post['selected_section'];
+        } elseif (isset($query['selected_section'])) {
+            $selectedSection = (int) $query['selected_section'];
+        }
+
         $searchModel = new SeriesSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $selectedSection);
+        $dataProvider->sort = false;
+
+        // Global "hide archive" toggle: exclude hidden series when it's on.
+        if (\app\helpers\AdminPrefs::hideArchive()) {
+            $dataProvider->query->andWhere(['series.isVisible' => 1]);
+        }
+
+        $sections = ArrayHelper::map(\app\models\Sections::find()->orderBy('sort ASC')->all(), 'id', 'title');
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'sections' => $sections,
+            'selectedSection' => $selectedSection,
         ]);
+    }
+
+    /**
+     * Swaps sort_order with the previous/next series in the same section
+     * (mirrors PaintingsController::actionMove).
+     */
+    public function actionMove($id, $direction, $selected_section = -1)
+    {
+        $model = $this->findModel($id);
+
+        $siblings = Series::find()
+            ->where(['section_id' => $model->section_id])
+            ->orderBy(['sort_order' => SORT_ASC, 'id' => SORT_ASC])
+            ->all();
+
+        $ids = ArrayHelper::getColumn($siblings, 'id');
+        $pos = array_search((int) $id, $ids, true);
+
+        $swapWith = null;
+        if ($direction === 'up' && $pos !== false && $pos > 0) {
+            $swapWith = $siblings[$pos - 1];
+        } elseif ($direction === 'down' && $pos !== false && $pos < count($siblings) - 1) {
+            $swapWith = $siblings[$pos + 1];
+        }
+
+        if ($swapWith !== null) {
+            $a = $model->sort_order;
+            $b = $swapWith->sort_order;
+            if ($a === $b) {
+                $model->sort_order = $pos + ($direction === 'up' ? -1 : 1);
+                $swapWith->sort_order = $pos;
+            } else {
+                $model->sort_order = $b;
+                $swapWith->sort_order = $a;
+            }
+            $model->save(false, ['sort_order']);
+            $swapWith->save(false, ['sort_order']);
+        }
+
+        return $this->redirect(['index', 'selected_section' => $selected_section]);
     }
 
     /**
@@ -98,6 +165,8 @@ class SeriesController extends Controller
         if ($series->section) {
             $this->view->params['activeNav'] = $series->section->slug;
         }
+        // Logged-in owner: "Edit" jumps straight to this series in admin.
+        $this->view->params['adminEditUrl'] = ['/series/update', 'id' => $series->id];
 
         return $this->render('show', [
             'series' => $series,
@@ -116,6 +185,7 @@ class SeriesController extends Controller
 
         if (Yii::$app->request->isPost) {
             $model->load(Yii::$app->request->post());
+            $model->description = RichText::purify($model->description);
             $model->uploadedCover = UploadedFile::getInstance($model, 'cover_filename');
             if ($model->uploadedCover !== null) {
                 if ($model->uploadCover()) {
@@ -149,6 +219,7 @@ class SeriesController extends Controller
 
         if (Yii::$app->request->isPost) {
             $model->load(Yii::$app->request->post());
+            $model->description = RichText::purify($model->description);
             $model->uploadedCover = UploadedFile::getInstance($model, 'cover_filename');
             if ($model->uploadedCover !== null) {
                 if ($model->uploadCover()) {

@@ -39,9 +39,15 @@ class SeriesSearch extends Series
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params, $section_id = -1)
     {
-        $query = Series::find();
+        if ($section_id != -1) {
+            // Filtering by section: order by manual sort_order so the admin
+            // grid matches the public site and reorder arrows are stable.
+            $query = Series::find()->where(['section_id' => $section_id])->orderBy(['sort_order' => SORT_ASC, 'id' => SORT_ASC]);
+        } else {
+            $query = Series::find();
+        }
 
         // add conditions that should always apply here
 

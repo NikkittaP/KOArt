@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\helpers\RichText;
 use app\models\ArtGenres;
 use app\models\ArtGenresToPainting;
 use app\models\ArtStyles;
@@ -13,26 +14,28 @@ use app\models\MaterialsToPainting;
 use app\models\Paintings;
 use app\models\PaintingsToSeries;
 use app\models\Prices;
+use app\models\Sections;
 use app\models\search\PaintingsSearch;
 use app\models\Series;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
-class PaintingsController extends Controller
+class PaintingsController extends AdminBaseController
 {
+    public $adminNav = 'works';
+
     public function behaviors()
     {
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['index', 'stats', 'view', 'create', 'update', 'delete'],
+                'only' => ['index', 'stats', 'view', 'create', 'update', 'delete', 'move', 'bulk-visibility', 'bulk-section'],
                 'rules' => [
                     [
-                        'actions' => ['index', 'stats', 'view', 'create', 'update', 'delete'],
+                        'actions' => ['index', 'stats', 'view', 'create', 'update', 'delete', 'move', 'bulk-visibility', 'bulk-section'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -42,6 +45,9 @@ class PaintingsController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                    'move' => ['POST'],
+                    'bulk-visibility' => ['POST'],
+                    'bulk-section' => ['POST'],
                 ],
             ],
         ];
@@ -49,33 +55,135 @@ class PaintingsController extends Controller
 
     public function actionIndex()
     {
-        $post = \Yii::$app->request->post();
-        if (isset($post['isPost'])) {
-            if (isset($post['selected_series'])) {
-                $selectedSeries = (int) $post['selected_series'];
-            }
-        } else {
-            $selectedSeries = -1;
-        }
+        // Redesigned list (Phase 4b): filters come from the URL (GET) so they
+        // auto-apply on change and compose with "Load more"; no POST step.
+        $query = Yii::$app->request->queryParams;
+
+        $selectedSeries = isset($query['selected_series']) ? (int) $query['selected_series'] : -1;
+        $selectedSection = isset($query['selected_section']) ? (int) $query['selected_section'] : -1;
+        $vis = isset($query['vis']) && in_array($query['vis'], ['1', '0'], true) ? $query['vis'] : 'all';
+        $show = isset($query['show']) ? max(24, (int) $query['show']) : 24;
 
         $searchModel = new PaintingsSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $selectedSeries);
+        $dataProvider = $searchModel->search($query, $selectedSeries, $selectedSection);
         $dataProvider->sort = false;
 
-        $artStyles = ArrayHelper::map(ArtStyles::find()->all(), 'id', 'name');
-        $artGenres = ArrayHelper::map(ArtGenres::find()->all(), 'id', 'name');
+        // Global "hide archive" toggle: exclude hidden works when it's on.
+        if (\app\helpers\AdminPrefs::hideArchive()) {
+            $dataProvider->query->andWhere(['paintings.isVisible' => 1]);
+        }
+        // Explicit visibility filter from the toolbar (overrides nothing else).
+        if ($vis === '1') {
+            $dataProvider->query->andWhere(['paintings.isVisible' => 1]);
+        } elseif ($vis === '0') {
+            $dataProvider->query->andWhere(['paintings.isVisible' => 0]);
+        }
+
+        $totalCount = (int) $dataProvider->totalCount;
+        $dataProvider->pagination = ['pageSize' => $show, 'page' => 0];
+
         $materials = ArrayHelper::map(Materials::find()->all(), 'id', 'name');
         $series = ArrayHelper::map(Series::find()->all(), 'id', 'name');
+        $sections = ArrayHelper::map(Sections::find()->orderBy('sort ASC')->all(), 'id', 'title');
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'artStyles' => $artStyles,
-            'artGenres' => $artGenres,
             'series' => $series,
+            'sections' => $sections,
             'materials' => $materials,
             'selectedSeries' => $selectedSeries,
+            'selectedSection' => $selectedSection,
+            'vis' => $vis,
+            'show' => $show,
+            'totalCount' => $totalCount,
+            'hasMore' => $totalCount > $show,
         ]);
+    }
+
+    /**
+     * Swaps sort_order with the previous/next work in the same section so
+     * the owner can reorder works without touching the DB. Only meaningful
+     * when the grid is filtered to one section (sort_order is otherwise
+     * not used for display).
+     */
+    public function actionMove($id, $direction, $selected_section = -1)
+    {
+        $model = $this->findModel($id);
+
+        $siblings = Paintings::find()
+            ->where(['section_id' => $model->section_id])
+            ->orderBy(['sort_order' => SORT_ASC, 'id' => SORT_ASC])
+            ->all();
+
+        $ids = ArrayHelper::getColumn($siblings, 'id');
+        $pos = array_search((int) $id, $ids, true);
+
+        $swapWith = null;
+        if ($direction === 'up' && $pos !== false && $pos > 0) {
+            $swapWith = $siblings[$pos - 1];
+        } elseif ($direction === 'down' && $pos !== false && $pos < count($siblings) - 1) {
+            $swapWith = $siblings[$pos + 1];
+        }
+
+        if ($swapWith !== null) {
+            $a = $model->sort_order;
+            $b = $swapWith->sort_order;
+            // Equal/zero sort_order values are common on never-reordered
+            // rows; fall back to swapping by position so the first click
+            // always does something visible.
+            if ($a === $b) {
+                $model->sort_order = $pos + ($direction === 'up' ? -1 : 1);
+                $swapWith->sort_order = $pos;
+            } else {
+                $model->sort_order = $b;
+                $swapWith->sort_order = $a;
+            }
+            $model->save(false, ['sort_order']);
+            $swapWith->save(false, ['sort_order']);
+        }
+
+        return $this->redirect(['index', 'selected_section' => $selected_section]);
+    }
+
+    /**
+     * Bulk action: toggle isVisible for the selected works.
+     */
+    public function actionBulkVisibility()
+    {
+        $ids = (array) Yii::$app->request->post('ids', []);
+        $visible = (int) Yii::$app->request->post('visible', 0);
+        $selectedSection = Yii::$app->request->post('selected_section', -1);
+
+        if (!empty($ids)) {
+            Paintings::updateAll(['isVisible' => $visible], ['id' => $ids]);
+            Yii::$app->session->setFlash('success', Yii::t('admin', '{n} work(s) updated.', ['n' => count($ids)]));
+        }
+
+        return $this->redirect(['index', 'selected_section' => $selectedSection]);
+    }
+
+    /**
+     * Bulk action: move the selected works to a different section. New
+     * works are appended to the end (max sort_order + 1 in the target
+     * section) so they don't jump ahead of existing ones.
+     */
+    public function actionBulkSection()
+    {
+        $ids = (array) Yii::$app->request->post('ids', []);
+        $sectionId = Yii::$app->request->post('section_id');
+
+        if (!empty($ids) && $sectionId !== null && $sectionId !== '') {
+            $maxSort = (int) Paintings::find()->where(['section_id' => $sectionId])->max('sort_order');
+            foreach (Paintings::findAll($ids) as $painting) {
+                $maxSort++;
+                $painting->section_id = $sectionId;
+                $painting->sort_order = $maxSort;
+                $painting->save(false, ['section_id', 'sort_order']);
+            }
+            Yii::$app->session->setFlash('success', Yii::t('admin', '{n} work(s) moved to another section.', ['n' => count($ids)]));
+        }
+
+        return $this->redirect(['index', 'selected_section' => $sectionId ?: -1]);
     }
 
     public function actionStats()
@@ -259,6 +367,7 @@ class PaintingsController extends Controller
             if ($model->date != '' && strlen($model->date) == 7) {
                 $model->date .= '-00';
             }
+            $model->description = RichText::purify($model->description);
             if ($model->save()) {
                 // Серия для картины
                 if (!empty($model->seriesName)) {
@@ -415,6 +524,7 @@ class PaintingsController extends Controller
             if ($model->date != '' && strlen($model->date) == 7) {
                 $model->date .= '-00';
             }
+            $model->description = RichText::purify($model->description);
 
             if ($model->save()) {
                 // Серия для картины

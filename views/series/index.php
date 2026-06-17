@@ -6,6 +6,8 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\search\SeriesSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $sections array id => title */
+/* @var $selectedSection int */
 
 $this->title = 'Серии';
 $this->params['breadcrumbs'][] = $this->title;
@@ -14,11 +16,42 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="series-index">
 
     <h1><?=Html::encode($this->title)?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
         <?=Html::a('Добавить серию', ['create'], ['class' => 'btn btn-success'])?>
     </p>
+
+    <h3>Фильтр / сортировка:</h3>
+    <?php
+    echo Html::beginForm(['series/index'], 'post');
+    echo Html::hiddenInput('isPost', '1');
+    ?>
+    <div class="row">
+        <div class="col-sm-5">
+            <label>Раздел (для сортировки серий — выберите раздел)</label>
+            <?php
+            $sectionList = ['-1' => 'Все разделы'];
+            foreach ($sections as $key => $value) {
+                $sectionList[$key] = $value;
+            }
+            echo Html::dropDownList('selected_section', $selectedSection, $sectionList, ['class' => 'nostyle form-control']);
+            ?>
+        </div>
+    </div>
+    <br />
+    <div class="form-group">
+        <?= Html::submitButton('Показать', ['class' => 'btn btn-primary']) ?>
+    </div>
+    <?= Html::endForm() ?>
+
+    <br />
+
+    <?php if ((int) $selectedSection !== -1): ?>
+        <p class="text-muted">
+            Список отсортирован по порядку раздела — стрелками ↑/↓ можно менять порядок
+            (именно в этом порядке серии будут показаны на сайте).
+        </p>
+    <?php endif; ?>
 
     <?=GridView::widget([
     'dataProvider' => $dataProvider,
@@ -56,11 +89,22 @@ $this->params['breadcrumbs'][] = $this->title;
             'headerOptions' => ['style' => 'vertical-align: middle;'],
         ],
         [
+            'attribute' => 'section_id',
+            'label' => 'Раздел',
+            'headerOptions' => ['style' => 'vertical-align: middle;'],
+            'contentOptions' => ['style' => 'width:130px;'],
+            'filter' => false,
+            'value' => function ($model) use ($sections) {
+                return $model->section_id && isset($sections[$model->section_id]) ? $sections[$model->section_id] : null;
+            },
+        ],
+        [
             'attribute' => 'isVisible',
             'headerOptions' => ['style' => 'max-width: 150px;width: 150px;text-align:center;vertical-align: middle;'],
             'contentOptions' => ['style' => 'width: 150px;text-align:center;'],
             'format' => 'raw',
             'value' => function ($model) {
+                $out = '';
                 if ($model->isVisible === null || $model->isVisible === 0) {
                     $out .= '<span>нет</span>';
                 } else {
@@ -68,6 +112,20 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
 
                 return $out;
+            },
+        ],
+        [
+            'label' => 'Порядок',
+            'headerOptions' => ['style' => 'vertical-align: middle;width:70px;text-align:center;'],
+            'contentOptions' => ['style' => 'width:70px;text-align:center;'],
+            'format' => 'raw',
+            'visible' => (int) $selectedSection !== -1,
+            'value' => function ($model) use ($selectedSection) {
+                return Html::a('↑', ['series/move', 'id' => $model->id, 'direction' => 'up', 'selected_section' => $selectedSection],
+                        ['class' => 'profile-link', 'data' => ['method' => 'post'], 'title' => 'Выше']) .
+                    '&nbsp;' .
+                    Html::a('↓', ['series/move', 'id' => $model->id, 'direction' => 'down', 'selected_section' => $selectedSection],
+                        ['class' => 'profile-link', 'data' => ['method' => 'post'], 'title' => 'Ниже']);
             },
         ],
         [

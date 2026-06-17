@@ -11,12 +11,13 @@ use Imagine\Filter\Basic\Autorotate;
 use Yii;
 use yii\filters\AccessControl;
 use yii\imagine\Image;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
-class PhotosController extends Controller
+class PhotosController extends AdminBaseController
 {
+    public $adminNav = 'works';
+
     public function behaviors()
     {
         return [

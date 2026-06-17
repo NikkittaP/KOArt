@@ -69,6 +69,26 @@ $config = [
                 'about' => 'site/about',
                 'contact' => 'site/contact',
                 'login' => 'site/login',
+
+                // --- Admin / archive panel (Phase 4b). Must stay BEFORE the
+                // generic <slug> rule so /admin/* never resolves to a section. ---
+                'admin' => 'admin/index',
+                'admin/lang' => 'admin/lang',
+                'admin/archive' => 'admin/archive',
+                'admin/works' => 'paintings/index',
+                'admin/paintings' => 'paintings/index',
+                'admin/series' => 'series/index',
+                'admin/sections' => 'sections/index',
+                'admin/genres' => 'art-genres/index',
+                'admin/grounds' => 'grounds/index',
+                'admin/paintings/<action:[\w-]+>' => 'paintings/<action>',
+                'admin/works/<action:[\w-]+>' => 'paintings/<action>',
+                'admin/series/<action:[\w-]+>' => 'series/<action>',
+                'admin/sections/<action:[\w-]+>' => 'sections/<action>',
+                'admin/genres/<action:[\w-]+>' => 'art-genres/<action>',
+                'admin/grounds/<action:[\w-]+>' => 'grounds/<action>',
+                'admin/photos/<action:[\w-]+>' => 'photos/<action>',
+
                 'series/<id:\d+>' => 'series/show',
                 // Any single-segment slug maps to a section page; SiteController
                 // 404s unknown slugs. Must stay AFTER the named routes above so
@@ -89,6 +109,17 @@ $config = [
                     'fileMap' => [
                         'app'       => 'app.php',
                         'app/error' => 'error.php',
+                    ],
+                ],
+                // Admin UI strings (Phase 4b). Authored in ENGLISH in code;
+                // Russian lives in messages/ru/admin.php. Separate category so it
+                // never collides with the public 'app' (ru-source) strings.
+                'admin' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@app/messages',
+                    'sourceLanguage' => 'en',
+                    'fileMap' => [
+                        'admin' => 'admin.php',
                     ],
                 ],
             ],

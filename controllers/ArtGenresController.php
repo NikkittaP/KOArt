@@ -5,7 +5,6 @@ namespace app\controllers;
 use Yii;
 use app\models\ArtGenres;
 use app\models\search\ArtGenresSearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -13,8 +12,10 @@ use yii\filters\VerbFilter;
 /**
  * ArtGenresController implements the CRUD actions for ArtGenres model.
  */
-class ArtGenresController extends Controller
+class ArtGenresController extends AdminBaseController
 {
+    public $adminNav = 'genres';
+
     /**
      * {@inheritdoc}
      */
@@ -79,7 +80,7 @@ class ArtGenresController extends Controller
         $model = new ArtGenres();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         }
 
         return $this->render('create', [
@@ -99,7 +100,7 @@ class ArtGenresController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         }
 
         return $this->render('update', [

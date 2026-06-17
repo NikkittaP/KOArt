@@ -39,13 +39,17 @@ class PaintingsSearch extends Paintings
      *
      * @return ActiveDataProvider
      */
-    public function search($params, $series_id = -1)
+    public function search($params, $series_id = -1, $section_id = -1)
     {
-        if ($series_id == -1)
-            $query = Paintings::find()->orderBy('id DESC');
-        else 
-        {
+        if ($series_id != -1) {
             $query = Paintings::find()->joinWith('paintingsToSeries')->where(['series_id' => $series_id])->indexBy('id');
+        } elseif ($section_id != -1) {
+            // Filtering by section: order by the manual sort_order so the
+            // admin grid matches what visitors will see, and reorder arrows
+            // (Phase 4) operate on a stable, predictable list.
+            $query = Paintings::find()->where(['section_id' => $section_id])->orderBy(['sort_order' => SORT_ASC, 'id' => SORT_ASC]);
+        } else {
+            $query = Paintings::find()->orderBy('id DESC');
         }
         // add conditions that should always apply here
 

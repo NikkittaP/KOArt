@@ -1,42 +1,43 @@
 <?php
 
 /* @var $this yii\web\View */
-/* @var $form yii\bootstrap\ActiveForm */
 /* @var $model app\models\LoginForm */
 
 use yii\helpers\Html;
-use yii\bootstrap4\ActiveForm;
 
-$this->title = 'Вход';
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = Yii::t('admin', 'Sign in');
+$errors = array_merge(...array_values($model->getErrors() ?: [[]]));
 ?>
-<div class="intranet">
-    <h1><?= Html::encode($this->title) ?></h1>
+<div class="alogin-wrap">
+    <div class="alogin">
+        <div class="wm">Katia Oskina</div>
+        <div class="sub"><?= Yii::t('admin', 'Archive · Admin') ?></div>
 
-    <p>Для доступа к расширенному управлению сайтом ввдеите логи и пароль:</p>
+        <?php if (!empty($errors)): ?>
+            <div class="flash danger"><?= Html::encode(reset($errors)) ?></div>
+        <?php endif; ?>
 
-    <?php $form = ActiveForm::begin([
-        'id' => 'login-form',
-        'layout' => 'horizontal',
-        'fieldConfig' => [
-            'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
-            'labelOptions' => ['class' => 'col-lg-1'],
-        ],
-    ]); ?>
-
-        <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
-
-        <?= $form->field($model, 'password')->passwordInput() ?>
-
-        <?= $form->field($model, 'rememberMe')->checkbox([
-            'template' => "<div class=\"col-lg-offset-1 col-lg-3\">{input} {label}</div>\n<div class=\"col-lg-8\">{error}</div>",
-        ]) ?>
-
-        <div class="form-group">
-            <div class="col-lg-offset-1 col-lg-11">
-                <?= Html::submitButton('Login', ['name' => 'login-button', 'class'=>'btn btn-primary float-left']) ?>
+        <?= Html::beginForm(['/site/login'], 'post') ?>
+            <div class="field">
+                <label><?= Yii::t('admin', 'Username') ?></label>
+                <?= Html::textInput('LoginForm[username]', $model->username, [
+                    'autofocus' => true,
+                    'autocomplete' => 'username',
+                    'style' => 'width:100%',
+                ]) ?>
             </div>
-        </div>
-
-    <?php ActiveForm::end(); ?>
-        </div>
+            <div class="field">
+                <label><?= Yii::t('admin', 'Password') ?></label>
+                <?= Html::passwordInput('LoginForm[password]', '', [
+                    'autocomplete' => 'current-password',
+                    'style' => 'width:100%',
+                ]) ?>
+            </div>
+            <label class="checkbox">
+                <?= Html::checkbox('LoginForm[rememberMe]', $model->rememberMe) ?>
+                <?= Yii::t('admin', 'Remember me') ?>
+            </label>
+            <?= Html::submitButton(Yii::t('admin', 'Sign in'), ['class' => 'btn accent']) ?>
+        <?= Html::endForm() ?>
+    </div>
+</div>

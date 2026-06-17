@@ -82,6 +82,15 @@ $this->beginPage();
     <div class="ver">build <?= (int) $buildVersion ?></div>
 </footer>
 </main>
+<?php if (!Yii::$app->user->isGuest): ?>
+    <div class="admin-bar">
+        <?php if (!empty($this->params['adminEditUrl'])): ?>
+            <a class="go" href="<?= Html::encode(Url::to($this->params['adminEditUrl'])) ?>">✎ Edit</a>
+        <?php endif; ?>
+        <a href="<?= Url::to(['/admin/index']) ?>">Admin</a>
+        <?= Html::a('Log out', ['/site/logout'], ['data' => ['method' => 'post']]) ?>
+    </div>
+<?php endif; ?>
 <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Image viewer">
     <button class="x" id="lbx" aria-label="Close">✕</button>
     <button class="nv prev" id="lbprev" aria-label="Previous">‹</button>

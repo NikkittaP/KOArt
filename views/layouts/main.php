@@ -98,7 +98,10 @@ echo Nav::widget([
             ['label' => \Yii::t('app', 'Картины'), 'url' => ['/paintings/index']]
         ),
         Yii::$app->user->isGuest ? ('') : (
-            ['label' => \Yii::t('app', 'Серии'), 'url' => ['/series']]
+            ['label' => \Yii::t('app', 'Серии'), 'url' => ['/series/index']]
+        ),
+        Yii::$app->user->isGuest ? ('') : (
+            ['label' => \Yii::t('app', 'Разделы'), 'url' => ['/sections/index']]
         ),
         Yii::$app->user->isGuest ? ('') : (
             ['label' => \Yii::t('app', 'Жанры'), 'url' => ['/art-genres']]

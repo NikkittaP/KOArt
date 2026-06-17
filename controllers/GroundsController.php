@@ -5,7 +5,6 @@ namespace app\controllers;
 use Yii;
 use app\models\Grounds;
 use app\models\search\GroundsSearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -13,8 +12,10 @@ use yii\filters\VerbFilter;
 /**
  * GroundsController implements the CRUD actions for Grounds model.
  */
-class GroundsController extends Controller
+class GroundsController extends AdminBaseController
 {
+    public $adminNav = 'grounds';
+
     /**
      * {@inheritdoc}
      */
@@ -79,7 +80,7 @@ class GroundsController extends Controller
         $model = new Grounds();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         }
 
         return $this->render('create', [
@@ -99,7 +100,7 @@ class GroundsController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         }
 
         return $this->render('update', [

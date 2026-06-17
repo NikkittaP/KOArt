@@ -108,6 +108,8 @@ class SiteController extends Controller
 
         $this->layout = '@app/views/layouts/public';
         $this->view->params['activeNav'] = $section->slug;
+        // Logged-in owner: "Edit" jumps to this section's works in admin.
+        $this->view->params['adminEditUrl'] = ['/paintings/index', 'selected_section' => $section->id];
 
         return $this->render('section', [
             'section' => $section,
@@ -125,12 +127,18 @@ class SiteController extends Controller
     public function actionLogin()
     {
         if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
+            return $this->redirect(['/admin/index']);
         }
+
+        // Login is the gateway to the admin panel: style it like admin and use
+        // the admin UI language.
+        \app\helpers\AdminLang::apply();
+        $this->layout = '@app/views/layouts/blank';
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
+            // Land in the admin dashboard, not on the public homepage.
+            return $this->redirect(['/admin/index']);
         }
 
         $model->password = '';
