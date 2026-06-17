@@ -1,43 +1,38 @@
 <?php
 
 use yii\helpers\Html;
-use kartik\form\ActiveForm;
 
-$this->title = 'Выбрать основное фото к картине #' . $paintingModel->id . ' "' . $paintingModel->name . '"';
-$this->params['breadcrumbs'][] = ['label' => 'Картины', 'url' => ['paintings/index']];
-$this->params['breadcrumbs'][] = $this->title;
+/* @var $this yii\web\View */
+/* @var $paintingModel app\models\Paintings */
+/* @var $photoModel app\models\Photos */
+/* @var $photos app\models\Photos[] */
+
+$this->title = Yii::t('admin', 'Choose cover');
+$baseUrl = Yii::$app->request->baseUrl;
+$current = $photoModel->isMain;
 ?>
-<div class="intranet">
-<div class="photos-selectmain">
-
-    <h1><?=Html::encode($this->title)?></h1>
-
-        <?php
-        $form = ActiveForm::begin(['enableClientValidation'=>false]); 
-        
-        $list = [];
-        foreach ($photos as $photo) {
-            $list[$photo->id] = Html::img(Yii::$app->request->BaseUrl . '/paintings_photo/thumb_squared/' . $photo->filename, [])."<br /><br />";
-        }
-        
-        echo  $form->field($photoModel, 'isMain')->radioList($list, [
-            'item' => function ($index, $label, $name, $checked, $value) {
-                $id = 'isMain-'. $index;
-                return
-                    Html::beginTag('div', ['class' => 'custom-control form-control-lg custom-radio', 'style' => 'height: 100%; ']) .
-                        Html::radio($name, $checked, ['value' => $value, 'id' => $id, 'class'=>'custom-control-input']) .
-                        Html::label($label, $id, ['style'=>'padding-left:30px;', 'class' => 'custom-control-label']) . 
-                    Html::endTag('div');
-            },
-        ]);
-        ?>
-
-    <div class="form-group">
-        <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
+<div class="apagehead">
+    <div>
+        <div class="crumb"><?= Html::a(Yii::t('admin', 'Works'), ['/paintings/index']) ?></div>
+        <h1><?= Yii::t('admin', 'Choose cover') ?>: #<?= (int) $paintingModel->id ?> <?= Html::encode($paintingModel->name) ?></h1>
     </div>
+</div>
 
-    <?php
-    ActiveForm::end();
-    ?>
+<?= Html::beginForm('', 'post') ?>
+<div class="panel">
+    <?php if (empty($photos)): ?>
+        <p style="color:var(--muted)"><?= Yii::t('admin', 'No photos yet — add some first.') ?></p>
+    <?php else: ?>
+        <div class="photo-grid">
+            <?php foreach ($photos as $photo): ?>
+                <label class="photo-pick <?= (int) $current === (int) $photo->id ? 'sel' : '' ?>">
+                    <?= Html::radio('Photos[isMain]', (int) $current === (int) $photo->id, ['value' => $photo->id]) ?>
+                    <?= Html::img($baseUrl . '/paintings_photo/thumb_squared/' . $photo->filename) ?>
+                </label>
+            <?php endforeach; ?>
+        </div>
+        <?= Html::submitButton(Yii::t('admin', 'Save'), ['class' => 'btn accent']) ?>
+    <?php endif; ?>
+    <?= Html::a(Yii::t('admin', 'Back'), ['add', 'painting_id' => $paintingModel->id], ['class' => 'btn ghost']) ?>
 </div>
-</div>
+<?= Html::endForm() ?>

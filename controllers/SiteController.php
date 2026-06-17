@@ -92,7 +92,7 @@ class SiteController extends Controller
         if (!$section) {
             throw new NotFoundHttpException('The requested section does not exist.');
         }
-        $intro = (string) $section->description;
+        $intro = (string) $section->tr('description');
 
         $series = Series::find()
             ->where(['section_id' => $section->id, 'isVisible' => 1])

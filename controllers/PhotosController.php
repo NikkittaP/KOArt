@@ -78,8 +78,9 @@ class PhotosController extends AdminBaseController
             return $this->redirect(['paintings/index']);
         }
 
+        // May be null if no cover has been chosen yet (e.g. right after upload).
         $photoMain = Photos::find()->where(['painting_id' => $painting_id, 'isMain' => 1])->one();
-        $photoModel->isMain = $photoMain->id;
+        $photoModel->isMain = $photoMain ? $photoMain->id : null;
 
         return $this->render('selectmain', [
             'paintingModel' => $paintingModel,

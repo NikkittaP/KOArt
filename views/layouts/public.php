@@ -33,7 +33,7 @@ $buildVersion = Yii::$app->params['buildVersion'];
 $navItems = [];
 foreach (Sections::find()->orderBy(['sort' => SORT_ASC, 'id' => SORT_ASC])->all() as $section) {
     $navItems[$section->slug] = [
-        'label' => $section->title,
+        'label' => $section->tr('title'),
         'url' => $section->slug === 'artworks'
             ? Url::to(['/'])
             : Url::to(['site/section', 'slug' => $section->slug]),

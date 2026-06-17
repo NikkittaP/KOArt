@@ -17,6 +17,8 @@ use Yii;
  */
 class Sections extends \yii\db\ActiveRecord
 {
+    use BilingualTrait;
+
     public static function tableName()
     {
         return 'sections';
@@ -24,7 +26,7 @@ class Sections extends \yii\db\ActiveRecord
 
     public function rules()
     {
-        return [
+        $rules = [
             [['slug', 'title'], 'required'],
             [['sort'], 'integer'],
             [['description'], 'string'],
@@ -32,6 +34,12 @@ class Sections extends \yii\db\ActiveRecord
             [['title'], 'string', 'max' => 128],
             [['slug'], 'unique'],
         ];
+        if ($this->hasAttribute('title_en')) {
+            $rules[] = [['title_en'], 'string', 'max' => 128];
+            $rules[] = [['description_en'], 'string'];
+            $rules[] = [['title_en', 'description_en'], 'default', 'value' => null];
+        }
+        return $rules;
     }
 
     public function attributeLabels()
@@ -40,7 +48,9 @@ class Sections extends \yii\db\ActiveRecord
             'id' => 'ID',
             'slug' => 'Slug (в URL)',
             'title' => 'Название',
+            'title_en' => 'Title (EN)',
             'description' => 'Описание (интро раздела)',
+            'description_en' => 'Description (EN)',
             'sort' => 'Порядок',
         ];
     }

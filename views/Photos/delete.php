@@ -1,43 +1,41 @@
 <?php
 
 use yii\helpers\Html;
-use kartik\form\ActiveForm;
 
-$this->title = 'Удалить фото к картине #' . $paintingModel->id . ' "' . $paintingModel->name . '"';
-$this->params['breadcrumbs'][] = ['label' => 'Картины', 'url' => ['paintings/index']];
-$this->params['breadcrumbs'][] = $this->title;
+/* @var $this yii\web\View */
+/* @var $paintingModel app\models\Paintings */
+/* @var $photoModel app\models\Photos */
+/* @var $photos app\models\Photos[] */
+
+$this->title = Yii::t('admin', 'Delete photos');
+$baseUrl = Yii::$app->request->baseUrl;
 ?>
-<div class="intranet">
-<div class="photos-delete">
-
-    <h1><?=Html::encode($this->title)?></h1>
-
-        <?php
-        $form = ActiveForm::begin([]); 
-        
-        $list = [];
-        foreach ($photos as $photo) {
-            $list[$photo->id] = Html::img(Yii::$app->request->BaseUrl . '/paintings_photo/thumb_squared/' . $photo->filename, [])."<br /><br />";
-        }
-        
-        echo  $form->field($photoModel, 'selected[]')->checkboxList($list, [
-            'item' => function ($index, $label, $name, $checked, $value) {
-                $id = 'selected-'. $index;
-                return
-                    Html::beginTag('div', ['class' => 'custom-control form-control-lg custom-checkbox', 'style' => 'height: 100%; ']) .
-                        Html::checkbox($name, $checked, ['value' => $value, 'id' => $id, 'class'=>'custom-control-input']) .
-                        Html::label($label, $id, ['style'=>'padding-left:30px;', 'class' => 'custom-control-label']) . 
-                    Html::endTag('div');
-            },
-        ]);
-        ?>
-
-    <div class="form-group">
-        <?= Html::submitButton('Удалить', ['class' => 'btn btn-danger', 'data-confirm'=> 'Вы уверены что хотите удалить выбранные фото?']) ?>
+<div class="apagehead">
+    <div>
+        <div class="crumb"><?= Html::a(Yii::t('admin', 'Works'), ['/paintings/index']) ?></div>
+        <h1><?= Yii::t('admin', 'Delete photos') ?>: #<?= (int) $paintingModel->id ?> <?= Html::encode($paintingModel->name) ?></h1>
     </div>
+</div>
 
-    <?php
-    ActiveForm::end();
-    ?>
+<?= Html::beginForm('', 'post') ?>
+<div class="panel">
+    <?php if (empty($photos)): ?>
+        <p style="color:var(--muted)"><?= Yii::t('admin', 'No photos yet.') ?></p>
+    <?php else: ?>
+        <p style="color:var(--muted);font-size:12.5px;margin-bottom:6px"><?= Yii::t('admin', 'Tick the photos you want to delete.') ?></p>
+        <div class="photo-grid">
+            <?php foreach ($photos as $photo): ?>
+                <label class="photo-pick">
+                    <?= Html::checkbox('Photos[selected][]', false, ['value' => $photo->id]) ?>
+                    <?= Html::img($baseUrl . '/paintings_photo/thumb_squared/' . $photo->filename) ?>
+                </label>
+            <?php endforeach; ?>
+        </div>
+        <?= Html::submitButton(Yii::t('admin', 'Delete selected'), [
+            'class' => 'btn danger',
+            'data' => ['confirm' => Yii::t('admin', 'Delete the selected photos?')],
+        ]) ?>
+    <?php endif; ?>
+    <?= Html::a(Yii::t('admin', 'Back'), ['selectmain', 'painting_id' => $paintingModel->id], ['class' => 'btn ghost']) ?>
 </div>
-</div>
+<?= Html::endForm() ?>

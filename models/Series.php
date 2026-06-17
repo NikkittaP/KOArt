@@ -21,6 +21,8 @@ use yii\imagine\Image;
  */
 class Series extends \yii\db\ActiveRecord
 {
+    use BilingualTrait;
+
     public $uploadedCover;
 
     /**
@@ -36,7 +38,7 @@ class Series extends \yii\db\ActiveRecord
      */
     public function rules()
     {
-        return [
+        $rules = [
             [['name'], 'required'],
             [['name'], 'string', 'max' => 255],
             [['description'], 'string'],
@@ -45,6 +47,12 @@ class Series extends \yii\db\ActiveRecord
             [['section_id', 'sort_order'], 'integer'],
             [['section_id'], 'exist', 'skipOnError' => true, 'targetClass' => Sections::className(), 'targetAttribute' => ['section_id' => 'id']],
         ];
+        if ($this->hasAttribute('name_en')) {
+            $rules[] = [['name_en'], 'string', 'max' => 255];
+            $rules[] = [['description_en'], 'string'];
+            $rules[] = [['name_en', 'description_en'], 'default', 'value' => null];
+        }
+        return $rules;
     }
 
     /**
@@ -55,7 +63,9 @@ class Series extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Название серии',
+            'name_en' => 'Name (EN)',
             'description' => 'Описание серии',
+            'description_en' => 'Description (EN)',
             'cover_filename' => 'Файл обложки',
             'isVisible' => 'Отображать на сайте',
             'section_id' => 'Раздел',

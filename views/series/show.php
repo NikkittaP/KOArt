@@ -16,25 +16,25 @@ use app\helpers\RichText;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
-$this->title = $series->name;
+$this->title = $series->tr('name');
 
 $section = $series->section;
 $backUrl = $section
     ? ($section->slug === 'artworks' ? Url::to(['/']) : Url::to(['site/section', 'slug' => $section->slug]))
     : Url::to(['/']);
-$backLabel = $section ? $section->title : 'Back';
+$backLabel = $section ? $section->tr('title') : 'Back';
 
 $metaLine = PaintingPresenter::seriesMetaLine($series, $paintings);
 $contactEmail = Yii::$app->params['contactEmail'];
 ?>
 <a class="back" href="<?= $backUrl ?>">← <?= Html::encode($backLabel) ?></a>
 <header class="shead pj">
-    <h1><?= Html::encode($series->name) ?></h1>
+    <h1><?= Html::encode($series->tr('name')) ?></h1>
     <?php if ($metaLine): ?><p class="meta"><?= Html::encode($metaLine) ?></p><?php endif; ?>
 </header>
 
-<?php if ($series->description): ?>
-    <div class="series-intro"><?= RichText::purify($series->description) ?></div>
+<?php if ($series->tr('description')): ?>
+    <div class="series-intro"><?= RichText::purify($series->tr('description')) ?></div>
 <?php endif; ?>
 
 <div class="blogflow">
@@ -49,11 +49,11 @@ $contactEmail = Yii::$app->params['contactEmail'];
             continue;
         }
         ?>
-        <figure data-full="<?= Html::encode($lg) ?>" data-title="<?= Html::encode($p->name) ?>" data-mat="<?= Html::encode($mat) ?>" data-year="<?= Html::encode($year) ?>" data-size="<?= Html::encode($size) ?>" data-desc="<?= Html::encode($descPlain) ?>">
-            <img src="<?= Html::encode($lg) ?>" alt="<?= Html::encode($p->name) ?>" loading="lazy">
+        <figure data-full="<?= Html::encode($lg) ?>" data-title="<?= Html::encode($p->tr('name')) ?>" data-mat="<?= Html::encode($mat) ?>" data-year="<?= Html::encode($year) ?>" data-size="<?= Html::encode($size) ?>" data-desc="<?= Html::encode($descPlain) ?>">
+            <img src="<?= Html::encode($lg) ?>" alt="<?= Html::encode($p->tr('name')) ?>" loading="lazy">
         </figure>
-        <?php if ($p->description): ?>
-            <div class="blogtext"><?= RichText::purify($p->description) ?></div>
+        <?php if ($p->tr('description')): ?>
+            <div class="blogtext"><?= RichText::purify($p->tr('description')) ?></div>
         <?php endif; ?>
     <?php endforeach; ?>
 </div>

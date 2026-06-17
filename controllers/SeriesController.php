@@ -58,15 +58,10 @@ class SeriesController extends AdminBaseController
      */
     public function actionIndex()
     {
-        $post = Yii::$app->request->post();
         $query = Yii::$app->request->queryParams;
 
-        $selectedSection = -1;
-        if (isset($post['isPost']) && isset($post['selected_section'])) {
-            $selectedSection = (int) $post['selected_section'];
-        } elseif (isset($query['selected_section'])) {
-            $selectedSection = (int) $query['selected_section'];
-        }
+        // Filters come from the URL (GET) so they auto-apply on change (Phase 4b).
+        $selectedSection = isset($query['selected_section']) ? (int) $query['selected_section'] : -1;
 
         $searchModel = new SeriesSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $selectedSection);
@@ -186,6 +181,9 @@ class SeriesController extends AdminBaseController
         if (Yii::$app->request->isPost) {
             $model->load(Yii::$app->request->post());
             $model->description = RichText::purify($model->description);
+            if ($model->hasAttribute('description_en')) {
+                $model->description_en = RichText::purify($model->description_en);
+            }
             $model->uploadedCover = UploadedFile::getInstance($model, 'cover_filename');
             if ($model->uploadedCover !== null) {
                 if ($model->uploadCover()) {
@@ -220,6 +218,9 @@ class SeriesController extends AdminBaseController
         if (Yii::$app->request->isPost) {
             $model->load(Yii::$app->request->post());
             $model->description = RichText::purify($model->description);
+            if ($model->hasAttribute('description_en')) {
+                $model->description_en = RichText::purify($model->description_en);
+            }
             $model->uploadedCover = UploadedFile::getInstance($model, 'cover_filename');
             if ($model->uploadedCover !== null) {
                 if ($model->uploadCover()) {

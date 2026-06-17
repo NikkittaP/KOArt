@@ -35,6 +35,8 @@ use yii\db\Expression;
  */
 class Paintings extends \yii\db\ActiveRecord
 {
+    use BilingualTrait;
+
     public $coverPhoto;
     public $coordinates;
     public $groundName;
@@ -64,7 +66,7 @@ class Paintings extends \yii\db\ActiveRecord
      */
     public function rules()
     {
-        return [
+        $rules = [
             [['author_id', 'name'], 'required'],
             [['author_id', 'ground_id', 'section_id', 'sort_order'], 'integer'],
             [['section_id'], 'exist', 'skipOnError' => true, 'targetClass' => Sections::className(), 'targetAttribute' => ['section_id' => 'id']],
@@ -78,6 +80,12 @@ class Paintings extends \yii\db\ActiveRecord
             [['coverPhoto', 'coordinates', 'groundName', 'photo_upload', 'artGenreName', 'artStyleName', 'materials', 'price', 'size_horizontal', 'size_vertical', 'authorComments_comments', 'authorComments_material_costs', 'authorComments_time_costs', 'seriesName'], 'safe'],
 			[['isVisible'], 'boolean'],
         ];
+        if ($this->hasAttribute('name_en')) {
+            $rules[] = [['name_en'], 'string', 'max' => 255];
+            $rules[] = [['description_en'], 'string'];
+            $rules[] = [['name_en', 'description_en'], 'default', 'value' => null];
+        }
+        return $rules;
     }
 
     /**
@@ -89,7 +97,9 @@ class Paintings extends \yii\db\ActiveRecord
             'id' => 'ID',
             'author_id' => 'Автор',
             'name' => 'Название',
+            'name_en' => 'Title (EN)',
             'description' => 'Описание',
+            'description_en' => 'Description (EN)',
             'width' => 'Длина, см',
             'height' => 'Высота, см',
             'ground_id' => 'Основа',

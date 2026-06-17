@@ -5,18 +5,13 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\Paintings */
 
-$this->title = 'Добавить картину';
-$this->params['breadcrumbs'][] = ['label' => 'Картины', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = Yii::t('admin', 'Add work');
 ?>
-<div class="intranet">
-<div class="paintings-create">
-
-    <h1><?=Html::encode($this->title)?></h1>
-
-    <?=$this->render('_form', [
-    'model' => $model,
-])?>
-    <br /><br /><br />
+<div class="apagehead">
+    <div>
+        <div class="crumb"><?= Html::a(Yii::t('admin', 'Works'), ['index']) ?></div>
+        <h1><?= Html::encode($this->title) ?></h1>
+    </div>
 </div>
-</div>
+
+<?= $this->render('_form', ['model' => $model]) ?>

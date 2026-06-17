@@ -19,6 +19,19 @@
     });
   }
 
+  // Photo picker: reflect selection with a highlighted border.
+  var picks = document.querySelectorAll('.photo-grid input');
+  if (picks.length) {
+    var sync = function () {
+      picks.forEach(function (i) {
+        var card = i.closest('.photo-pick');
+        if (card) { card.classList.toggle('sel', i.checked); }
+      });
+    };
+    picks.forEach(function (i) { i.addEventListener('change', sync); });
+    sync();
+  }
+
   // "Load more": fetch the next cumulative page and swap the table body in
   // place. Degrades to a normal link (full reload) if JS/fetch is unavailable.
   var more = document.getElementById('loadmore');

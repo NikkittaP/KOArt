@@ -61,10 +61,11 @@ class PaintingPresenter
      */
     public static function descPlain(Paintings $painting): string
     {
-        if (empty($painting->description)) {
+        $description = $painting->tr('description');
+        if (empty($description)) {
             return '';
         }
-        $text = strip_tags($painting->description);
+        $text = strip_tags($description);
         $text = html_entity_decode($text, ENT_QUOTES);
         $text = preg_replace('/\s+/', ' ', $text);
         return trim($text);

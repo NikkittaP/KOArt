@@ -5,19 +5,16 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\Paintings */
 
-$this->title = 'Обновить данные по картине #' . $model->id . ' "' . $model->name . '"';
-$this->params['breadcrumbs'][] = ['label' => 'Картины', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Обновить';
+$this->title = Yii::t('admin', 'Edit work') . ': #' . $model->id;
 ?>
-<div class="intranet">
-<div class="paintings-update">
-
-    <h1><?=Html::encode($this->title)?></h1>
-
-    <?=$this->render('_form', [
-    'model' => $model,
-])?>
-    <br /><br /><br />
+<div class="apagehead">
+    <div>
+        <div class="crumb"><?= Html::a(Yii::t('admin', 'Works'), ['index']) ?></div>
+        <h1><?= Html::encode($model->name ?: ('#' . $model->id)) ?></h1>
+    </div>
+    <div class="actions">
+        <?= Html::a(Yii::t('admin', 'Photos'), ['/photos/add', 'painting_id' => $model->id], ['class' => 'btn ghost']) ?>
+    </div>
 </div>
-</div>
+
+<?= $this->render('_form', ['model' => $model]) ?>

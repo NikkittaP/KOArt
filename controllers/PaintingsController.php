@@ -79,6 +79,9 @@ class PaintingsController extends AdminBaseController
             $dataProvider->query->andWhere(['paintings.isVisible' => 0]);
         }
 
+        // Eager-load the relations rendered per row (thumb, series, notes column).
+        $dataProvider->query->with(['mainPhoto', 'paintingsToSeries', 'authorComments']);
+
         $totalCount = (int) $dataProvider->totalCount;
         $dataProvider->pagination = ['pageSize' => $show, 'page' => 0];
 
@@ -368,6 +371,9 @@ class PaintingsController extends AdminBaseController
                 $model->date .= '-00';
             }
             $model->description = RichText::purify($model->description);
+            if ($model->hasAttribute('description_en')) {
+                $model->description_en = RichText::purify($model->description_en);
+            }
             if ($model->save()) {
                 // Серия для картины
                 if (!empty($model->seriesName)) {
@@ -525,6 +531,9 @@ class PaintingsController extends AdminBaseController
                 $model->date .= '-00';
             }
             $model->description = RichText::purify($model->description);
+            if ($model->hasAttribute('description_en')) {
+                $model->description_en = RichText::purify($model->description_en);
+            }
 
             if ($model->save()) {
                 // Серия для картины
@@ -750,7 +759,8 @@ class PaintingsController extends AdminBaseController
             $model->seriesName[] = $paintingsToSeries_->series_id;
         }
 
-        $model->price = Prices::find()->where(['painting_id' => $id])->orderBy(['datetime_add' => SORT_DESC])->one()->value;
+        $lastPrice = Prices::find()->where(['painting_id' => $id])->orderBy(['datetime_add' => SORT_DESC])->one();
+        $model->price = $lastPrice ? $lastPrice->value : null;
 
         $artGenresToPaintings = ArtGenresToPainting::find()->where(['painting_id' => $id])->all();
         $model->artGenreName = [];

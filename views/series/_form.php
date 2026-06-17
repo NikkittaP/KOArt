@@ -1,65 +1,93 @@
 <?php
 
-use kartik\file\FileInput;
-use kartik\select2\Select2;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
-use yii\helpers\Url;
-use yii\widgets\ActiveForm;
-
 use app\models\Sections;
 use app\assets\RichTextAsset;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Series */
-/* @var $form yii\widgets\ActiveForm */
 
 RichTextAsset::register($this);
+
+$baseUrl = Yii::$app->request->baseUrl;
+$sections = ArrayHelper::map(Sections::find()->orderBy('sort ASC')->all(), 'id', 'title');
+$err = function ($attr) use ($model) {
+    return $model->hasErrors($attr)
+        ? '<div class="help-block">' . Html::encode($model->getFirstError($attr)) . '</div>'
+        : '';
+};
 ?>
+<?= Html::beginForm('', 'post', ['enctype' => 'multipart/form-data']) ?>
+<div class="form-grid">
+    <div>
+        <div class="panel">
+            <div class="field <?= $model->hasErrors('name') ? 'has-error' : '' ?>">
+                <label><?= Yii::t('admin', 'Name') ?> (RU)</label>
+                <?= Html::activeTextInput($model, 'name', ['maxlength' => true, 'style' => 'width:100%']) ?>
+                <?= $err('name') ?>
+            </div>
 
-<div class="intranet-form">
+            <?php if ($model->hasAttribute('name_en')): ?>
+            <div class="field <?= $model->hasErrors('name_en') ? 'has-error' : '' ?>">
+                <label><?= Yii::t('admin', 'Name') ?> (EN)</label>
+                <?= Html::activeTextInput($model, 'name_en', ['maxlength' => true, 'style' => 'width:100%']) ?>
+                <div class="hint"><?= Yii::t('admin', 'Shown on the (English) site; falls back to Russian if empty.') ?></div>
+            </div>
+            <?php endif; ?>
 
-    <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
+            <div class="field">
+                <label><?= Yii::t('admin', 'Description') ?> (RU)</label>
+                <?= Html::activeTextarea($model, 'description', ['rows' => 6, 'class' => 'rich-text-editor']) ?>
+                <div class="hint"><?= Yii::t('admin', 'Shown on the series page. Allowed: bold/italic, paragraphs, lists, links.') ?></div>
+            </div>
 
-    <div class="card border-dark">
-        <div class="card-header">
-            <h5>Базовая информация</h5>
-        </div>
-        <div class="card-body">
-            <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-
-            <?= $form->field($model, 'description')->textarea(['rows' => 6, 'class' => 'form-control rich-text-editor'])
-                ->hint('Показывается на блог-странице серии. Допустимы: жирный/курсив, абзацы, списки, ссылки.') ?>
-
-            <?php
-            if ($model->cover_filename != null) {
-                echo Html::img(Yii::$app->request->BaseUrl . '/series_cover/thumb/' . $model->cover_filename,
-                ['width' => '100px']);
-            }
-            ?>
-
-            <?= $form->field($model, 'cover_filename')->fileInput() ?>
-
-            <?= $form->field($model, 'isVisible')->checkbox(['class' => 'intranet_checkbox']) ?>
-
-            <?php
-            $sections = ArrayHelper::map(Sections::find()->orderBy('sort ASC')->all(), 'id', 'title');
-            echo $form->field($model, 'section_id')->widget(Select2::className(), [
-                'data' => $sections,
-                'options' => ['placeholder' => '- Выбрать раздел -'],
-            ]);
-            ?>
-
-            <?= $form->field($model, 'sort_order')->input('number', ['step' => 1])
-                ->hint('Порядок серии внутри раздела (меньше — выше). Можно также менять стрелками в списке серий.') ?>
+            <?php if ($model->hasAttribute('description_en')): ?>
+            <div class="field">
+                <label><?= Yii::t('admin', 'Description') ?> (EN)</label>
+                <?= Html::activeTextarea($model, 'description_en', ['rows' => 6, 'class' => 'rich-text-editor']) ?>
+                <div class="hint"><?= Yii::t('admin', 'Shown on the (English) site; falls back to Russian if empty.') ?></div>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
-    <br />
 
-    <div class="form-group">
-        <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
+    <div>
+        <div class="panel">
+            <div class="field">
+                <label><?= Yii::t('admin', 'Cover') ?></label>
+                <?php if ($model->cover_filename): ?>
+                    <?= Html::img($baseUrl . '/series_cover/thumb/' . $model->cover_filename,
+                        ['class' => 'thumb', 'style' => 'width:120px;height:120px;margin-bottom:10px']) ?>
+                <?php endif; ?>
+                <?= Html::activeFileInput($model, 'cover_filename', ['accept' => 'image/*']) ?>
+                <div class="hint"><?= Yii::t('admin', 'Leave empty to keep the current cover.') ?></div>
+            </div>
+
+            <div class="field">
+                <label><?= Yii::t('admin', 'Section') ?></label>
+                <?= Html::activeDropDownList($model, 'section_id', $sections,
+                    ['prompt' => Yii::t('admin', '— choose —'), 'style' => 'width:100%']) ?>
+            </div>
+
+            <div class="field">
+                <label><?= Yii::t('admin', 'Order') ?></label>
+                <?= Html::activeInput('number', $model, 'sort_order', ['step' => 1, 'style' => 'width:120px']) ?>
+                <div class="hint"><?= Yii::t('admin', 'Order within the section (lower = higher). Can also be changed with ↑/↓ in the list.') ?></div>
+            </div>
+
+            <div class="field" style="margin-bottom:0">
+                <label class="checkbox" style="display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;color:var(--ink);font-size:13.5px">
+                    <?= Html::activeCheckbox($model, 'isVisible', ['label' => null]) ?>
+                    <?= Yii::t('admin', 'Visible on the site') ?>
+                </label>
+            </div>
+        </div>
     </div>
-
-    <?php ActiveForm::end(); ?>
-
 </div>
+
+<div style="margin-top:18px">
+    <?= Html::submitButton(Yii::t('admin', 'Save'), ['class' => 'btn accent']) ?>
+    <?= Html::a(Yii::t('admin', 'Cancel'), ['index'], ['class' => 'btn ghost']) ?>
+</div>
+<?= Html::endForm() ?>

@@ -55,6 +55,9 @@ class SectionsController extends AdminBaseController
 
         if ($model->load(Yii::$app->request->post())) {
             $model->description = RichText::purify($model->description);
+            if ($model->hasAttribute('description_en')) {
+                $model->description_en = RichText::purify($model->description_en);
+            }
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', Yii::t('admin', 'Section created.'));
 
@@ -73,6 +76,9 @@ class SectionsController extends AdminBaseController
 
         if ($model->load(Yii::$app->request->post())) {
             $model->description = RichText::purify($model->description);
+            if ($model->hasAttribute('description_en')) {
+                $model->description_en = RichText::purify($model->description_en);
+            }
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', Yii::t('admin', 'Section saved.'));
 

@@ -4,34 +4,43 @@ use kartik\file\FileInput;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
-$this->title = 'Добавить фото к картине #' . $paintingModel->id . ' "' . $paintingModel->name . '"';
-$this->params['breadcrumbs'][] = ['label' => 'Картины', 'url' => ['paintings/index']];
-$this->params['breadcrumbs'][] = $this->title;
+/* @var $this yii\web\View */
+/* @var $paintingModel app\models\Paintings */
+
+$this->title = Yii::t('admin', 'Photos');
 ?>
-<div class="intranet">
-<div class="photos-add">
-
-    <h1><?=Html::encode($this->title)?></h1>
-
-    <?php
-    echo FileInput::widget([
-      'name' => 'photos[]',
-      'options' => [
-        'multiple' => true,
-        'accept' => 'image/*',
-      ],
-      'pluginOptions' => [
-        'previewFileType' => 'image',
-        'uploadUrl' => Url::to(['/photos/upload']),
-        'uploadExtraData' => [
-          'painting_id' => $paintingModel->id,
-        ],
-        'maxFileCount' => 10,
-      ],
-    ]);
-    ?>
-    <br /><br />
-    <?= Html::a('Далее', ['selectmain', 'painting_id' => $paintingModel->id], ['class' => 'btn btn-primary float-right']) ?>
-    <br />
+<div class="apagehead">
+    <div>
+        <div class="crumb"><?= Html::a(Yii::t('admin', 'Works'), ['/paintings/index']) ?></div>
+        <h1><?= Yii::t('admin', 'Add photos') ?>: #<?= (int) $paintingModel->id ?> <?= Html::encode($paintingModel->name) ?></h1>
+    </div>
+    <div class="actions">
+        <?= Html::a(Yii::t('admin', 'Choose cover →'), ['selectmain', 'painting_id' => $paintingModel->id], ['class' => 'btn accent']) ?>
+    </div>
 </div>
+
+<div class="panel">
+    <?= FileInput::widget([
+        'name' => 'photos[]',
+        'options' => [
+            'multiple' => true,
+            'accept' => 'image/*',
+        ],
+        'pluginOptions' => [
+            'previewFileType' => 'image',
+            'uploadUrl' => Url::to(['/photos/upload']),
+            'uploadExtraData' => [
+                'painting_id' => $paintingModel->id,
+            ],
+            'maxFileCount' => 10,
+        ],
+    ]) ?>
+    <p class="hint" style="margin-top:14px;color:var(--faint)">
+        <?= Yii::t('admin', 'Upload photos, then choose which one is the cover.') ?>
+    </p>
+</div>
+
+<div>
+    <?= Html::a(Yii::t('admin', 'Choose cover →'), ['selectmain', 'painting_id' => $paintingModel->id], ['class' => 'btn ghost']) ?>
+    <?= Html::a(Yii::t('admin', 'Delete photos'), ['delete', 'painting_id' => $paintingModel->id], ['class' => 'btn ghost']) ?>
 </div>

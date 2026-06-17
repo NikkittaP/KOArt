@@ -110,9 +110,22 @@ textarea{width:100%;min-height:120px;line-height:1.6}
 .atable .thumb{width:84px;height:84px;object-fit:cover;border-radius:3px;background:#f4f2ec;border:1px solid var(--line)}
 .atable .rowact{display:flex;gap:7px;flex-wrap:nowrap;align-items:center}
 .atable code{font-size:12px;background:#f3f1ec;padding:1px 6px;border-radius:2px;color:var(--soft)}
+.atable .note summary{cursor:pointer;color:var(--soft);font-size:12.5px;list-style:none}
+.atable .note summary::-webkit-details-marker{display:none}
+.atable .note summary::after{content:" ▾";color:var(--faint)}
+.atable .note[open] summary::after{content:" ▴"}
+.atable .note[open] .trunc{display:none}
+.atable .note .full{margin-top:2px;color:var(--soft);font-size:12.5px;line-height:1.5;white-space:normal}
 .ord{display:inline-flex;flex-direction:column;gap:2px}
 .ord a{text-decoration:none;color:var(--muted);font-size:14px;line-height:1;padding:1px 5px;border:1px solid var(--line);border-radius:2px}
 .ord a:hover{color:var(--ink);border-color:var(--muted)}
+
+/* ---- Photo picker grid (select cover / delete photos) ---- */
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin:4px 0 22px}
+.photo-pick{position:relative;display:block;cursor:pointer;border:2px solid var(--line);border-radius:5px;overflow:hidden;background:#f4f2ec;transition:border-color .15s}
+.photo-pick img{width:100%;height:150px;object-fit:cover;display:block}
+.photo-pick input{position:absolute;top:8px;left:8px;width:20px;height:20px;cursor:pointer}
+.photo-pick.sel{border-color:var(--accent);box-shadow:0 0 0 2px rgba(154,106,79,.25)}
 
 /* ---- Pills / badges ---- */
 .pill{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:20px;font-weight:400}
@@ -183,6 +196,26 @@ textarea{width:100%;min-height:120px;line-height:1.6}
 .amain .summary{font-size:12px;color:var(--muted);margin-bottom:10px}
 .amain .black-link,.amain .profile-link{color:var(--accent);text-decoration:none}
 .amain .black-link:hover,.amain .profile-link:hover{text-decoration:underline}
+
+/* kartik Select2 -> match admin inputs and stay ~1 row tall (was very tall).
+   Target the theme-agnostic .select2-selection because kartik with bsVersion 4
+   uses the class .select2-container--krajee-bs4 (not --krajee). */
+.amain .select2-container{max-width:520px;width:100%!important}
+.amain .select2-selection{
+  min-height:40px!important;height:auto!important;
+  border:1px solid #dcd9d1!important;border-radius:3px!important;
+  box-shadow:none!important;background:#fff!important}
+.amain .select2-selection--single{height:40px!important;padding:4px 10px!important}
+.amain .select2-selection--single .select2-selection__rendered{line-height:30px!important;padding:0!important;color:var(--ink)}
+.amain .select2-selection--single .select2-selection__arrow{height:38px!important}
+.amain .select2-selection--multiple{padding:3px 6px!important}
+.amain .select2-selection--multiple .select2-selection__rendered{
+  min-height:30px!important;padding:0!important;margin:0!important;
+  display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:4px}
+.amain .select2-selection--multiple .select2-search--inline,
+.amain .select2-selection--multiple .select2-search__field{height:28px!important;margin:0!important}
+.amain .select2-selection__choice{background:#f3f1ec!important;border:1px solid var(--line)!important;border-radius:3px!important;color:var(--ink)!important;font-size:12.5px!important;margin:0!important}
+.amain .select2-container--focus .select2-selection{border-color:var(--accent)!important}
 
 /* Bootstrap cards (e.g. the "hidden author comments" block) -> neutral panels.
    These notes are never shown on the public site, so no accent colour. */

@@ -1,7 +1,7 @@
 <?php
 
-use yii\grid\GridView;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\search\SeriesSearch */
@@ -9,135 +9,98 @@ use yii\helpers\Html;
 /* @var $sections array id => title */
 /* @var $selectedSection int */
 
-$this->title = 'Серии';
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = Yii::t('admin', 'Series');
+$models = $dataProvider->getModels();
+$baseUrl = Yii::$app->request->baseUrl;
+$ordering = (int) $selectedSection !== -1;
 ?>
-<div class="intranet">
-<div class="series-index">
-
-    <h1><?=Html::encode($this->title)?></h1>
-
-    <p>
-        <?=Html::a('Добавить серию', ['create'], ['class' => 'btn btn-success'])?>
-    </p>
-
-    <h3>Фильтр / сортировка:</h3>
-    <?php
-    echo Html::beginForm(['series/index'], 'post');
-    echo Html::hiddenInput('isPost', '1');
-    ?>
-    <div class="row">
-        <div class="col-sm-5">
-            <label>Раздел (для сортировки серий — выберите раздел)</label>
-            <?php
-            $sectionList = ['-1' => 'Все разделы'];
-            foreach ($sections as $key => $value) {
-                $sectionList[$key] = $value;
-            }
-            echo Html::dropDownList('selected_section', $selectedSection, $sectionList, ['class' => 'nostyle form-control']);
-            ?>
-        </div>
+<div class="apagehead">
+    <div>
+        <div class="crumb"><?= Yii::t('admin', 'Archive') ?></div>
+        <h1><?= Yii::t('admin', 'Series') ?></h1>
     </div>
-    <br />
-    <div class="form-group">
-        <?= Html::submitButton('Показать', ['class' => 'btn btn-primary']) ?>
+    <div class="actions">
+        <?= Html::a(Yii::t('admin', '+ Add series'), ['create'], ['class' => 'btn accent']) ?>
     </div>
-    <?= Html::endForm() ?>
-
-    <br />
-
-    <?php if ((int) $selectedSection !== -1): ?>
-        <p class="text-muted">
-            Список отсортирован по порядку раздела — стрелками ↑/↓ можно менять порядок
-            (именно в этом порядке серии будут показаны на сайте).
-        </p>
-    <?php endif; ?>
-
-    <?=GridView::widget([
-    'dataProvider' => $dataProvider,
-    'filterModel' => $searchModel,
-    'formatter' => ['class' => 'yii\i18n\Formatter', 'nullDisplay' => '&ndash;'],
-    'columns' => [
-        [
-            'attribute' => 'id',
-            'headerOptions' => ['style' => 'max-width: 70px;width: 70px;text-align:center;vertical-align: middle;'],
-            'contentOptions' => ['style' => 'width: 70px;text-align:center;'],
-        ],
-        [
-            'attribute' => 'cover_filename',
-            'headerOptions' => ['style' => 'vertical-align: middle;'],
-            'contentOptions' => ['style' => 'width: 200px;'],
-            'format' => 'raw',
-            'value' => function ($model) {
-                if ($model->cover_filename === null) {
-                    return null;
-                }
-
-                return Html::a(
-                    Html::img(Yii::$app->request->BaseUrl . '/series_cover/thumb/' . $model->cover_filename,
-                        ['width' => '200px']),
-                    ['series/show', 'id' => $model->id], ['class' => 'black-link', 'target' => '_blank']);
-            },
-        ],
-        [
-            'attribute' => 'name',
-            'headerOptions' => ['style' => 'vertical-align: middle;'],
-            'contentOptions' => ['style' => 'width: 150px;text-align:left;'],
-        ],
-        [
-            'attribute' => 'description',
-            'headerOptions' => ['style' => 'vertical-align: middle;'],
-        ],
-        [
-            'attribute' => 'section_id',
-            'label' => 'Раздел',
-            'headerOptions' => ['style' => 'vertical-align: middle;'],
-            'contentOptions' => ['style' => 'width:130px;'],
-            'filter' => false,
-            'value' => function ($model) use ($sections) {
-                return $model->section_id && isset($sections[$model->section_id]) ? $sections[$model->section_id] : null;
-            },
-        ],
-        [
-            'attribute' => 'isVisible',
-            'headerOptions' => ['style' => 'max-width: 150px;width: 150px;text-align:center;vertical-align: middle;'],
-            'contentOptions' => ['style' => 'width: 150px;text-align:center;'],
-            'format' => 'raw',
-            'value' => function ($model) {
-                $out = '';
-                if ($model->isVisible === null || $model->isVisible === 0) {
-                    $out .= '<span>нет</span>';
-                } else {
-                    $out .= '<span>да</span>';
-                }
-
-                return $out;
-            },
-        ],
-        [
-            'label' => 'Порядок',
-            'headerOptions' => ['style' => 'vertical-align: middle;width:70px;text-align:center;'],
-            'contentOptions' => ['style' => 'width:70px;text-align:center;'],
-            'format' => 'raw',
-            'visible' => (int) $selectedSection !== -1,
-            'value' => function ($model) use ($selectedSection) {
-                return Html::a('↑', ['series/move', 'id' => $model->id, 'direction' => 'up', 'selected_section' => $selectedSection],
-                        ['class' => 'profile-link', 'data' => ['method' => 'post'], 'title' => 'Выше']) .
-                    '&nbsp;' .
-                    Html::a('↓', ['series/move', 'id' => $model->id, 'direction' => 'down', 'selected_section' => $selectedSection],
-                        ['class' => 'profile-link', 'data' => ['method' => 'post'], 'title' => 'Ниже']);
-            },
-        ],
-        [
-            'label' => 'Действия',
-            'headerOptions' => ['style' => 'vertical-align: middle;'],
-            'format' => 'html',
-            'value' => function ($model) {
-                return Html::a('Посмотреть', ['series/view', 'id' => $model->id], ['class' => 'profile-link']) . '<br />' .
-                Html::a('Обновить', ['update', 'id' => $model->id], ['class' => 'profile-link']);
-            },
-        ],
-    ],
-]);?>
 </div>
+
+<?= Html::beginForm(['index'], 'get', ['class' => 'filterbar']) ?>
+    <div class="fg">
+        <label><?= Yii::t('admin', 'Section') ?></label>
+        <?= Html::dropDownList('selected_section', $selectedSection,
+            [-1 => Yii::t('admin', 'All sections')] + $sections,
+            ['onchange' => 'this.form.submit()']) ?>
+    </div>
+    <?php if ($ordering): ?>
+        <a class="btn ghost sm" href="<?= Url::to(['index']) ?>"><?= Yii::t('admin', 'Reset') ?></a>
+    <?php endif; ?>
+<?= Html::endForm() ?>
+
+<p style="color:var(--muted);font-size:12.5px;margin:0 0 14px">
+    <?php if ($ordering): ?>
+        <?= Yii::t('admin', 'Sorted by section order — use ↑/↓ to reorder (this is the order shown on the site).') ?>
+    <?php else: ?>
+        <?= Yii::t('admin', 'Pick a section above to reorder series with ↑/↓.') ?>
+    <?php endif; ?>
+</p>
+
+<div class="table-scroll">
+<table class="atable">
+    <thead>
+    <tr>
+        <th style="width:64px">ID</th>
+        <th style="width:96px"></th>
+        <th><?= Yii::t('admin', 'Name') ?></th>
+        <th style="width:130px"><?= Yii::t('admin', 'Section') ?></th>
+        <th style="width:110px"><?= Yii::t('admin', 'Visibility') ?></th>
+        <?php if ($ordering): ?><th style="width:60px"><?= Yii::t('admin', 'Order') ?></th><?php endif; ?>
+        <th style="width:200px"><?= Yii::t('admin', 'Actions') ?></th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($models as $m): ?>
+        <?php
+        $hidden = ($m->isVisible === null || (int) $m->isVisible === 0);
+        $cover = $m->cover_filename ? $baseUrl . '/series_cover/thumb/' . $m->cover_filename : null;
+        ?>
+        <tr class="<?= $hidden ? 'is-hidden' : '' ?>">
+            <td><?= (int) $m->id ?></td>
+            <td>
+                <?php if ($cover): ?>
+                    <?= Html::a(Html::img($cover, ['class' => 'thumb', 'width' => 84, 'height' => 84]),
+                        ['show', 'id' => $m->id], ['target' => '_blank']) ?>
+                <?php else: ?>
+                    <span class="thumb" style="display:inline-block"></span>
+                <?php endif; ?>
+            </td>
+            <td><?= Html::encode($m->name) ?></td>
+            <td><?= isset($sections[$m->section_id]) ? Html::encode($sections[$m->section_id]) : '<span style="color:var(--faint)">—</span>' ?></td>
+            <td>
+                <?php if ($hidden): ?>
+                    <span class="pill off"><?= Yii::t('admin', 'Archived') ?></span>
+                <?php else: ?>
+                    <span class="pill on"><?= Yii::t('admin', 'On site') ?></span>
+                <?php endif; ?>
+            </td>
+            <?php if ($ordering): ?>
+                <td>
+                    <span class="ord">
+                        <?= Html::a('↑', ['move', 'id' => $m->id, 'direction' => 'up', 'selected_section' => $selectedSection], ['data' => ['method' => 'post'], 'title' => Yii::t('admin', 'Up')]) ?>
+                        <?= Html::a('↓', ['move', 'id' => $m->id, 'direction' => 'down', 'selected_section' => $selectedSection], ['data' => ['method' => 'post'], 'title' => Yii::t('admin', 'Down')]) ?>
+                    </span>
+                </td>
+            <?php endif; ?>
+            <td>
+                <div class="rowact">
+                    <?= Html::a(Yii::t('admin', 'Edit'), ['update', 'id' => $m->id], ['class' => 'btn ghost sm']) ?>
+                    <?= Html::a(Yii::t('admin', 'Open ↗'), ['show', 'id' => $m->id], ['class' => 'btn ghost sm', 'target' => '_blank']) ?>
+                </div>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+    <?php if (empty($models)): ?>
+        <tr><td colspan="<?= $ordering ? 7 : 6 ?>" style="text-align:center;color:var(--muted);padding:34px"><?= Yii::t('admin', 'Nothing here yet.') ?></td></tr>
+    <?php endif; ?>
+    </tbody>
+</table>
 </div>

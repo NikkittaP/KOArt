@@ -16,10 +16,10 @@ use app\helpers\PaintingPresenter;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
-$this->title = $section->title;
+$this->title = $section->tr('title');
 ?>
 <header class="shead">
-    <h1><?= Html::encode($section->title) ?></h1>
+    <h1><?= Html::encode($section->tr('title')) ?></h1>
     <?php if ($intro): ?>
         <p><?= Html::encode($intro) ?></p>
     <?php endif; ?>
@@ -33,11 +33,11 @@ $this->title = $section->title;
             <a class="scard" href="<?= Url::to(['series/show', 'id' => $s->id]) ?>">
                 <div class="scard-img">
                     <?php if ($s->cover_filename): ?>
-                        <img src="/series_cover/thumb/<?= Html::encode($s->cover_filename) ?>" alt="<?= Html::encode($s->name) ?>" loading="lazy">
+                        <img src="/series_cover/thumb/<?= Html::encode($s->cover_filename) ?>" alt="<?= Html::encode($s->tr('name')) ?>" loading="lazy">
                     <?php endif; ?>
                 </div>
                 <div class="scard-cap">
-                    <span class="nm"><?= Html::encode($s->name) ?></span>
+                    <span class="nm"><?= Html::encode($s->tr('name')) ?></span>
                     <span class="ct"><?= (int) $workCount ?> work<?= $workCount === 1 ? '' : 's' ?></span>
                 </div>
             </a>
@@ -60,10 +60,10 @@ $this->title = $section->title;
                 continue;
             }
             ?>
-            <figure data-full="<?= Html::encode($lg) ?>" data-title="<?= Html::encode($p->name) ?>" data-mat="<?= Html::encode($mat) ?>" data-year="<?= Html::encode($year) ?>" data-size="<?= Html::encode($size) ?>" data-desc="<?= Html::encode($desc) ?>">
-                <img src="<?= Html::encode($sm) ?>" alt="<?= Html::encode($p->name) ?>" loading="lazy">
+            <figure data-full="<?= Html::encode($lg) ?>" data-title="<?= Html::encode($p->tr('name')) ?>" data-mat="<?= Html::encode($mat) ?>" data-year="<?= Html::encode($year) ?>" data-size="<?= Html::encode($size) ?>" data-desc="<?= Html::encode($desc) ?>">
+                <img src="<?= Html::encode($sm) ?>" alt="<?= Html::encode($p->tr('name')) ?>" loading="lazy">
                 <figcaption class="hov">
-                    <span class="t"><?= Html::encode($p->name) ?></span>
+                    <span class="t"><?= Html::encode($p->tr('name')) ?></span>
                     <?php if ($mat): ?><span class="m"><?= Html::encode($mat) ?></span><?php endif; ?>
                 </figcaption>
             </figure>

@@ -5,19 +5,13 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\Series */
 
-$this->title = 'Обновить серию: ' . $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Серии', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Обновить';
+$this->title = Yii::t('admin', 'Edit series') . ': ' . $model->name;
 ?>
-<div class="intranet">
-<div class="series-update">
-
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <?= $this->render('_form', [
-        'model' => $model,
-    ]) ?>
-
+<div class="apagehead">
+    <div>
+        <div class="crumb"><?= Html::a(Yii::t('admin', 'Series'), ['index']) ?></div>
+        <h1><?= Html::encode($model->name) ?></h1>
+    </div>
 </div>
-</div>
+
+<?= $this->render('_form', ['model' => $model]) ?>

@@ -74,6 +74,8 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
     <?= Yii::t('admin', 'Showing {n} of {t}', ['n' => count($models), 't' => $totalCount]) ?>
     <?php if ($ordering): ?>
         · <?= Yii::t('admin', 'Sorted by section order — use ↑/↓ to reorder (this is the order shown on the site).') ?>
+    <?php else: ?>
+        · <?= Yii::t('admin', 'Pick a section above to reorder works with ↑/↓.') ?>
     <?php endif; ?>
 </p>
 
@@ -101,6 +103,7 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
         <th><?= Yii::t('admin', 'Name') ?></th>
         <th style="width:130px"><?= Yii::t('admin', 'Section') ?></th>
         <th style="width:140px"><?= Yii::t('admin', 'Series') ?></th>
+        <th style="width:220px"><?= Yii::t('admin', 'Notes') ?></th>
         <th style="width:90px"><?= Yii::t('admin', 'Size') ?></th>
         <th style="width:110px"><?= Yii::t('admin', 'Visibility') ?></th>
         <?php if ($ordering): ?><th style="width:60px"><?= Yii::t('admin', 'Order') ?></th><?php endif; ?>
@@ -118,6 +121,8 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
             if (isset($series[$p2s->series_id])) $seriesNames[] = $series[$p2s->series_id];
         }
         $sizeLabel = (is_numeric($m->width) && is_numeric($m->height)) ? $m->width . '×' . $m->height : '';
+        $noteModel = $m->authorComments;
+        $note = $noteModel ? trim((string) $noteModel->comments) : '';
         ?>
         <tr class="<?= $hidden ? 'is-hidden' : '' ?>">
             <td><input type="checkbox" name="ids[]" value="<?= (int) $m->id ?>"></td>
@@ -125,7 +130,7 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
             <td>
                 <?php if ($thumb): ?>
                     <?= Html::a(Html::img($thumb, ['class' => 'thumb', 'width' => 84, 'height' => 84]),
-                        ['show', 'id' => $m->id], ['target' => '_blank']) ?>
+                        ['show', 'id' => $m->id]) ?>
                 <?php else: ?>
                     <span class="thumb" style="display:inline-block"></span>
                 <?php endif; ?>
@@ -133,6 +138,15 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
             <td><?= Html::encode($m->name) ?></td>
             <td><?= isset($sections[$m->section_id]) ? Html::encode($sections[$m->section_id]) : '<span style="color:var(--faint)">—</span>' ?></td>
             <td><?= $seriesNames ? Html::encode(implode(', ', $seriesNames)) : '<span style="color:var(--faint)">—</span>' ?></td>
+            <td>
+                <?php if ($note === ''): ?>
+                    <span style="color:var(--faint)">—</span>
+                <?php elseif (mb_strlen($note) <= 70): ?>
+                    <span style="color:var(--soft)"><?= Html::encode($note) ?></span>
+                <?php else: ?>
+                    <details class="note"><summary><span class="trunc"><?= Html::encode(mb_substr($note, 0, 70)) ?>…</span></summary><div class="full"><?= nl2br(Html::encode($note)) ?></div></details>
+                <?php endif; ?>
+            </td>
             <td><?= $sizeLabel ?: '<span style="color:var(--faint)">—</span>' ?></td>
             <td>
                 <?php if ($hidden): ?>
@@ -159,7 +173,7 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
         </tr>
     <?php endforeach; ?>
     <?php if (empty($models)): ?>
-        <tr><td colspan="<?= $ordering ? 10 : 9 ?>" style="text-align:center;color:var(--muted);padding:34px"><?= Yii::t('admin', 'Nothing here yet.') ?></td></tr>
+        <tr><td colspan="<?= $ordering ? 11 : 10 ?>" style="text-align:center;color:var(--muted);padding:34px"><?= Yii::t('admin', 'Nothing here yet.') ?></td></tr>
     <?php endif; ?>
     </tbody>
 </table>
