@@ -32,10 +32,10 @@ class PaintingsController extends AdminBaseController
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['index', 'stats', 'view', 'create', 'update', 'delete', 'move', 'bulk-visibility', 'bulk-section'],
+                'only' => ['index', 'stats', 'view', 'create', 'update', 'delete', 'move', 'bulk-visibility', 'bulk-section', 'bulk-status'],
                 'rules' => [
                     [
-                        'actions' => ['index', 'stats', 'view', 'create', 'update', 'delete', 'move', 'bulk-visibility', 'bulk-section'],
+                        'actions' => ['index', 'stats', 'view', 'create', 'update', 'delete', 'move', 'bulk-visibility', 'bulk-section', 'bulk-status'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -48,6 +48,7 @@ class PaintingsController extends AdminBaseController
                     'move' => ['POST'],
                     'bulk-visibility' => ['POST'],
                     'bulk-section' => ['POST'],
+                    'bulk-status' => ['POST'],
                 ],
             ],
         ];
@@ -62,6 +63,7 @@ class PaintingsController extends AdminBaseController
         $selectedSeries = isset($query['selected_series']) ? (int) $query['selected_series'] : -1;
         $selectedSection = isset($query['selected_section']) ? (int) $query['selected_section'] : -1;
         $vis = isset($query['vis']) && in_array($query['vis'], ['1', '0'], true) ? $query['vis'] : 'all';
+        $status = isset($query['status']) && in_array($query['status'], ['1', '2', '3'], true) ? $query['status'] : 'all';
         $show = isset($query['show']) ? max(24, (int) $query['show']) : 24;
 
         $searchModel = new PaintingsSearch();
@@ -77,6 +79,10 @@ class PaintingsController extends AdminBaseController
             $dataProvider->query->andWhere(['paintings.isVisible' => 1]);
         } elseif ($vis === '0') {
             $dataProvider->query->andWhere(['paintings.isVisible' => 0]);
+        }
+        // Sale/availability status filter (guarded: column may not exist pre-migration).
+        if ($status !== 'all' && (new Paintings())->hasAttribute('status')) {
+            $dataProvider->query->andWhere(['paintings.status' => (int) $status]);
         }
 
         // Eager-load the relations rendered per row (thumb, series, notes column).
@@ -97,6 +103,7 @@ class PaintingsController extends AdminBaseController
             'selectedSeries' => $selectedSeries,
             'selectedSection' => $selectedSection,
             'vis' => $vis,
+            'status' => $status,
             'show' => $show,
             'totalCount' => $totalCount,
             'hasMore' => $totalCount > $show,
@@ -187,6 +194,23 @@ class PaintingsController extends AdminBaseController
         }
 
         return $this->redirect(['index', 'selected_section' => $sectionId ?: -1]);
+    }
+
+    /**
+     * Bulk action: set the sale/availability status on the selected works.
+     */
+    public function actionBulkStatus()
+    {
+        $ids = (array) Yii::$app->request->post('ids', []);
+        $status = Yii::$app->request->post('status');
+        $selectedSection = Yii::$app->request->post('selected_section', -1);
+
+        if (!empty($ids) && in_array((int) $status, array_keys(Paintings::statuses()), true)) {
+            Paintings::updateAll(['status' => (int) $status], ['id' => $ids]);
+            Yii::$app->session->setFlash('success', Yii::t('admin', '{n} work(s) status updated.', ['n' => count($ids)]));
+        }
+
+        return $this->redirect(['index', 'selected_section' => $selectedSection]);
     }
 
     public function actionStats()

@@ -49,7 +49,7 @@ $ordering = (int) $selectedSection !== -1;
     <thead>
     <tr>
         <th style="width:64px">ID</th>
-        <th style="width:96px"></th>
+        <th style="width:160px"></th>
         <th><?= Yii::t('admin', 'Name') ?></th>
         <th style="width:130px"><?= Yii::t('admin', 'Section') ?></th>
         <th style="width:110px"><?= Yii::t('admin', 'Visibility') ?></th>
@@ -67,10 +67,10 @@ $ordering = (int) $selectedSection !== -1;
             <td><?= (int) $m->id ?></td>
             <td>
                 <?php if ($cover): ?>
-                    <?= Html::a(Html::img($cover, ['class' => 'thumb', 'width' => 84, 'height' => 84]),
+                    <?= Html::a(Html::img($cover, ['class' => 'thumb', 'alt' => Html::encode($m->name), 'loading' => 'lazy']),
                         ['show', 'id' => $m->id], ['target' => '_blank']) ?>
                 <?php else: ?>
-                    <span class="thumb" style="display:inline-block"></span>
+                    <span class="thumb ph"></span>
                 <?php endif; ?>
             </td>
             <td><?= Html::encode($m->name) ?></td>

@@ -107,7 +107,9 @@ textarea{width:100%;min-height:120px;line-height:1.6}
 .atable tbody tr:hover{background:#faf9f5}
 .atable tr.is-hidden{background:var(--hidden-bg)}
 .atable tr.is-hidden td{color:var(--muted)}
-.atable .thumb{width:84px;height:84px;object-fit:cover;border-radius:3px;background:#f4f2ec;border:1px solid var(--line)}
+/* Thumbnails preserve the artwork's real aspect ratio (fixed height, auto width). */
+.atable .thumb{display:block;height:104px;width:auto;max-width:150px;object-fit:contain;border-radius:3px;background:#f4f2ec;border:1px solid var(--line)}
+.atable .thumb.ph{width:84px;height:104px}
 .atable .rowact{display:flex;gap:7px;flex-wrap:nowrap;align-items:center}
 .atable code{font-size:12px;background:#f3f1ec;padding:1px 6px;border-radius:2px;color:var(--soft)}
 .atable .note summary{cursor:pointer;color:var(--soft);font-size:12.5px;list-style:none}
@@ -128,9 +130,13 @@ textarea{width:100%;min-height:120px;line-height:1.6}
 .photo-pick.sel{border-color:var(--accent);box-shadow:0 0 0 2px rgba(154,106,79,.25)}
 
 /* ---- Pills / badges ---- */
-.pill{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:20px;font-weight:400}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:20px;font-weight:400;white-space:nowrap}
 .pill.on{background:#e7f0ea;color:var(--ok)}
 .pill.off{background:#efe9e9;color:var(--danger)}
+/* Sale/availability status pills (1=available, 2=sold, 3=not available) */
+.pill.status-1{background:#e7f0ea;color:var(--ok)}
+.pill.status-2{background:#efe9e9;color:var(--danger)}
+.pill.status-3{background:#f0ece4;color:var(--muted)}
 
 /* ---- Bulk action bar ---- */
 .bulkbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:#f7f6f2;border:1px solid var(--line);border-radius:5px;padding:12px 16px;margin-bottom:14px;font-size:12.5px}

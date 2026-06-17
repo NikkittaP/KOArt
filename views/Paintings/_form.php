@@ -147,6 +147,12 @@ RichTextAsset::register($this);
     <div class="panel">
         <h2><?= Yii::t('admin', 'Sale') ?></h2>
         <?php
+        if ($model->hasAttribute('status')) {
+            echo $form->field($model, 'status')->dropDownList(Paintings::statuses())
+                ->label(Yii::t('admin', 'Status'))
+                ->hint(Yii::t('admin', 'Availability of the original. Admin-only; not shown on the public site.'));
+        }
+
         echo $form->field($model, 'price')->widget(NumberControl::classname(), [
             'maskedInputOptions' => ['prefix' => '$ ', 'allowMinus' => false],
             'displayOptions' => ['class' => 'form-control kv-monospace', 'style' => 'width=20%'],

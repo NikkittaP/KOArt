@@ -37,6 +37,11 @@ class Paintings extends \yii\db\ActiveRecord
 {
     use BilingualTrait;
 
+    // Sale / availability status (column `status`, independent of isVisible).
+    const STATUS_AVAILABLE = 1;     // В наличии
+    const STATUS_SOLD = 2;          // Продано
+    const STATUS_NOT_AVAILABLE = 3; // Нет в наличии
+
     public $coverPhoto;
     public $coordinates;
     public $groundName;
@@ -85,6 +90,10 @@ class Paintings extends \yii\db\ActiveRecord
             $rules[] = [['description_en'], 'string'];
             $rules[] = [['name_en', 'description_en'], 'default', 'value' => null];
         }
+        if ($this->hasAttribute('status')) {
+            $rules[] = [['status'], 'default', 'value' => self::STATUS_AVAILABLE];
+            $rules[] = [['status'], 'in', 'range' => array_keys(self::statuses())];
+        }
         return $rules;
     }
 
@@ -127,7 +136,36 @@ class Paintings extends \yii\db\ActiveRecord
             'isVisible' => 'Отображать на сайте',
             'section_id' => 'Раздел',
             'sort_order' => 'Порядок сортировки',
+            'status' => 'Статус',
         ];
+    }
+
+    /**
+     * Sale / availability statuses → translated labels (admin category, so the
+     * label follows the admin UI language). Used by the editor dropdown, the
+     * list column and the filter/bulk controls.
+     *
+     * @return array status const => label
+     */
+    public static function statuses()
+    {
+        return [
+            self::STATUS_AVAILABLE => Yii::t('admin', 'Available'),
+            self::STATUS_SOLD => Yii::t('admin', 'Sold'),
+            self::STATUS_NOT_AVAILABLE => Yii::t('admin', 'Not available'),
+        ];
+    }
+
+    /**
+     * Human-readable label for this work's status (empty if unset / pre-migration).
+     */
+    public function getStatusLabel()
+    {
+        if (!$this->hasAttribute('status')) {
+            return '';
+        }
+        $map = self::statuses();
+        return $map[$this->status] ?? '';
     }
 
     public function behaviors()

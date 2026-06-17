@@ -11,6 +11,7 @@ use yii\helpers\Url;
 /* @var $selectedSeries int */
 /* @var $selectedSection int */
 /* @var $vis string all|1|0 */
+/* @var $status string all|1|2|3 */
 /* @var $show int */
 /* @var $totalCount int */
 /* @var $hasMore bool */
@@ -20,12 +21,18 @@ $models = $dataProvider->getModels();
 $baseUrl = Yii::$app->request->baseUrl;
 $ordering = (int) $selectedSection !== -1;
 
+// Sale/availability status (guarded so the page still renders pre-migration).
+$hasStatus = (new \app\models\Paintings())->hasAttribute('status');
+$statusMap = \app\models\Paintings::statuses();
+$status = isset($status) ? $status : 'all';
+
 // Current filters, for building the "Load more" link.
 $searchName = Yii::$app->request->get('PaintingsSearch')['name'] ?? '';
 $filters = ['index'];
 if ($selectedSeries !== -1) $filters['selected_series'] = $selectedSeries;
 if ($selectedSection !== -1) $filters['selected_section'] = $selectedSection;
 if ($vis !== 'all') $filters['vis'] = $vis;
+if ($status !== 'all') $filters['status'] = $status;
 if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
 ?>
 <div class="apagehead">
@@ -60,12 +67,20 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
             '0' => Yii::t('admin', 'Archived'),
         ], ['onchange' => 'this.form.submit()']) ?>
     </div>
+    <?php if ($hasStatus): ?>
+    <div class="fg">
+        <label><?= Yii::t('admin', 'Status') ?></label>
+        <?= Html::dropDownList('status', $status,
+            ['all' => Yii::t('admin', 'All statuses')] + $statusMap,
+            ['onchange' => 'this.form.submit()']) ?>
+    </div>
+    <?php endif; ?>
     <div class="fg" style="flex:1;min-width:160px">
         <label><?= Yii::t('admin', 'Search by name') ?></label>
         <?= Html::textInput('PaintingsSearch[name]', Yii::$app->request->get('PaintingsSearch')['name'] ?? '',
             ['placeholder' => Yii::t('admin', 'Type and press Enter'), 'style' => 'width:100%']) ?>
     </div>
-    <?php if ($selectedSeries !== -1 || $selectedSection !== -1 || $vis !== 'all' || !empty(Yii::$app->request->get('PaintingsSearch')['name'])): ?>
+    <?php if ($selectedSeries !== -1 || $selectedSection !== -1 || $vis !== 'all' || $status !== 'all' || !empty(Yii::$app->request->get('PaintingsSearch')['name'])): ?>
         <a class="btn ghost sm" href="<?= Url::to(['index']) ?>"><?= Yii::t('admin', 'Reset') ?></a>
     <?php endif; ?>
 <?= Html::endForm() ?>
@@ -91,6 +106,12 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
     <?= Yii::t('admin', 'Move to section:') ?>
     <?= Html::dropDownList('section_id', null, $sections, ['prompt' => Yii::t('admin', '— choose —'), 'style' => 'width:auto']) ?>
     <button type="submit" class="btn ghost sm" formaction="<?= Url::to(['bulk-section']) ?>"><?= Yii::t('admin', 'Move') ?></button>
+    <?php if ($hasStatus): ?>
+        <span style="color:var(--faint)">|</span>
+        <?= Yii::t('admin', 'Set status:') ?>
+        <?= Html::dropDownList('status', null, $statusMap, ['prompt' => Yii::t('admin', '— choose —'), 'style' => 'width:auto']) ?>
+        <button type="submit" class="btn ghost sm" formaction="<?= Url::to(['bulk-status']) ?>"><?= Yii::t('admin', 'Apply') ?></button>
+    <?php endif; ?>
 </div>
 
 <div class="table-scroll">
@@ -99,13 +120,14 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
     <tr>
         <th style="width:34px"><input type="checkbox" data-check-all aria-label="Select all"></th>
         <th style="width:64px">ID</th>
-        <th style="width:96px"></th>
+        <th style="width:160px"></th>
         <th><?= Yii::t('admin', 'Name') ?></th>
         <th style="width:130px"><?= Yii::t('admin', 'Section') ?></th>
         <th style="width:140px"><?= Yii::t('admin', 'Series') ?></th>
         <th style="width:220px"><?= Yii::t('admin', 'Notes') ?></th>
         <th style="width:90px"><?= Yii::t('admin', 'Size') ?></th>
         <th style="width:110px"><?= Yii::t('admin', 'Visibility') ?></th>
+        <?php if ($hasStatus): ?><th style="width:140px"><?= Yii::t('admin', 'Status') ?></th><?php endif; ?>
         <?php if ($ordering): ?><th style="width:60px"><?= Yii::t('admin', 'Order') ?></th><?php endif; ?>
         <th style="width:230px"><?= Yii::t('admin', 'Actions') ?></th>
     </tr>
@@ -115,7 +137,7 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
         <?php
         $hidden = ($m->isVisible === null || (int) $m->isVisible === 0);
         $thumb = ($m->mainPhoto && $m->mainPhoto->filename)
-            ? $baseUrl . '/paintings_photo/thumb_squared/' . $m->mainPhoto->filename : null;
+            ? $baseUrl . '/paintings_photo/preview/' . $m->mainPhoto->filename : null;
         $seriesNames = [];
         foreach ($m->paintingsToSeries as $p2s) {
             if (isset($series[$p2s->series_id])) $seriesNames[] = $series[$p2s->series_id];
@@ -129,10 +151,10 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
             <td><?= (int) $m->id ?></td>
             <td>
                 <?php if ($thumb): ?>
-                    <?= Html::a(Html::img($thumb, ['class' => 'thumb', 'width' => 84, 'height' => 84]),
+                    <?= Html::a(Html::img($thumb, ['class' => 'thumb', 'alt' => Html::encode($m->name), 'loading' => 'lazy']),
                         ['show', 'id' => $m->id]) ?>
                 <?php else: ?>
-                    <span class="thumb" style="display:inline-block"></span>
+                    <span class="thumb ph"></span>
                 <?php endif; ?>
             </td>
             <td><?= Html::encode($m->name) ?></td>
@@ -155,6 +177,15 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
                     <span class="pill on"><?= Yii::t('admin', 'On site') ?></span>
                 <?php endif; ?>
             </td>
+            <?php if ($hasStatus): ?>
+                <td>
+                    <?php if (isset($statusMap[$m->status])): ?>
+                        <span class="pill status-<?= (int) $m->status ?>"><?= Html::encode($statusMap[$m->status]) ?></span>
+                    <?php else: ?>
+                        <span style="color:var(--faint)">—</span>
+                    <?php endif; ?>
+                </td>
+            <?php endif; ?>
             <?php if ($ordering): ?>
                 <td>
                     <span class="ord">
@@ -173,7 +204,7 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
         </tr>
     <?php endforeach; ?>
     <?php if (empty($models)): ?>
-        <tr><td colspan="<?= $ordering ? 11 : 10 ?>" style="text-align:center;color:var(--muted);padding:34px"><?= Yii::t('admin', 'Nothing here yet.') ?></td></tr>
+        <tr><td colspan="<?= 10 + ($ordering ? 1 : 0) + ($hasStatus ? 1 : 0) ?>" style="text-align:center;color:var(--muted);padding:34px"><?= Yii::t('admin', 'Nothing here yet.') ?></td></tr>
     <?php endif; ?>
     </tbody>
 </table>
