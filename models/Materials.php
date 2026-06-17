@@ -14,6 +14,8 @@ use Yii;
  */
 class Materials extends \yii\db\ActiveRecord
 {
+    use BilingualTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -27,10 +29,17 @@ class Materials extends \yii\db\ActiveRecord
      */
     public function rules()
     {
-        return [
+        $rules = [
             [['name'], 'required'],
             [['name'], 'string', 'max' => 255],
         ];
+        // name_en is added by a migration; guard so the model also works before
+        // the migration has been applied.
+        if ($this->hasAttribute('name_en')) {
+            $rules[] = [['name_en'], 'string', 'max' => 255];
+            $rules[] = [['name_en'], 'default', 'value' => null];
+        }
+        return $rules;
     }
 
     /**
@@ -41,6 +50,7 @@ class Materials extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Название',
+            'name_en' => 'Name (EN)',
         ];
     }
 

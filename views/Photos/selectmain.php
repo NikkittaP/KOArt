@@ -27,7 +27,8 @@ $current = $photoModel->isMain;
             <?php foreach ($photos as $photo): ?>
                 <label class="photo-pick <?= (int) $current === (int) $photo->id ? 'sel' : '' ?>">
                     <?= Html::radio('Photos[isMain]', (int) $current === (int) $photo->id, ['value' => $photo->id]) ?>
-                    <?= Html::img($baseUrl . '/paintings_photo/thumb_squared/' . $photo->filename) ?>
+                    <?= Html::img($baseUrl . '/paintings_photo/thumb_squared/' . \app\helpers\Img::webp($photo->filename)) ?>
+                    <?= Html::a(Yii::t('admin', 'Original'), ['download-original', 'id' => $photo->id], ['class' => 'photo-dl', 'title' => Yii::t('admin', 'Download full-resolution original')]) ?>
                 </label>
             <?php endforeach; ?>
         </div>

@@ -36,8 +36,8 @@ $hasComments = $comments && (trim((string) $comments->comments) !== ''
                 <p style="color:var(--muted)"><?= Yii::t('admin', 'No photos yet.') ?></p>
             <?php else: ?>
                 <?php foreach ($photos as $i => $photo): ?>
-                    <a href="<?= $baseUrl ?>/paintings_photo/original_site/<?= Html::encode($photo->filename) ?>" target="_blank" rel="noopener" style="display:block;margin-bottom:14px">
-                        <?= Html::img($baseUrl . '/paintings_photo/preview/' . $photo->filename, [
+                    <a href="<?= $baseUrl ?>/paintings_photo/original_site/<?= Html::encode(\app\helpers\Img::webp($photo->filename)) ?>" target="_blank" rel="noopener" style="display:block;margin-bottom:14px">
+                        <?= Html::img($baseUrl . '/paintings_photo/preview/' . \app\helpers\Img::webp($photo->filename), [
                             'style' => 'width:100%;height:auto;border-radius:4px;border:1px solid var(--line)',
                         ]) ?>
                     </a>
@@ -53,7 +53,7 @@ $hasComments = $comments && (trim((string) $comments->comments) !== ''
                 <?php
                 $rows = [
                     Yii::t('admin', 'Series') => $series->name ?? null,
-                    Yii::t('admin', 'Ground') => $painting->ground->name ?? null,
+                    Yii::t('admin', 'Ground') => $painting->ground ? $painting->ground->tr('name') : null,
                     Yii::t('admin', 'Materials') => $materialsLabel ?: null,
                     Yii::t('admin', 'Date created') => $dateLabel ?: null,
                     Yii::t('admin', 'Size') => $sizeLabel ?: null,

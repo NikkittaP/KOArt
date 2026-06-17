@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\helpers\Img;
 use app\models\Paintings;
 use app\models\Photos;
 use Imagine\Image\Box;
@@ -10,6 +11,7 @@ use Imagine\Image\Point;
 use Imagine\Filter\Basic\Autorotate;
 use Yii;
 use yii\filters\AccessControl;
+use yii\helpers\Inflector;
 use yii\imagine\Image;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -23,10 +25,10 @@ class PhotosController extends AdminBaseController
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['add', 'selectmain', 'delete', 'upload', 'resizeImage'],
+                'only' => ['add', 'selectmain', 'delete', 'upload', 'resizeImage', 'download-original'],
                 'rules' => [
                     [
-                        'actions' => ['add', 'selectmain', 'delete', 'upload', 'resizeImage'],
+                        'actions' => ['add', 'selectmain', 'delete', 'upload', 'resizeImage', 'download-original'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -99,11 +101,14 @@ class PhotosController extends AdminBaseController
             $ids = $_POST['Photos']['selected'];
             foreach ($photos as $photo) {
                 if (in_array($photo->id, $ids)) {
-                    unlink(Yii::getAlias('@app') . '/web/paintings_photo/original/' . $photo->filename);
-                    unlink(Yii::getAlias('@app') . '/web/paintings_photo/original_site/' . $photo->filename);
-                    unlink(Yii::getAlias('@app') . '/web/paintings_photo/preview/' . $photo->filename);
-                    unlink(Yii::getAlias('@app') . '/web/paintings_photo/thumb_squared/' . $photo->filename);
-                    unlink(Yii::getAlias('@app') . '/web/paintings_photo/thumb_tiny/' . $photo->filename);
+                    $base = Yii::getAlias('@app') . '/web/paintings_photo/';
+                    $webp = Img::webp($photo->filename);
+                    // Original master is JPG; all derivatives are WebP.
+                    @unlink($base . 'original/' . $photo->filename);
+                    @unlink($base . 'original_site/' . $webp);
+                    @unlink($base . 'preview/' . $webp);
+                    @unlink($base . 'thumb_squared/' . $webp);
+                    @unlink($base . 'thumb_tiny/' . $webp);
 
                     $photo->delete();
                 }
@@ -151,63 +156,111 @@ class PhotosController extends AdminBaseController
         }
         $preserve
             ->paste($resizeimg, new Point($startX, $startY))
-            ->save($output);
+            ->save($output, ['webp_quality' => Img::WEBP_QUALITY]);
     }
 
     public function actionUpload()
     {
-        $painting_id = $_POST['painting_id'];
+        Yii::$app->response->format = Response::FORMAT_JSON;
 
-        $result = [];
-        if (isset($_POST) && isset($_FILES['photos'])) {
-            $currentPhoto = $_FILES['photos'];
-            $tmpFilePath = $currentPhoto['tmp_name'][0];
+        $painting_id = isset($_POST['painting_id']) ? (int) $_POST['painting_id'] : 0;
 
-            if ($tmpFilePath != "") {
-                $shortname = $currentPhoto['name'][0];
-                $size = $currentPhoto['size'][0];
-                $ext = substr(strrchr($shortname, '.'), 1);
-                $newFileName = Yii::$app->security->generateRandomString(10) . "." . strtolower($ext);
-
-                $originalFilePath = Yii::getAlias('@app') . "/web/paintings_photo/original/" . $newFileName;
-
-                $originalSiteFilePath = Yii::getAlias('@app') . "/web/paintings_photo/original_site/" . $newFileName;
-                $previewFilePath = Yii::getAlias('@app') . "/web/paintings_photo/preview/" . $newFileName;
-                $thumbSquaredFilePath = Yii::getAlias('@app') . "/web/paintings_photo/thumb_squared/" . $newFileName;
-                $thumbTinyFilePath = Yii::getAlias('@app') . "/web/paintings_photo/thumb_tiny/" . $newFileName;
-               
-                if (move_uploaded_file($tmpFilePath, $originalFilePath)) {
-                    $imagine = Image::getImagine();
-                    $image = $imagine->open($originalFilePath);
-
-                    $filterAutorotate = new Autorotate();
-                    $filterAutorotate->apply($image);
-
-                    $image->thumbnail(new Box(2000, 2000))
-                        ->save($originalSiteFilePath);
-                        
-                    $image->thumbnail(new Box(900, 900))
-                        ->save($previewFilePath);
-                    
-                    $this->resizeImage($originalFilePath, $thumbSquaredFilePath, 700, 700);
-
-                    $image->thumbnail(new Box(100, 100), ImageInterface::THUMBNAIL_OUTBOUND)->save($thumbTinyFilePath);
-
-                    $photoModel = new Photos();
-                    $photoModel->painting_id = $painting_id;
-                    $photoModel->filename = $newFileName;
-                    $photoModel->isMain = 0;
-                    $photoModel->save();
-                } else {
-                    $result = [
-                        'error' => "Не удалось загрузить файл!",
-                    ];
-                }
-            }
+        if (!isset($_FILES['photos']) || $_FILES['photos']['tmp_name'][0] === '') {
+            return ['error' => Yii::t('admin', 'No file received.')];
         }
 
-        Yii::$app->response->format = trim(Response::FORMAT_JSON);
-        return $result;
+        $currentPhoto = $_FILES['photos'];
+        $tmpFilePath = $currentPhoto['tmp_name'][0];
+        $bytes = (int) $currentPhoto['size'][0];
+
+        // 1. Sanity-check the source image (size + resolution + format).
+        $error = Img::validate($tmpFilePath, $bytes);
+        if ($error !== null) {
+            return ['error' => $error];
+        }
+
+        $info = @getimagesize($tmpFilePath);
+        $isJpeg = Img::isJpeg(isset($info[2]) ? $info[2] : null);
+
+        // 2. The master original is always JPG; derivatives are always WebP.
+        $base = Yii::$app->security->generateRandomString(10);
+        $originalName = $base . '.jpg';
+        $webpName = $base . '.webp';
+
+        $dir = Yii::getAlias('@app') . '/web/paintings_photo/';
+        $originalFilePath = $dir . 'original/' . $originalName;
+        $originalSiteFilePath = $dir . 'original_site/' . $webpName;
+        $previewFilePath = $dir . 'preview/' . $webpName;
+        $thumbSquaredFilePath = $dir . 'thumb_squared/' . $webpName;
+        $thumbTinyFilePath = $dir . 'thumb_tiny/' . $webpName;
+
+        try {
+            $imagine = Image::getImagine();
+
+            if ($isJpeg) {
+                // Keep the uploaded JPG byte-for-byte (best fidelity for the master).
+                if (!move_uploaded_file($tmpFilePath, $originalFilePath)) {
+                    return ['error' => Yii::t('admin', 'Could not save the uploaded file.')];
+                }
+            } else {
+                // PNG / other → convert the master to JPG. The admin warns about this.
+                $src = $imagine->open($tmpFilePath);
+                $rotate = new Autorotate();
+                $rotate->apply($src);
+                $src->save($originalFilePath, ['jpeg_quality' => Img::JPEG_QUALITY]);
+            }
+
+            // 3. Build WebP derivatives from the stored master.
+            $image = $imagine->open($originalFilePath);
+            $filterAutorotate = new Autorotate();
+            $filterAutorotate->apply($image);
+
+            $image->thumbnail(new Box(2000, 2000))
+                ->save($originalSiteFilePath, ['webp_quality' => Img::WEBP_QUALITY]);
+
+            $image->thumbnail(new Box(900, 900))
+                ->save($previewFilePath, ['webp_quality' => Img::WEBP_QUALITY]);
+
+            $this->resizeImage($originalFilePath, $thumbSquaredFilePath, 700, 700);
+
+            $image->thumbnail(new Box(100, 100), ImageInterface::THUMBNAIL_OUTBOUND)
+                ->save($thumbTinyFilePath, ['webp_quality' => Img::WEBP_QUALITY]);
+
+            $photoModel = new Photos();
+            $photoModel->painting_id = $painting_id;
+            $photoModel->filename = $originalName;
+            $photoModel->isMain = 0;
+            $photoModel->save();
+        } catch (\Exception $e) {
+            // Roll back any partial files so we never leave orphans behind.
+            foreach ([$originalFilePath, $originalSiteFilePath, $previewFilePath, $thumbSquaredFilePath, $thumbTinyFilePath] as $f) {
+                @unlink($f);
+            }
+            Yii::error('Photo upload failed: ' . $e->getMessage(), __METHOD__);
+            return ['error' => Yii::t('admin', 'Could not process the image. Please try a different file.')];
+        }
+
+        return [];
+    }
+
+    /**
+     * Stream the full-resolution JPG master for a single photo as a download,
+     * named after the work it belongs to.
+     */
+    public function actionDownloadOriginal($id)
+    {
+        $photo = $this->findModel($id);
+        $path = Yii::getAlias('@app') . '/web/paintings_photo/original/' . $photo->filename;
+
+        if (!is_file($path)) {
+            throw new NotFoundHttpException('The original file does not exist.');
+        }
+
+        $painting = $photo->painting;
+        $slug = $painting ? Inflector::slug(Inflector::transliterate((string) $painting->name)) : '';
+        $downloadName = ($slug !== '' ? $slug : 'painting') . '-' . $photo->id . '.jpg';
+
+        return Yii::$app->response->sendFile($path, $downloadName);
     }
 
     /*

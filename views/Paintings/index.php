@@ -137,7 +137,7 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
         <?php
         $hidden = ($m->isVisible === null || (int) $m->isVisible === 0);
         $thumb = ($m->mainPhoto && $m->mainPhoto->filename)
-            ? $baseUrl . '/paintings_photo/preview/' . $m->mainPhoto->filename : null;
+            ? $baseUrl . '/paintings_photo/preview/' . \app\helpers\Img::webp($m->mainPhoto->filename) : null;
         $seriesNames = [];
         foreach ($m->paintingsToSeries as $p2s) {
             if (isset($series[$p2s->series_id])) $seriesNames[] = $series[$p2s->series_id];
@@ -199,6 +199,9 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
                     <?= Html::a(Yii::t('admin', 'Edit'), ['update', 'id' => $m->id], ['class' => 'btn ghost sm']) ?>
                     <?= Html::a(Yii::t('admin', 'Photos'), ['photos/add', 'painting_id' => $m->id], ['class' => 'btn ghost sm']) ?>
                     <?= Html::a(Yii::t('admin', 'Cover'), ['photos/selectmain', 'painting_id' => $m->id], ['class' => 'btn ghost sm']) ?>
+                    <?php if ($m->mainPhoto && $m->mainPhoto->filename): ?>
+                        <?= Html::a(Yii::t('admin', 'Original'), ['photos/download-original', 'id' => $m->mainPhoto->id], ['class' => 'btn ghost sm', 'title' => Yii::t('admin', 'Download full-resolution original')]) ?>
+                    <?php endif; ?>
                 </div>
             </td>
         </tr>

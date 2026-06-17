@@ -34,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
     
                     return Html::a(
-                        Html::img(Yii::$app->request->BaseUrl . '/series_cover/thumb/' . $model->cover_filename,
+                        Html::img(Yii::$app->request->BaseUrl . '/series_cover/thumb/' . \app\helpers\Img::webp($model->cover_filename),
                             ['width' => '100px']),
                         ['series/show', 'id' => $model->id], ['class' => 'black-link', 'target' => '_blank']);
                 },

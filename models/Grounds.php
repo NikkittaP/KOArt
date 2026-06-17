@@ -14,6 +14,8 @@ use Yii;
  */
 class Grounds extends \yii\db\ActiveRecord
 {
+    use BilingualTrait;
+
     /**
      * {@inheritdoc}
      */

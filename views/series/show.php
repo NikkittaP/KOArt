@@ -42,6 +42,7 @@ $contactEmail = Yii::$app->params['contactEmail'];
         <?php
         $lg = PaintingPresenter::photoUrl($p, 'lg') ?: PaintingPresenter::photoUrl($p, 'sm');
         $mat = PaintingPresenter::materialsLabel($p);
+        $ground = PaintingPresenter::groundLabel($p);
         $year = PaintingPresenter::yearLabel($p);
         $size = PaintingPresenter::sizeLabel($p);
         $descPlain = PaintingPresenter::descPlain($p);
@@ -49,7 +50,7 @@ $contactEmail = Yii::$app->params['contactEmail'];
             continue;
         }
         ?>
-        <figure data-full="<?= Html::encode($lg) ?>" data-title="<?= Html::encode($p->tr('name')) ?>" data-mat="<?= Html::encode($mat) ?>" data-year="<?= Html::encode($year) ?>" data-size="<?= Html::encode($size) ?>" data-desc="<?= Html::encode($descPlain) ?>">
+        <figure data-full="<?= Html::encode($lg) ?>" data-title="<?= Html::encode($p->tr('name')) ?>" data-mat="<?= Html::encode($mat) ?>" data-ground="<?= Html::encode($ground) ?>" data-year="<?= Html::encode($year) ?>" data-size="<?= Html::encode($size) ?>" data-desc="<?= Html::encode($descPlain) ?>">
             <img src="<?= Html::encode($lg) ?>" alt="<?= Html::encode($p->tr('name')) ?>" loading="lazy">
         </figure>
         <?php if ($p->tr('description')): ?>

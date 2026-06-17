@@ -23,8 +23,9 @@
 
   function caption(f){
     var t=f.getAttribute('data-title')||'', mat=f.getAttribute('data-mat')||'',
+        g=f.getAttribute('data-ground')||'',
         y=f.getAttribute('data-year')||'', s=f.getAttribute('data-size')||'', d=f.getAttribute('data-desc')||'';
-    var l2=[mat,y,s].filter(Boolean).join('  ·  '); var h='';
+    var l2=[mat,g,y,s].filter(Boolean).join('  ·  '); var h='';
     if(t) h+="<div class='ct'>"+esc(t)+"</div>";
     if(l2) h+="<div class='cm'>"+esc(l2)+"</div>";
     if(d) h+="<div class='cd'>"+esc(d)+"</div>";

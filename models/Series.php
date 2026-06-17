@@ -2,6 +2,8 @@
 
 namespace app\models;
 
+use app\helpers\Img;
+use Imagine\Filter\Basic\Autorotate;
 use Imagine\Image\Box;
 use Imagine\Image\ImageInterface;
 use Imagine\Image\Point;
@@ -101,9 +103,12 @@ class Series extends \yii\db\ActiveRecord
         $imagine = Image::getImagine();
         $size = new Box($width, $height);
         $mode = ImageInterface::THUMBNAIL_INSET;
-        $resizeimg = $imagine
-            ->open($input)
-            ->thumbnail($size, $mode);
+        $image = $imagine->open($input);
+
+        $filterAutorotate = new Autorotate();
+        $filterAutorotate->apply($image);
+
+        $resizeimg = $image->thumbnail($size, $mode);
         $sizeR = $resizeimg->getSize();
         $widthR = $sizeR->getWidth();
         $heightR = $sizeR->getHeight();
@@ -118,29 +123,59 @@ class Series extends \yii\db\ActiveRecord
         }
         $preserve
             ->paste($resizeimg, new Point($startX, $startY))
-            ->save($output);
+            ->save($output, ['webp_quality' => Img::WEBP_QUALITY]);
     }
 
+    /**
+     * Stores the uploaded cover: a JPG master (PNG/other converted) plus WebP
+     * derivatives (700px squared thumb + 2000px site image).
+     */
     public function uploadCover()
     {
-        $newFileName = Yii::$app->security->generateRandomString(10) . "." . $this->uploadedCover->extension;
-        $this->cover_filename = $newFileName;
-        if ($this->validate()) {
-            $newFilePath = 'series_cover/original/' . $newFileName;
-            $newThumbFilePath = Yii::getAlias('@app') . '/web/series_cover/thumb/' . $newFileName;
-            $newSiteFilePath = Yii::getAlias('@app') . '/web/series_cover/' . $newFileName;
-            $this->uploadedCover->saveAs($newFilePath);
+        $tmpPath = $this->uploadedCover->tempName;
 
-            $this->resizeImage($newFilePath, $newThumbFilePath, 700, 700);
-
-            $imagine = Image::getImagine();
-            $image = $imagine->open($newFilePath);
-            $image->thumbnail(new Box(2000, 2000))
-                ->save($newSiteFilePath);
-
-            return true;
-        } else {
+        // Reject oversized / wrong-format covers, mirroring the photo pipeline.
+        $error = Img::validate($tmpPath, (int) $this->uploadedCover->size);
+        if ($error !== null) {
+            $this->addError('cover_filename', $error);
+            Yii::$app->session->setFlash('error', $error);
             return false;
         }
+
+        $base = Yii::$app->security->generateRandomString(10);
+        $this->cover_filename = $base . '.jpg';
+        if (!$this->validate()) {
+            return false;
+        }
+
+        $info = @getimagesize($tmpPath);
+        $isJpeg = Img::isJpeg(isset($info[2]) ? $info[2] : null);
+
+        $originalFilePath = Yii::getAlias('@app') . '/web/series_cover/original/' . $base . '.jpg';
+        $thumbFilePath = Yii::getAlias('@app') . '/web/series_cover/thumb/' . $base . '.webp';
+        $siteFilePath = Yii::getAlias('@app') . '/web/series_cover/' . $base . '.webp';
+
+        $imagine = Image::getImagine();
+
+        // JPG master (keep JPG uploads as-is; convert anything else).
+        if ($isJpeg) {
+            $this->uploadedCover->saveAs($originalFilePath);
+        } else {
+            $src = $imagine->open($tmpPath);
+            $rotate = new Autorotate();
+            $rotate->apply($src);
+            $src->save($originalFilePath, ['jpeg_quality' => Img::JPEG_QUALITY]);
+        }
+
+        // WebP derivatives from the master.
+        $this->resizeImage($originalFilePath, $thumbFilePath, 700, 700);
+
+        $image = $imagine->open($originalFilePath);
+        $rotate = new Autorotate();
+        $rotate->apply($image);
+        $image->thumbnail(new Box(2000, 2000))
+            ->save($siteFilePath, ['webp_quality' => Img::WEBP_QUALITY]);
+
+        return true;
     }
 }

@@ -57,7 +57,7 @@ $err = function ($attr) use ($model) {
             <div class="field">
                 <label><?= Yii::t('admin', 'Cover') ?></label>
                 <?php if ($model->cover_filename): ?>
-                    <?= Html::img($baseUrl . '/series_cover/thumb/' . $model->cover_filename,
+                    <?= Html::img($baseUrl . '/series_cover/thumb/' . \app\helpers\Img::webp($model->cover_filename),
                         ['class' => 'thumb', 'style' => 'width:120px;height:120px;margin-bottom:10px']) ?>
                 <?php endif; ?>
                 <?= Html::activeFileInput($model, 'cover_filename', ['accept' => 'image/*']) ?>

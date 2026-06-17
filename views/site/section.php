@@ -33,7 +33,7 @@ $this->title = $section->tr('title');
             <a class="scard" href="<?= Url::to(['series/show', 'id' => $s->id]) ?>">
                 <div class="scard-img">
                     <?php if ($s->cover_filename): ?>
-                        <img src="/series_cover/thumb/<?= Html::encode($s->cover_filename) ?>" alt="<?= Html::encode($s->tr('name')) ?>" loading="lazy">
+                        <img src="/series_cover/thumb/<?= Html::encode(\app\helpers\Img::webp($s->cover_filename)) ?>" alt="<?= Html::encode($s->tr('name')) ?>" loading="lazy">
                     <?php endif; ?>
                 </div>
                 <div class="scard-cap">
@@ -53,6 +53,7 @@ $this->title = $section->tr('title');
             $sm = PaintingPresenter::photoUrl($p, 'sm');
             $lg = PaintingPresenter::photoUrl($p, 'lg');
             $mat = PaintingPresenter::materialsLabel($p);
+            $ground = PaintingPresenter::groundLabel($p);
             $year = PaintingPresenter::yearLabel($p);
             $size = PaintingPresenter::sizeLabel($p);
             $desc = PaintingPresenter::descPlain($p);
@@ -60,7 +61,7 @@ $this->title = $section->tr('title');
                 continue;
             }
             ?>
-            <figure data-full="<?= Html::encode($lg) ?>" data-title="<?= Html::encode($p->tr('name')) ?>" data-mat="<?= Html::encode($mat) ?>" data-year="<?= Html::encode($year) ?>" data-size="<?= Html::encode($size) ?>" data-desc="<?= Html::encode($desc) ?>">
+            <figure data-full="<?= Html::encode($lg) ?>" data-title="<?= Html::encode($p->tr('name')) ?>" data-mat="<?= Html::encode($mat) ?>" data-ground="<?= Html::encode($ground) ?>" data-year="<?= Html::encode($year) ?>" data-size="<?= Html::encode($size) ?>" data-desc="<?= Html::encode($desc) ?>">
                 <img src="<?= Html::encode($sm) ?>" alt="<?= Html::encode($p->tr('name')) ?>" loading="lazy">
                 <figcaption class="hov">
                     <span class="t"><?= Html::encode($p->tr('name')) ?></span>

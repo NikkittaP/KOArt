@@ -70,6 +70,11 @@ $config = [
                 'contact' => 'site/contact',
                 'login' => 'site/login',
 
+                // Public series page. MUST stay before the admin rules below:
+                // otherwise URL creation for the 'series/show' route matches
+                // 'admin/series/<action>' first and links get an /admin/ prefix.
+                'series/<id:\d+>' => 'series/show',
+
                 // --- Admin / archive panel (Phase 4b). Must stay BEFORE the
                 // generic <slug> rule so /admin/* never resolves to a section. ---
                 'admin' => 'admin/index',
@@ -81,15 +86,16 @@ $config = [
                 'admin/sections' => 'sections/index',
                 'admin/genres' => 'art-genres/index',
                 'admin/grounds' => 'grounds/index',
+                'admin/materials' => 'materials/index',
                 'admin/paintings/<action:[\w-]+>' => 'paintings/<action>',
                 'admin/works/<action:[\w-]+>' => 'paintings/<action>',
                 'admin/series/<action:[\w-]+>' => 'series/<action>',
                 'admin/sections/<action:[\w-]+>' => 'sections/<action>',
                 'admin/genres/<action:[\w-]+>' => 'art-genres/<action>',
                 'admin/grounds/<action:[\w-]+>' => 'grounds/<action>',
+                'admin/materials/<action:[\w-]+>' => 'materials/<action>',
                 'admin/photos/<action:[\w-]+>' => 'photos/<action>',
 
-                'series/<id:\d+>' => 'series/show',
                 // Any single-segment slug maps to a section page; SiteController
                 // 404s unknown slugs. Must stay AFTER the named routes above so
                 // about/contact/login/series win first.

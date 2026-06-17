@@ -29,6 +29,7 @@ $nav = [
     'sections'  => ['Sections',  ['/sections/index'], '☰'],
     'genres'    => ['Genres',    ['/art-genres/index'], '#'],
     'grounds'   => ['Grounds',   ['/grounds/index'], '◇'],
+    'materials' => ['Materials', ['/materials/index'], '◈'],
 ];
 
 $this->beginPage();

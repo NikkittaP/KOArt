@@ -13,16 +13,18 @@ $this->title = 'Oskina.Art';
     foreach ($series as $series_) {
         $styleNum = 7;
 
-        $seriesDescription = mb_strlen($series_->description) > 150 ? mb_substr($series_->description, 0, 150) . "..." : $series_->description;
+        $seriesName = $series_->tr('name');
+        $seriesDesc = (string) $series_->tr('description');
+        $seriesDescription = mb_strlen($seriesDesc) > 150 ? mb_substr($seriesDesc, 0, 150) . "..." : $seriesDesc;
 
         echo '
             <article class="style' . $styleNum . '">';
         echo '<span class="image">';
-        echo Html::img(Yii::$app->request->BaseUrl . '/series_cover/thumb/' . $series_->cover_filename, []);
+        echo Html::img(Yii::$app->request->BaseUrl . '/series_cover/thumb/' . \app\helpers\Img::webp($series_->cover_filename), []);
         echo '</span>';
         echo '
             ' . Html::a('
-            <h2>' . $series_->name . '</h2>
+            <h2>' . Html::encode($seriesName) . '</h2>
             <div class="content">
                 <p>
                     ' . $seriesDescription . '

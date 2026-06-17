@@ -192,4 +192,28 @@ return [
     'Notes' => 'Комментарии',
     'Material costs' => 'Затраты на материалы',
     'Time spent' => 'Затраты времени',
+
+    // Photos: originals + upload validation
+    'Original' => 'Оригинал',
+    'Download original' => 'Скачать оригинал',
+    'Download full-resolution original' => 'Скачать оригинал в полном разрешении',
+    'No file received.' => 'Файл не получен.',
+    'Could not save the uploaded file.' => 'Не удалось сохранить загруженный файл.',
+    'Could not process the image. Please try a different file.'
+        => 'Не удалось обработать изображение. Попробуйте другой файл.',
+    'The file could not be read.' => 'Не удалось прочитать файл.',
+    'File is too large ({size}). Maximum is {max}.'
+        => 'Файл слишком большой ({size}). Максимум — {max}.',
+    'This file is not a valid image.' => 'Это не похоже на изображение.',
+    'Unsupported image format. Use JPG or PNG.'
+        => 'Неподдерживаемый формат. Используйте JPG или PNG.',
+    'Image resolution is too high ({w}×{h} px). The longer side must not exceed {max} px.'
+        => 'Слишком большое разрешение ({w}×{h} px). Длинная сторона не должна превышать {max} px.',
+    'JPG and PNG are accepted (PNG is converted to JPG automatically). Max {mb} MB and {px} px on the longer side.'
+        => 'Принимаются JPG и PNG (PNG автоматически конвертируется в JPG). Максимум {mb} МБ и {px} px по длинной стороне.',
+
+    // Materials taxonomy section
+    '+ Add material' => '+ Добавить материал',
+    'Add material' => 'Добавить материал',
+    'Update material' => 'Изменить материал',
 ];

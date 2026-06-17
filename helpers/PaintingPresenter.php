@@ -24,10 +24,18 @@ class PaintingPresenter
         $names = [];
         foreach ($painting->materialsToPaintings as $mtp) {
             if ($mtp->material) {
-                $names[] = $mtp->material->name;
+                $names[] = $mtp->material->tr('name');
             }
         }
         return implode(', ', $names);
+    }
+
+    /**
+     * Ground (support/base) label, bilingual. Empty string if none set.
+     */
+    public static function groundLabel(Paintings $painting): string
+    {
+        return $painting->ground ? (string) $painting->ground->tr('name') : '';
     }
 
     /**
@@ -85,7 +93,8 @@ class PaintingPresenter
             return null;
         }
         $dir = $variant === 'lg' ? 'original_site' : 'preview';
-        return '/paintings_photo/' . $dir . '/' . $photo->filename;
+        // Derivatives are stored as WebP (the master JPG lives in /original).
+        return '/paintings_photo/' . $dir . '/' . Img::webp($photo->filename);
     }
 
     /**

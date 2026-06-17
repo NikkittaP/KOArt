@@ -27,7 +27,7 @@ $baseUrl = Yii::$app->request->baseUrl;
             <?php foreach ($photos as $photo): ?>
                 <label class="photo-pick">
                     <?= Html::checkbox('Photos[selected][]', false, ['value' => $photo->id]) ?>
-                    <?= Html::img($baseUrl . '/paintings_photo/thumb_squared/' . $photo->filename) ?>
+                    <?= Html::img($baseUrl . '/paintings_photo/thumb_squared/' . \app\helpers\Img::webp($photo->filename)) ?>
                 </label>
             <?php endforeach; ?>
         </div>

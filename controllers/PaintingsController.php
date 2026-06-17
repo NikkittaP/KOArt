@@ -358,13 +358,14 @@ class PaintingsController extends AdminBaseController
 
         $materialsLabel = '';
         if (count($painting->materialsToPaintings) != 0) {
-            $materials = ArrayHelper::map(Materials::find()->all(), 'id', 'name');
+            $materials = ArrayHelper::index(Materials::find()->all(), 'id');
             $i = 0;
             foreach ($painting->materialsToPaintings as $material) {
+                $name = isset($materials[$material->material_id]) ? $materials[$material->material_id]->tr('name') : '';
                 if ($i != 0) {
-                    $materialsLabel .= ', ' . mb_convert_case($materials[$material->material_id], MB_CASE_LOWER, "UTF-8");
+                    $materialsLabel .= ', ' . mb_convert_case($name, MB_CASE_LOWER, "UTF-8");
                 } else {
-                    $materialsLabel .= mb_convert_case($materials[$material->material_id], MB_CASE_LOWER, "UTF-8");
+                    $materialsLabel .= mb_convert_case($name, MB_CASE_LOWER, "UTF-8");
                 }
                 $i++;
             }

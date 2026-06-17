@@ -37,6 +37,11 @@ $this->title = Yii::t('admin', 'Photos');
     ]) ?>
     <p class="hint" style="margin-top:14px;color:var(--faint)">
         <?= Yii::t('admin', 'Upload photos, then choose which one is the cover.') ?>
+        <br>
+        <?= Yii::t('admin', 'JPG and PNG are accepted (PNG is converted to JPG automatically). Max {mb} MB and {px} px on the longer side.', [
+            'mb' => 15,
+            'px' => 8000,
+        ]) ?>
     </p>
 </div>
 
