@@ -87,6 +87,7 @@ $config = [
                 'admin/genres' => 'art-genres/index',
                 'admin/grounds' => 'grounds/index',
                 'admin/materials' => 'materials/index',
+                'admin/about' => 'about/edit',
                 'admin/paintings/<action:[\w-]+>' => 'paintings/<action>',
                 'admin/works/<action:[\w-]+>' => 'paintings/<action>',
                 'admin/series/<action:[\w-]+>' => 'series/<action>',
@@ -94,6 +95,7 @@ $config = [
                 'admin/genres/<action:[\w-]+>' => 'art-genres/<action>',
                 'admin/grounds/<action:[\w-]+>' => 'grounds/<action>',
                 'admin/materials/<action:[\w-]+>' => 'materials/<action>',
+                'admin/about/<action:[\w-]+>' => 'about/<action>',
                 'admin/photos/<action:[\w-]+>' => 'photos/<action>',
 
                 // Any single-segment slug maps to a section page; SiteController

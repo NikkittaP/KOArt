@@ -30,6 +30,7 @@ $nav = [
     'genres'    => ['Genres',    ['/art-genres/index'], '#'],
     'grounds'   => ['Grounds',   ['/grounds/index'], '◇'],
     'materials' => ['Materials', ['/materials/index'], '◈'],
+    'about'     => ['About',     ['/about/edit'], '✎'],
 ];
 
 $this->beginPage();

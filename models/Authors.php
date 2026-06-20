@@ -10,11 +10,14 @@ use Yii;
  * @property int $id
  * @property string $name Имя
  * @property string $biography Биография
+ * @property string $biography_en Biography (EN)
  *
  * @property Paintings[] $paintings
  */
 class Authors extends \yii\db\ActiveRecord
 {
+    use BilingualTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -28,11 +31,17 @@ class Authors extends \yii\db\ActiveRecord
      */
     public function rules()
     {
-        return [
+        $rules = [
             [['name'], 'required'],
             [['biography'], 'string'],
             [['name'], 'string', 'max' => 255],
         ];
+        // Guarded so the model keeps working before the biography_en migration.
+        if ($this->hasAttribute('biography_en')) {
+            $rules[] = [['biography_en'], 'string'];
+            $rules[] = [['biography_en'], 'default', 'value' => null];
+        }
+        return $rules;
     }
 
     /**
@@ -44,6 +53,7 @@ class Authors extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Имя',
             'biography' => 'Биография',
+            'biography_en' => 'Biography (EN)',
         ];
     }
 

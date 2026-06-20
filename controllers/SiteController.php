@@ -187,6 +187,10 @@ class SiteController extends Controller
         $this->layout = '@app/views/layouts/public';
         $this->view->params['activeNav'] = 'about';
 
-        return $this->render('about');
+        $author = \app\models\Authors::find()->orderBy(['id' => SORT_ASC])->one();
+
+        return $this->render('about', [
+            'author' => $author,
+        ]);
     }
 }

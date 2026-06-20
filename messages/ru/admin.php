@@ -216,4 +216,21 @@ return [
     '+ Add material' => '+ Добавить материал',
     'Add material' => 'Добавить материал',
     'Update material' => 'Изменить материал',
+
+    // About page editor
+    'About' => 'Об авторе',
+    'Site content' => 'Контент сайта',
+    'View page' => 'Открыть страницу',
+    'The text of the public About page. The English site shows the English text and falls back to Russian when it is empty.'
+        => 'Текст публичной страницы «Об авторе». Английский сайт показывает английский текст, а если он пуст — русский.',
+    'Author name' => 'Имя',
+    'Author name (not shown on the page heading, kept for reference).'
+        => 'Имя автора (не выводится в заголовке страницы, хранится для справки).',
+    'Biography' => 'Биография',
+    'Plain text. Leave a blank line between paragraphs.'
+        => 'Обычный текст. Между абзацами оставляйте пустую строку.',
+    'Portrait' => 'Портрет',
+    'The photo is a file, not a database field. To change it, replace this image:'
+        => 'Фото — это файл, а не поле в базе. Чтобы заменить, перезапишите изображение:',
+    'About page saved.' => 'Страница «Об авторе» сохранена.',
 ];
