@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\helpers\Url;
+use app\helpers\Img;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\search\SeriesSearch */
@@ -61,7 +62,7 @@ $ordering = (int) $selectedSection !== -1;
     <?php foreach ($models as $m): ?>
         <?php
         $hidden = ($m->isVisible === null || (int) $m->isVisible === 0);
-        $cover = $m->cover_filename ? $baseUrl . '/series_cover/thumb/' . $m->cover_filename : null;
+        $cover = $m->cover_filename ? $baseUrl . '/series_cover/thumb/' . Img::webp($m->cover_filename) : null;
         ?>
         <tr class="<?= $hidden ? 'is-hidden' : '' ?>">
             <td><?= (int) $m->id ?></td>
