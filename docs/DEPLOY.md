@@ -66,22 +66,11 @@
    mysqldump -u root oskina_art > oskina_art.sql
    ```
 
-4. **Поправить почту и адреса** (иначе форма обратной связи не работает):
-   - `config/web.php`: у `mailer` сейчас `useFileTransport => true`. Для реальной отправки
-     поставь `false` и настрой SMTP (через почтовый ящик Hetzner на твоём домене):
-     ```php
-     'useFileTransport' => false,
-     'transport' => [
-         'class' => 'Swift_SmtpTransport',
-         'host' => 'смтп-хост-hetzner',
-         'username' => 'ящик@katiaoskina.com',
-         'password' => 'пароль-ящика',
-         'port' => 587,
-         'encryption' => 'tls',
-     ],
-     ```
-   - `config/params.php`: замени `adminEmail`/`senderEmail`/`senderName` с example.com
-     на адреса своего домена. `contactEmail` уже стоит твой.
+4. **Почта — настраивать НЕ нужно.** Сайт использует только ссылки `mailto:`
+   (подвал в `views/layouts/public.php` и кнопка на странице серии) — они открывают
+   почтовую программу посетителя, сервер писем не отправляет. SMTP / App Password
+   не требуются. Просто проверь, что адрес верный: `contactEmail` в `config/params.php`.
+   На сервере оставь `MAIL_USE_FILE_TRANSPORT=true` (или не задавай эти переменные).
 
 ---
 

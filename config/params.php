@@ -3,9 +3,9 @@
 return [
     'bsVersion' => '4.x', // this will set globally `bsVersion` to Bootstrap 4.x for all Krajee Extensions
     'icon-framework' => \kartik\icons\Icon::FAS,  // Font Awesome Icon framework
-    'adminEmail' => 'admin@example.com',
-    'senderEmail' => 'noreply@example.com',
-    'senderName' => 'Example.com mailer',
+    'adminEmail' => 'ekaterina.oskina@gmail.com',
+    'senderEmail' => 'ekaterina.oskina@gmail.com',
+    'senderName' => 'Katia Oskina',
     // Public-site content constants (Phase 3). TODO: replace placeholder shop URL
     // with the real Etsy shop link once the owner provides it.
     'shopUrl' => 'https://www.etsy.com/',
