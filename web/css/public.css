@@ -10,7 +10,7 @@ a{color:inherit}
 /* Sidebar / left nav */
 .sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;padding:40px 30px;display:flex;flex-direction:column;border-right:1px solid var(--line);background:#fff;z-index:30}
 .logo-link{display:inline-block}
-.logo{height:44px;width:auto;opacity:.92}
+.logo{display:block;width:200px;max-width:none;height:auto;opacity:.92}
 /* Owner is producing a handwritten logo mark (Phase 3 TODO); until then,
    render the wordmark as scalable text rather than a missing image. */
 .logo-text{display:inline-flex;align-items:center;height:44px;font-size:18px;font-weight:400;letter-spacing:.04em;color:var(--ink);white-space:nowrap}
@@ -103,7 +103,7 @@ a{color:inherit}
 /* Mobile (portrait phones) */
 @media(max-width:860px){
   .sidebar{position:sticky;top:0;width:auto;height:auto;flex-direction:row;align-items:center;justify-content:space-between;padding:14px 18px;border-right:none;border-bottom:1px solid var(--line)}
-  .logo{height:32px}
+  .logo{height:40px;width:auto}
   .logo-text{height:32px;font-size:15px}
   .hamburger{display:flex;flex-direction:column;justify-content:center;gap:5px;width:34px;height:34px;background:none;border:none;cursor:pointer;z-index:50}
   .hamburger span{display:block;width:24px;height:1.5px;background:var(--ink);transition:.28s}

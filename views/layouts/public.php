@@ -59,7 +59,7 @@ $this->beginPage();
 <?php $this->beginBody() ?>
 
 <div class="sidebar">
-    <a class="logo-link" href="<?= Url::to(['/']) ?>"><span class="logo logo-text">Katia Oskina</span></a>
+    <a class="logo-link" href="<?= Url::to(['/']) ?>"><img class="logo" src="<?= Url::to('@web/img/logo.png') ?>" alt="Katia Oskina"></a>
     <button class="hamburger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
     <nav class="nav" id="nav">
         <?php foreach ($navItems as $key => $item): ?>
