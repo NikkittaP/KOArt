@@ -65,7 +65,7 @@ $this->beginPage();
             </a>
         <?php endforeach; ?>
         <div class="sep"></div>
-        <a href="<?= Url::to(['/site/index']) ?>" target="_blank" rel="noopener">
+        <a href="<?= Url::to(['/site/index', 'language' => 'en']) ?>" target="_blank" rel="noopener">
             <span class="ic">↗</span><?= Yii::t('admin', 'View site') ?>
         </a>
     </nav>
