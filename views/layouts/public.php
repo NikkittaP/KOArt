@@ -79,7 +79,9 @@ $this->beginPage();
         <a href="mailto:<?= Html::encode($contactEmail) ?>" aria-label="Email"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 5.5C2 4.67 2.67 4 3.5 4h17c.83 0 1.5.67 1.5 1.5v13c0 .83-.67 1.5-1.5 1.5h-17C2.67 20 2 19.33 2 18.5v-13zM4 7v.4l8 5 8-5V7H4zm16 2.4l-7.5 4.68a1 1 0 01-1 0L4 9.4V18h16V9.4z"/></svg></a>
     </div>
     <div class="copy">© <?= date('Y') ?> Katia Oskina. All rights reserved. All images and artworks on this site are the property of the artist and may not be reproduced or used without permission.</div>
+<?php if (YII_ENV_DEV): ?>
     <div class="ver">build <?= (int) $buildVersion ?></div>
+<?php endif; ?>
 </footer>
 </main>
 <?php if (!Yii::$app->user->isGuest): ?>
