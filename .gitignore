@@ -54,3 +54,4 @@ tests/_support/_generated
 
 # === Editor ===
 /.vscode
+prod.env

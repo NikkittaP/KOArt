@@ -254,44 +254,6 @@ class SeriesController extends AdminBaseController
 
         return $this->redirect(['index']);
     }
-/*
-    public function actionSet($painting_id)
-    {
-        $paintingModel = Paintings::find()->where(['id' => $painting_id])->one();
-        $series = Series::find()->where(['painting_id' => $painting_id])->all();
-
-        if (count($series) == 1) {
-            $seriesModel = $series[0];
-        } else if (count($series) > 1) {
-            Yii::$app->session->setFlash('warning', "Добавлено несколько серий к картине. Такой функционал пока не реализован.");
-
-            $seriesModel = $series[0];
-        }
-        
-        $series = Series::findAll();
-
-        if (isset($_POST['Photos'])) {
-            $id = $_POST['Photos']['isMain'];
-            foreach ($photos as $photo) {
-                if ($photo->id == $id) {
-                    $photo->isMain = 1;
-                } else {
-                    $photo->isMain = 0;
-                }
-
-                $photo->save();
-            }
-
-            return $this->redirect(['paintings/index']);
-        }
-
-        return $this->render('set', [
-            'paintingModel' => $paintingModel,
-            'series' => $series,
-            'seriesModel' => $seriesModel,
-        ]);
-    }
-*/
 
     /**
      * Finds the Series model based on its primary key value.

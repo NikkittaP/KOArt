@@ -773,7 +773,6 @@ class PaintingsController extends AdminBaseController
 
                 $model->save();
 
-                //return $this->redirect(['update', 'id' => $model->id]);
                 return $this->redirect(['paintings/index']);
             }
         }
