@@ -2,8 +2,7 @@
 
 /**
  * Public-facing portfolio layout (Phase 3 port of design_mockups_v2).
- * Deliberately separate from views/layouts/main.php (the old admin layout) —
- * see docs/03-data-model-and-decisions.md, "do not re-litigate" Yii2 decision.
+ * The admin area uses its own layout (views/layouts/admin.php).
  *
  * Expects, optionally, from the view/controller:
  * @var string $this->title            page title (without the " — Katia Oskina" suffix)

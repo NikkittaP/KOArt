@@ -2,7 +2,6 @@
 
 namespace app\controllers;
 
-use app\models\ContactForm;
 use app\models\LoginForm;
 use app\models\Paintings;
 use app\models\PaintingsToSeries;
@@ -52,6 +51,9 @@ class SiteController extends Controller
         return [
             'error' => [
                 'class' => 'yii\web\ErrorAction',
+                // Render error pages with the public-facing portfolio layout
+                // so 404/500 etc. match the rest of the site.
+                'layout' => '@app/views/layouts/public',
             ],
             'captcha' => [
                 'class' => 'yii\captcha\CaptchaAction',
@@ -157,24 +159,6 @@ class SiteController extends Controller
         Yii::$app->user->logout();
 
         return $this->goHome();
-    }
-
-    /**
-     * Displays contact page.
-     *
-     * @return Response|string
-     */
-    public function actionContact()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
-
-            return $this->refresh();
-        }
-        return $this->render('contact', [
-            'model' => $model,
-        ]);
     }
 
     /**

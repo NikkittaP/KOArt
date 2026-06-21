@@ -29,6 +29,9 @@ a{color:inherit}
 .shead p{color:var(--soft);font-size:14.5px;max-width:600px;margin-top:14px;font-weight:300}
 .shead.pj{margin-bottom:20px}
 .shead .meta{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:12px}
+.error-head{margin-top:30px;margin-bottom:34px}
+.error-code{font-weight:300;font-size:96px;line-height:1;letter-spacing:.02em;color:var(--faint);margin-bottom:14px}
+@media(max-width:760px){.error-code{font-size:68px}}
 .back{display:inline-block;margin-bottom:26px;font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);text-decoration:none}
 .back:hover{color:var(--ink)}
 

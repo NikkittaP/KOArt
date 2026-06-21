@@ -75,7 +75,6 @@ $config = [
             'rules' => [
                 '' => 'site/index',
                 'about' => 'site/about',
-                'contact' => 'site/contact',
                 'login' => 'site/login',
 
                 // Public series page. MUST stay before the admin rules below:
