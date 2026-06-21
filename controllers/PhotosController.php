@@ -124,41 +124,6 @@ class PhotosController extends AdminBaseController
         ]);
     }
 
-    /**
-     * Image resize
-     * @param string $input Full path to source image
-     * @param string $output Full path to result image
-     * @param int $width Width of result image
-     * @param int $height Height of result image
-     */
-    public function resizeImage($input, $output, $width, $height)
-    {
-        $imagine = Image::getImagine();
-        $size = new Box($width, $height);
-        $mode = ImageInterface::THUMBNAIL_INSET;
-        $image = $imagine->open($input);
-        
-        $filterAutorotate = new Autorotate();
-        $filterAutorotate->apply($image);
-
-        $resizeimg = $image->thumbnail($size, $mode);
-        $sizeR = $resizeimg->getSize();
-        $widthR = $sizeR->getWidth();
-        $heightR = $sizeR->getHeight();
-
-        $preserve = $imagine->create($size);
-        $startX = $startY = 0;
-        if ($widthR < $width) {
-            $startX = ($width - $widthR) / 2;
-        }
-        if ($heightR < $height) {
-            $startY = ($height - $heightR) / 2;
-        }
-        $preserve
-            ->paste($resizeimg, new Point($startX, $startY))
-            ->save($output, ['webp_quality' => Img::WEBP_QUALITY]);
-    }
-
     public function actionUpload()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
@@ -182,49 +147,9 @@ class PhotosController extends AdminBaseController
         $info = @getimagesize($tmpFilePath);
         $isJpeg = Img::isJpeg(isset($info[2]) ? $info[2] : null);
 
-        // 2. The master original is always JPG; derivatives are always WebP.
-        $base = Yii::$app->security->generateRandomString(10);
-        $originalName = $base . '.jpg';
-        $webpName = $base . '.webp';
-
-        $dir = Yii::getAlias('@app') . '/web/paintings_photo/';
-        $originalFilePath = $dir . 'original/' . $originalName;
-        $originalSiteFilePath = $dir . 'original_site/' . $webpName;
-        $previewFilePath = $dir . 'preview/' . $webpName;
-        $thumbSquaredFilePath = $dir . 'thumb_squared/' . $webpName;
-        $thumbTinyFilePath = $dir . 'thumb_tiny/' . $webpName;
-
+        // 2. Store master (JPG) + WebP derivatives via the shared pipeline.
         try {
-            $imagine = Image::getImagine();
-
-            if ($isJpeg) {
-                // Keep the uploaded JPG byte-for-byte (best fidelity for the master).
-                if (!move_uploaded_file($tmpFilePath, $originalFilePath)) {
-                    return ['error' => Yii::t('admin', 'Could not save the uploaded file.')];
-                }
-            } else {
-                // PNG / other → convert the master to JPG. The admin warns about this.
-                $src = $imagine->open($tmpFilePath);
-                $rotate = new Autorotate();
-                $rotate->apply($src);
-                $src->save($originalFilePath, ['jpeg_quality' => Img::JPEG_QUALITY]);
-            }
-
-            // 3. Build WebP derivatives from the stored master.
-            $image = $imagine->open($originalFilePath);
-            $filterAutorotate = new Autorotate();
-            $filterAutorotate->apply($image);
-
-            $image->thumbnail(new Box(2000, 2000))
-                ->save($originalSiteFilePath, ['webp_quality' => Img::WEBP_QUALITY]);
-
-            $image->thumbnail(new Box(900, 900))
-                ->save($previewFilePath, ['webp_quality' => Img::WEBP_QUALITY]);
-
-            $this->resizeImage($originalFilePath, $thumbSquaredFilePath, 700, 700);
-
-            $image->thumbnail(new Box(100, 100), ImageInterface::THUMBNAIL_OUTBOUND)
-                ->save($thumbTinyFilePath, ['webp_quality' => Img::WEBP_QUALITY]);
+            $originalName = Img::store($tmpFilePath, $isJpeg);
 
             $photoModel = new Photos();
             $photoModel->painting_id = $painting_id;
@@ -232,10 +157,6 @@ class PhotosController extends AdminBaseController
             $photoModel->isMain = 0;
             $photoModel->save();
         } catch (\Exception $e) {
-            // Roll back any partial files so we never leave orphans behind.
-            foreach ([$originalFilePath, $originalSiteFilePath, $previewFilePath, $thumbSquaredFilePath, $thumbTinyFilePath] as $f) {
-                @unlink($f);
-            }
             Yii::error('Photo upload failed: ' . $e->getMessage(), __METHOD__);
             return ['error' => Yii::t('admin', 'Could not process the image. Please try a different file.')];
         }

@@ -148,6 +148,18 @@ return [
     // Work editor form
     'Add work' => 'Добавить картину',
     'Edit work' => 'Картина',
+    'Work added.' => 'Картина добавлена.',
+    // Photo-first upload panel (Add work)
+    'Drop a photo here, or click to choose' => 'Перетащите фото сюда или нажмите, чтобы выбрать',
+    'The first photo is the cover. You can add more — they stay smaller.'
+        => 'Первое фото — обложка. Можно добавить ещё — они будут мельче.',
+    'Click a thumbnail to make it the cover.' => 'Нажмите на миниатюру, чтобы сделать её обложкой.',
+    'Cover' => 'Обложка',
+    'Add more' => 'Добавить ещё',
+    'Optional — leave blank and a default (genre + month) is filled in automatically.'
+        => 'Необязательно — если оставить пустым, подставится автоматически (жанр + месяц).',
+    'Filled automatically from the photo when available; you can override it.'
+        => 'Заполняется автоматически из фото, если есть данные; можно изменить вручную.',
     'Basic info' => 'Основное',
     'Shown on the series page, under this work. Allowed: bold/italic, paragraphs, lists, links.'
         => 'Показывается на странице серии, под этой работой. Допустимы: жирный/курсив, абзацы, списки, ссылки.',

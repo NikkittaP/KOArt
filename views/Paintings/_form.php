@@ -23,14 +23,49 @@ use app\assets\RichTextAsset;
 RichTextAsset::register($this);
 ?>
 
-<?php $form = ActiveForm::begin(); ?>
+<?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
     <?= $form->field($model, 'author_id')->hiddenInput(['value' => 1])->label(false) ?>
+
+    <?php if ($model->isNewRecord): ?>
+    <div class="panel" id="photo-panel">
+        <h2><?= Yii::t('admin', 'Photos') ?></h2>
+
+        <div class="ph-up">
+            <label class="ph-drop" id="ph-drop">
+                <input type="file" id="ph-input" name="photos[]" accept="image/*" multiple>
+                <div class="ph-drop-empty" id="ph-empty">
+                    <span class="ph-drop-title"><?= Yii::t('admin', 'Drop a photo here, or click to choose') ?></span>
+                    <span class="ph-drop-sub"><?= Yii::t('admin', 'The first photo is the cover. You can add more — they stay smaller.') ?></span>
+                </div>
+                <div class="ph-cover" id="ph-cover" hidden>
+                    <img id="ph-cover-img" alt="">
+                    <span class="ph-cover-badge"><?= Yii::t('admin', 'Cover') ?></span>
+                </div>
+            </label>
+
+            <div class="ph-thumbs" id="ph-thumbs" hidden></div>
+
+            <p class="ph-hint">
+                <?= Yii::t('admin', 'Click a thumbnail to make it the cover.') ?><br>
+                <?= Yii::t('admin', 'JPG and PNG are accepted (PNG is converted to JPG automatically). Max {mb} MB and {px} px on the longer side.', [
+                    'mb' => 15,
+                    'px' => 8000,
+                ]) ?>
+            </p>
+        </div>
+
+        <input type="hidden" name="cover_index" id="ph-cover-index" value="0">
+        <input type="hidden" name="device_coords" id="ph-device-coords" value="">
+    </div>
+    <?php endif; ?>
 
     <div class="panel">
         <h2><?= Yii::t('admin', 'Basic info') ?></h2>
 
-        <?= $form->field($model, 'name')->textInput(['maxlength' => true])->label(Yii::t('admin', 'Title') . ' (RU)') ?>
+        <?= $form->field($model, 'name')->textInput(['maxlength' => true])
+            ->label(Yii::t('admin', 'Title') . ' (RU)')
+            ->hint(Yii::t('admin', 'Optional — leave blank and a default (genre + month) is filled in automatically.')) ?>
 
         <?php if ($model->hasAttribute('name_en')): ?>
             <?= $form->field($model, 'name_en')->textInput(['maxlength' => true])
@@ -174,9 +209,12 @@ RichTextAsset::register($this);
                 'format' => 'yyyy-mm',
                 'endDate' => '+0d',
             ],
-        ])->label(Yii::t('admin', 'Date created'));
+        ])->label(Yii::t('admin', 'Date created'))
+          ->hint($model->isNewRecord ? Yii::t('admin', 'Filled automatically from the photo when available; you can override it.') : '');
 
-        echo $form->field($model, 'coordinates')->widget(\msvdev\widgets\mappicker\MapInput::className(), ['service' => 'yandex'])->label(Yii::t('admin', 'Location'));
+        echo $form->field($model, 'coordinates')->widget(\msvdev\widgets\mappicker\MapInput::className(), ['service' => 'yandex'])
+            ->label(Yii::t('admin', 'Location'))
+            ->hint($model->isNewRecord ? Yii::t('admin', 'Filled automatically from the photo when available; you can override it.') : '');
         ?>
     </div>
 
@@ -193,3 +231,7 @@ RichTextAsset::register($this);
     </div>
 
 <?php ActiveForm::end(); ?>
+
+<?php if ($model->isNewRecord): ?>
+    <?php $this->registerJsFile('@web/js/painting-form.js', ['position' => \yii\web\View::POS_END]); ?>
+<?php endif; ?>

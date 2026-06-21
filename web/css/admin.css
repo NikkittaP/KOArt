@@ -90,7 +90,7 @@ input[type=text],input[type=number],input[type=password],input[type=email],selec
   font-family:inherit;font-size:14px;font-weight:300;color:var(--ink);background:#fff;border:1px solid #dcd9d1;border-radius:3px;padding:9px 11px;transition:border-color .15s}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
 select{min-width:150px;cursor:pointer}
-textarea{width:100%;min-height:120px;line-height:1.6}
+textarea:not(.select2-search__field){width:100%;min-height:120px;line-height:1.6}
 .field{margin-bottom:18px}
 .field>label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
 .field .hint{font-size:11.5px;color:var(--faint);margin-top:6px}
@@ -217,14 +217,32 @@ textarea{width:100%;min-height:120px;line-height:1.6}
 .amain .select2-selection--single{height:40px!important;padding:4px 10px!important}
 .amain .select2-selection--single .select2-selection__rendered{line-height:30px!important;padding:0!important;color:var(--ink)}
 .amain .select2-selection--single .select2-selection__arrow{height:38px!important}
-.amain .select2-selection--multiple{padding:3px 6px!important}
+
+/* Multiple select: one tidy row that grows as tags are added.
+   The selection is a flex container so the tag list (.__rendered) and the
+   inline search box sit on the SAME line and wrap together instead of
+   stacking into a tall box. The inline search is a <textarea> — the global
+   textarea min-height:120px would otherwise inflate every multi-select to
+   ~157px, so its height is pinned here. (Verified against the live DOM.) */
+.amain .select2-selection--multiple{
+  display:flex!important;flex-wrap:wrap!important;align-items:center!important;
+  min-height:40px!important;height:auto!important;padding:3px 6px!important;gap:4px}
 .amain .select2-selection--multiple .select2-selection__rendered{
-  min-height:30px!important;padding:0!important;margin:0!important;
-  display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:4px}
-.amain .select2-selection--multiple .select2-search--inline,
-.amain .select2-selection--multiple .select2-search__field{height:28px!important;margin:0!important}
+  min-height:0!important;height:auto!important;padding:0!important;margin:0!important;
+  display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:4px;flex:0 1 auto}
+.amain .select2-selection--multiple .select2-search--inline{
+  display:flex!important;align-items:center;flex:1 1 60px;min-width:60px}
+.amain .select2-selection--multiple .select2-search--inline .select2-search__field,
+.amain .select2-selection--multiple .select2-search__field{
+  min-height:24px!important;height:24px!important;line-height:22px!important;
+  padding:0 2px!important;margin:0!important;width:100%!important;box-sizing:border-box!important}
 .amain .select2-selection__choice{background:#f3f1ec!important;border:1px solid var(--line)!important;border-radius:3px!important;color:var(--ink)!important;font-size:12.5px!important;margin:0!important}
 .amain .select2-container--focus .select2-selection{border-color:var(--accent)!important}
+
+/* Native <select>: give the control enough height that the selected value
+   (16px font + 9–10px padding) isn't vertically clipped — the closed
+   "20x30" size dropdowns were cutting off the top of the text. */
+.amain select{height:auto;min-height:44px;line-height:1.5}
 
 /* Bootstrap cards (e.g. the "hidden author comments" block) -> neutral panels.
    These notes are never shown on the public site, so no accent colour. */
@@ -298,6 +316,35 @@ input:focus,select:focus,textarea:focus,.amain .form-control:focus{
 
 /* Submit row: a hairline above and a touch of space separate it from the last panel */
 .field+div .btn,form>div:last-child>.btn{margin-top:2px}
+
+/* =========================================================================
+   PHOTO-FIRST UPLOADER (Add work page). The cover is the first thing the
+   author sees, so the dropzone shows the picked image large with a small
+   thumbnail strip for the extras. All preview is client-side (no upload until
+   Save); see web/js/painting-form.js.
+   ========================================================================= */
+.ph-up{max-width:520px}
+.ph-drop{display:block;position:relative;border:1.5px dashed #c8c2b4;border-radius:8px;
+  background:#fcfbf8;cursor:pointer;overflow:hidden;transition:border-color .15s,background .15s}
+.ph-drop:hover,.ph-drop.drag{border-color:var(--accent);background:#fff}
+.ph-drop input[type=file]{display:none}
+.ph-drop-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;text-align:center;padding:46px 20px;color:var(--muted)}
+.ph-drop-title{font-size:14px;color:var(--soft)}
+.ph-drop-sub{font-size:12px;color:var(--faint)}
+.ph-cover{position:relative;display:block}
+.ph-cover img{display:block;width:100%;max-height:360px;object-fit:contain;background:#1a1916}
+.ph-cover-badge{position:absolute;top:10px;left:10px;font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;background:var(--accent);color:#fff;padding:4px 9px;border-radius:3px}
+.ph-thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.ph-thumb{position:relative;width:64px;height:64px;padding:0;border:2px solid transparent;
+  border-radius:6px;overflow:hidden;cursor:pointer;background:#f3f1ec}
+.ph-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.ph-thumb.is-cover{border-color:var(--accent)}
+.ph-thumb-x{position:absolute;top:1px;right:1px;width:16px;height:16px;line-height:14px;
+  text-align:center;font-size:13px;color:#fff;background:rgba(26,25,22,.65);border-radius:50%}
+.ph-thumb-x:hover{background:var(--danger)}
+.ph-hint{margin-top:12px;color:var(--faint);font-size:11.5px;line-height:1.5}
 
 /* ---- Mobile ---- */
 @media(max-width:860px){

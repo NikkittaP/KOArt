@@ -392,8 +392,44 @@ class PaintingsController extends AdminBaseController
         $model = new Paintings();
 
         if ($model->load(Yii::$app->request->post())) {
+            // Inline photos uploaded from the cover-first "Add work" form.
+            $uploadedFiles = $this->collectUploadedPhotos();
+            $coverIndex = (int) Yii::$app->request->post('cover_index', 0);
+
+            // Pre-fill blank Date / Location from the cover photo's EXIF.
+            if (!empty($uploadedFiles)) {
+                $coverFile = isset($uploadedFiles[$coverIndex]) ? $uploadedFiles[$coverIndex] : reset($uploadedFiles);
+                $meta = \app\helpers\Img::exifMeta($coverFile['tmp']);
+                if (($model->date === null || $model->date === '') && !empty($meta['date'])) {
+                    $model->date = $meta['date'];
+                }
+                if (($model->latitude === null || $model->latitude === '') && $meta['lat'] !== null) {
+                    $model->latitude = $meta['lat'];
+                    $model->longitude = $meta['lng'];
+                }
+            }
+
+            // Fall back to the device location captured client-side (if still blank).
+            if ($model->latitude === null || $model->latitude === '') {
+                $dev = (string) Yii::$app->request->post('device_coords', '');
+                if (strpos($dev, '@') !== false) {
+                    list($dlat, $dlng) = array_pad(explode('@', $dev, 2), 2, '');
+                    if (is_numeric($dlat) && is_numeric($dlng)) {
+                        $model->latitude = (float) $dlat;
+                        $model->longitude = (float) $dlng;
+                    }
+                }
+            }
+
+            // Title is optional — synthesise one from genre + month when left blank.
+            if (trim((string) $model->name) === '') {
+                $model->name = Paintings::suggestName($model->artGenreName, $model->date);
+            }
+
             if ($model->date != '' && strlen($model->date) == 7) {
-                $model->date .= '-00';
+                // Store month-only dates as the 1st (valid date; matches the
+                // legacy-date migration). The day is ignored when displaying.
+                $model->date .= '-01';
             }
             $model->description = RichText::purify($model->description);
             if ($model->hasAttribute('description_en')) {
@@ -522,10 +558,14 @@ class PaintingsController extends AdminBaseController
                 $price->value = $model->price;
                 $price->save();
 
-                // Координаты
-                if ($model->coordinates != null) {
-                    $model->latitude = explode('@', $model->coordinates)[0];
-                    $model->longitude = explode('@', $model->coordinates)[1];
+                // Координаты — берём из карты только если автор реально выбрал
+                // точку (иначе пустой ввод затёр бы координаты из EXIF/устройства).
+                if ($model->coordinates != null && strpos((string) $model->coordinates, '@') !== false) {
+                    $parts = explode('@', $model->coordinates);
+                    if (isset($parts[0], $parts[1]) && is_numeric($parts[0]) && is_numeric($parts[1])) {
+                        $model->latitude = $parts[0];
+                        $model->longitude = $parts[1];
+                    }
                 }
 
                 // Комментарии автора
@@ -538,6 +578,44 @@ class PaintingsController extends AdminBaseController
 
                 $model->save();
 
+                // Store the inline-uploaded photos (cover-first flow). The file
+                // at $coverIndex becomes the cover; the rest are extras.
+                $savedPhotos = 0;
+                foreach ($uploadedFiles as $i => $f) {
+                    if (\app\helpers\Img::validate($f['tmp'], $f['size']) !== null) {
+                        continue;
+                    }
+                    $info = @getimagesize($f['tmp']);
+                    $isJpeg = \app\helpers\Img::isJpeg(isset($info[2]) ? $info[2] : null);
+                    try {
+                        $filename = \app\helpers\Img::store($f['tmp'], $isJpeg);
+                    } catch (\Exception $e) {
+                        Yii::error('Inline photo store failed: ' . $e->getMessage(), __METHOD__);
+                        continue;
+                    }
+                    $photo = new \app\models\Photos();
+                    $photo->painting_id = $model->id;
+                    $photo->filename = $filename;
+                    $photo->isMain = ($i === $coverIndex) ? 1 : 0;
+                    $photo->save();
+                    $savedPhotos++;
+                }
+
+                // Guarantee exactly one cover when photos were saved.
+                if ($savedPhotos > 0 && (int) \app\models\Photos::find()->where(['painting_id' => $model->id, 'isMain' => 1])->count() === 0) {
+                    $first = \app\models\Photos::find()->where(['painting_id' => $model->id])->orderBy(['id' => SORT_ASC])->one();
+                    if ($first) {
+                        $first->isMain = 1;
+                        $first->save();
+                    }
+                }
+
+                if ($savedPhotos > 0) {
+                    Yii::$app->session->setFlash('success', Yii::t('admin', 'Work added.'));
+                    return $this->redirect(['index']);
+                }
+
+                // No photo uploaded inline — keep the old "add photos" step.
                 return $this->redirect(['photos/add', 'painting_id' => $model->id]);
             }
         }
@@ -547,13 +625,48 @@ class PaintingsController extends AdminBaseController
         ]);
     }
 
+    /**
+     * Read the inline photo uploads from the create form ($_FILES['photos'],
+     * a "photos[]" multi-file field). Returns a list keyed by the original
+     * pick order so the posted cover_index still lines up after any skips.
+     *
+     * @return array<int, array{tmp:string, size:int, name:string}>
+     */
+    private function collectUploadedPhotos()
+    {
+        $files = [];
+        if (!isset($_FILES['photos']) || !is_array($_FILES['photos']['tmp_name'])) {
+            return $files;
+        }
+        $count = count($_FILES['photos']['tmp_name']);
+        for ($i = 0; $i < $count; $i++) {
+            $tmp = $_FILES['photos']['tmp_name'][$i];
+            $err = isset($_FILES['photos']['error'][$i]) ? (int) $_FILES['photos']['error'][$i] : UPLOAD_ERR_NO_FILE;
+            if ($tmp === '' || $err !== UPLOAD_ERR_OK || !is_uploaded_file($tmp)) {
+                continue;
+            }
+            $files[$i] = [
+                'tmp' => $tmp,
+                'size' => (int) $_FILES['photos']['size'][$i],
+                'name' => (string) $_FILES['photos']['name'][$i],
+            ];
+        }
+        return $files;
+    }
+
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post())) {
+            // Title stays optional here too — keep a sensible default if cleared.
+            if (trim((string) $model->name) === '') {
+                $model->name = Paintings::suggestName($model->artGenreName, $model->date);
+            }
             if ($model->date != '' && strlen($model->date) == 7) {
-                $model->date .= '-00';
+                // Store month-only dates as the 1st (valid date; matches the
+                // legacy-date migration). The day is ignored when displaying.
+                $model->date .= '-01';
             }
             $model->description = RichText::purify($model->description);
             if ($model->hasAttribute('description_en')) {

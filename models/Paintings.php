@@ -72,8 +72,13 @@ class Paintings extends \yii\db\ActiveRecord
     public function rules()
     {
         $rules = [
-            [['author_id', 'name'], 'required'],
+            // Title is optional — a sensible default (genre + month) is filled in
+            // by the controller when it's left blank. See Paintings::suggestName().
+            [['author_id'], 'required'],
             [['author_id', 'ground_id', 'section_id', 'sort_order'], 'integer'],
+            // "Order" can be left blank when adding — default it so the NOT NULL
+            // column never receives null (lets the author save without filling it).
+            [['sort_order'], 'default', 'value' => 0],
             [['section_id'], 'exist', 'skipOnError' => true, 'targetClass' => Sections::className(), 'targetAttribute' => ['section_id' => 'id']],
             [['width', 'height'], 'number'],
             [['description'], 'string'],
@@ -154,6 +159,66 @@ class Paintings extends \yii\db\ActiveRecord
             self::STATUS_SOLD => Yii::t('admin', 'Sold'),
             self::STATUS_NOT_AVAILABLE => Yii::t('admin', 'Not available'),
         ];
+    }
+
+    /** Russian month names, 1-indexed, for the auto title / date labels. */
+    public static function ruMonths()
+    {
+        return [
+            1 => 'январь', 2 => 'февраль', 3 => 'март', 4 => 'апрель',
+            5 => 'май', 6 => 'июнь', 7 => 'июль', 8 => 'август',
+            9 => 'сентябрь', 10 => 'октябрь', 11 => 'ноябрь', 12 => 'декабрь',
+        ];
+    }
+
+    /**
+     * Build a sensible default title from the chosen genre(s) and date, used
+     * when the author leaves the title blank (titling every piece is tedious).
+     * Examples: "Натюрморт · июнь 2026", "Натюрморт", "Июнь 2026", "Без названия".
+     *
+     * @param array  $genreNames values from the genre Select2 — each is either a
+     *                            numeric genre id or a free-typed new genre name.
+     * @param string|null $date   "YYYY-MM" or "YYYY-MM-DD" (may be empty).
+     * @return string
+     */
+    public static function suggestName($genreNames, $date)
+    {
+        $genre = '';
+        if (is_array($genreNames)) {
+            foreach ($genreNames as $g) {
+                if ($g === null || $g === '') {
+                    continue;
+                }
+                if (is_numeric($g)) {
+                    $row = ArtGenres::findOne((int) $g);
+                    $genre = $row ? (string) $row->name : '';
+                } else {
+                    $genre = (string) $g;
+                }
+                if ($genre !== '') {
+                    break;
+                }
+            }
+        }
+
+        $when = '';
+        if (!empty($date) && preg_match('/^(\d{4})-(\d{2})/', (string) $date, $m)) {
+            $months = self::ruMonths();
+            $mi = (int) $m[2];
+            $month = $months[$mi] ?? '';
+            $when = trim(($month !== '' ? mb_convert_case($month, MB_CASE_TITLE, 'UTF-8') . ' ' : '') . $m[1]);
+        }
+
+        if ($genre !== '' && $when !== '') {
+            return $genre . ' · ' . $when;
+        }
+        if ($genre !== '') {
+            return $genre;
+        }
+        if ($when !== '') {
+            return $when;
+        }
+        return 'Без названия';
     }
 
     /**
