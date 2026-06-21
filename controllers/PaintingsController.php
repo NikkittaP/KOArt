@@ -426,6 +426,13 @@ class PaintingsController extends AdminBaseController
                 $model->name = Paintings::suggestName($model->artGenreName, $model->date);
             }
 
+            // Section is set by the series for works that have one (a work can
+            // appear in several sections via several series), so a work with
+            // any series has no direct section_id. Only loose works use it.
+            if (!empty($model->seriesName)) {
+                $model->section_id = null;
+            }
+
             if ($model->date != '' && strlen($model->date) == 7) {
                 // Store month-only dates as the 1st (valid date; matches the
                 // legacy-date migration). The day is ignored when displaying.
@@ -662,6 +669,10 @@ class PaintingsController extends AdminBaseController
             // Title stays optional here too — keep a sensible default if cleared.
             if (trim((string) $model->name) === '') {
                 $model->name = Paintings::suggestName($model->artGenreName, $model->date);
+            }
+            // A work with series has no direct section (set by the series).
+            if (!empty($model->seriesName)) {
+                $model->section_id = null;
             }
             if ($model->date != '' && strlen($model->date) == 7) {
                 // Store month-only dates as the 1st (valid date; matches the

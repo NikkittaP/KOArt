@@ -164,6 +164,10 @@ return [
     'Shown on the series page, under this work. Allowed: bold/italic, paragraphs, lists, links.'
         => 'Показывается на странице серии, под этой работой. Допустимы: жирный/курсив, абзацы, списки, ссылки.',
     'Series…' => 'Серия…',
+    'Used only for works that are not in a series — otherwise the section is set by the series.'
+        => 'Используется только для работ вне серий — иначе раздел задаётся серией.',
+    'A work in a series is placed by the series — add it to several series to show it in several sections.'
+        => 'Работа в серии размещается по серии — добавьте её в несколько серий, чтобы показать в нескольких разделах.',
     'Dimensions' => 'Размеры',
     'Existing landscape size' => 'Готовый альбомный размер',
     '— pick a landscape size —' => '— выбрать альбомный размер —',

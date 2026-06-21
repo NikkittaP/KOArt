@@ -86,7 +86,31 @@ RichTextAsset::register($this);
         <?= $form->field($model, 'isVisible')->checkbox(['class' => 'intranet_checkbox'])->label(Yii::t('admin', 'Visible on the site')) ?>
 
         <?php
-        $items = ArrayHelper::map(Series::find()->all(), 'id', 'name');
+        // Section sits above Series: it's the higher-level grouping. It applies
+        // only to "loose" works (not in any series). When a work has series,
+        // the section is set by the series, so this field is locked (see the
+        // script at the bottom) and section_id is cleared server-side.
+        $sections = ArrayHelper::map(Sections::find()->orderBy('sort ASC')->all(), 'id', 'title');
+        echo $form->field($model, 'section_id')->widget(Select2::className(), [
+            'data' => $sections,
+            'options' => ['placeholder' => Yii::t('admin', '— choose —')],
+        ])->label(Yii::t('admin', 'Section'))
+          ->hint(Yii::t('admin', 'Used only for works that are not in a series — otherwise the section is set by the series.'));
+
+        // Series. With "Hide archive" on, drop archived series from the list,
+        // but keep any already linked to this work so editing won't unlink them.
+        $seriesQuery = Series::find();
+        if (\app\helpers\AdminPrefs::hideArchive()) {
+            $selectedSeriesIds = is_array($model->seriesName)
+                ? array_values(array_filter($model->seriesName, 'is_numeric'))
+                : [];
+            $seriesQuery->andWhere([
+                'or',
+                ['isVisible' => 1],
+                ['id' => $selectedSeriesIds ?: [0]],
+            ]);
+        }
+        $items = ArrayHelper::map($seriesQuery->all(), 'id', 'name');
         echo $form->field($model, 'seriesName')->widget(Select2::className(), [
             'data' => $items,
             'maintainOrder' => true,
@@ -96,15 +120,8 @@ RichTextAsset::register($this);
                 'tokenSeparators' => [','],
                 'maximumInputLength' => 30,
             ],
-        ])->label(Yii::t('admin', 'Series'));
-        ?>
-
-        <?php
-        $sections = ArrayHelper::map(Sections::find()->orderBy('sort ASC')->all(), 'id', 'title');
-        echo $form->field($model, 'section_id')->widget(Select2::className(), [
-            'data' => $sections,
-            'options' => ['placeholder' => Yii::t('admin', '— choose —')],
-        ])->label(Yii::t('admin', 'Section'));
+        ])->label(Yii::t('admin', 'Series'))
+          ->hint(Yii::t('admin', 'A work in a series is placed by the series — add it to several series to show it in several sections.'));
         ?>
 
         <?= $form->field($model, 'sort_order')->input('number', ['step' => 1])
@@ -235,3 +252,26 @@ RichTextAsset::register($this);
 <?php if ($model->isNewRecord): ?>
     <?php $this->registerJsFile('@web/js/painting-form.js', ['position' => \yii\web\View::POS_END]); ?>
 <?php endif; ?>
+
+<?php
+// Section ↔ Series are mutually exclusive: once a series is chosen, the work's
+// section comes from the series, so lock & clear the Section field. Purely
+// cosmetic — the server also clears section_id when series are present.
+$this->registerJs(<<<'JS'
+(function () {
+  var series = jQuery('#paintings-seriesname');
+  if (!series.length) return;
+  var section = jQuery('#paintings-section_id');
+  var sectionField = jQuery('.field-paintings-section_id');
+  function sync() {
+    var locked = (series.val() || []).length > 0;
+    if (locked) { section.val(null); }
+    section.prop('disabled', locked).trigger('change.select2');
+    sectionField.toggleClass('is-locked', locked);
+  }
+  series.on('change', sync);
+  sync();
+})();
+JS
+);
+?>
