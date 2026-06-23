@@ -310,9 +310,24 @@ RichTextAsset::register($this);
         ])->label(Yii::t('admin', 'Date created'))
           ->hint($model->isNewRecord ? Yii::t('admin', 'Filled automatically from the photo when available; you can override it.') : '');
 
-        echo $form->field($model, 'coordinates')->widget(\msvdev\widgets\mappicker\MapInput::className(), ['service' => 'yandex'])
-            ->label(Yii::t('admin', 'Location'))
-            ->hint($model->isNewRecord ? Yii::t('admin', 'Filled automatically from the photo when available; you can override it.') : '');
+        $coordHint = $model->isNewRecord
+            ? Yii::t('admin', 'Search a city, click the map, or let it fill from the photo / your device.')
+            : Yii::t('admin', 'Search a city or click the map to set the location.');
+        ?>
+        <div class="field field-paintings-coordinates">
+            <label><?= Yii::t('admin', 'Location') ?></label>
+            <div class="mappick">
+                <input type="text" class="mappick-search" placeholder="<?= Yii::t('admin', 'Search a city or address…') ?>" autocomplete="off">
+                <div class="mappick-map" id="paintings-map"></div>
+                <?= Html::activeHiddenInput($model, 'coordinates', ['id' => 'paintings-coordinates']) ?>
+                <div class="mappick-bar">
+                    <button type="button" class="btn ghost sm mappick-clear"><?= Yii::t('admin', 'Clear location') ?></button>
+                    <span class="mappick-status"></span>
+                </div>
+            </div>
+            <div class="hint"><?= Html::encode($coordHint) ?></div>
+        </div>
+        <?php
         ?>
     </div>
 
@@ -330,7 +345,17 @@ RichTextAsset::register($this);
 
 <?php ActiveForm::end(); ?>
 
+<?php
+// Location picker: Leaflet + OpenStreetMap (no API key). Search is via the
+// free Nominatim geocoder. Loaded on both create and edit.
+$this->registerCssFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+$this->registerJsFile('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', ['position' => \yii\web\View::POS_HEAD]);
+$this->registerJsFile('@web/js/map-picker.js', ['position' => \yii\web\View::POS_END]);
+?>
+
 <?php if ($model->isNewRecord): ?>
+    <?php // exif-js reads the photo's GPS client-side so the marker can be pre-placed. ?>
+    <?php $this->registerJsFile('https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.min.js', ['position' => \yii\web\View::POS_END]); ?>
     <?php $this->registerJsFile('@web/js/painting-form.js', ['position' => \yii\web\View::POS_END]); ?>
 <?php else: ?>
     <?php

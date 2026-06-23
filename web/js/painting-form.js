@@ -109,6 +109,30 @@
     syncInput();
     render();
     requestLocationOnce();
+    if (selected.length) readPhotoGps(selected[coverIndex] || selected[0]);
+  }
+
+  // Read the cover photo's GPS (EXIF) client-side and drop a map marker. The
+  // map keeps any point the author already chose (see paintingMapSetCoords).
+  function readPhotoGps(file) {
+    if (!file || typeof EXIF === 'undefined' || typeof window.paintingMapSetCoords !== 'function') return;
+    EXIF.getData(file, function () {
+      var lat = toDecimal(EXIF.getTag(this, 'GPSLatitude'), EXIF.getTag(this, 'GPSLatitudeRef'));
+      var lng = toDecimal(EXIF.getTag(this, 'GPSLongitude'), EXIF.getTag(this, 'GPSLongitudeRef'));
+      if (lat !== null && lng !== null && (lat !== 0 || lng !== 0)) {
+        window.paintingMapSetCoords(lat, lng);
+      }
+    });
+  }
+
+  // EXIF GPS is [deg, min, sec] (each a Number-like); ref is N/S/E/W.
+  function toDecimal(dms, ref) {
+    if (!dms || dms.length < 3) return null;
+    var d = +dms[0], m = +dms[1], s = +dms[2];
+    if (isNaN(d) || isNaN(m) || isNaN(s)) return null;
+    var dec = d + m / 60 + s / 3600;
+    if (ref === 'S' || ref === 'W') dec = -dec;
+    return Math.round(dec * 1e6) / 1e6;
   }
 
   function removeAt(i) {
@@ -124,6 +148,9 @@
     navigator.geolocation.getCurrentPosition(
       function (pos) {
         deviceCoordsEl.value = pos.coords.latitude + '@' + pos.coords.longitude;
+        if (typeof window.paintingMapSetCoords === 'function') {
+          window.paintingMapSetCoords(pos.coords.latitude, pos.coords.longitude);
+        }
       },
       function () { /* denied / unavailable — leave blank, EXIF or manual still work */ },
       { enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 }

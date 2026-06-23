@@ -879,10 +879,16 @@ class PaintingsController extends AdminBaseController
                     $price->save();
                 }
 
-                // Координаты
-                if ($model->coordinates != null) {
-                    $model->latitude = explode('@', $model->coordinates)[0];
-                    $model->longitude = explode('@', $model->coordinates)[1];
+                // Координаты — пустое значение очищает точку, а парсим её
+                // только если в строке есть валидные "lat@lng".
+                $model->latitude = null;
+                $model->longitude = null;
+                if (strpos((string) $model->coordinates, '@') !== false) {
+                    $parts = explode('@', $model->coordinates);
+                    if (isset($parts[0], $parts[1]) && is_numeric($parts[0]) && is_numeric($parts[1])) {
+                        $model->latitude = (float) $parts[0];
+                        $model->longitude = (float) $parts[1];
+                    }
                 }
 
                 // Комментарии автора

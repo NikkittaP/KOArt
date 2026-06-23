@@ -390,3 +390,12 @@ input:focus,select:focus,textarea:focus,.amain .form-control:focus{
 #photo-panel .photo-cover-pick{background:rgba(20,18,16,.82)}
 #photo-panel .photo-del-pick{background:rgba(140,38,30,.85)}
 #photo-panel .photo-cover-pick input,#photo-panel .photo-del-pick input{position:static;width:14px;height:14px;margin:0;top:auto;left:auto;flex:none}
+
+/* ---- Location picker (Leaflet + OpenStreetMap) ---- */
+.mappick{max-width:560px}
+.mappick-search{width:100%;margin-bottom:8px;padding:8px 11px;border:1px solid var(--line);
+  border-radius:5px;font-size:13px;background:#fff;color:var(--ink)}
+.mappick-search:focus{outline:none;border-color:var(--accent)}
+.mappick-map{width:100%;height:340px;border:1px solid var(--line);border-radius:6px;z-index:0}
+.mappick-bar{display:flex;align-items:center;gap:12px;margin-top:8px}
+.mappick-status{font-size:12px;color:var(--faint)}

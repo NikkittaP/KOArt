@@ -216,6 +216,12 @@ return [
     'Date created…' => 'Дата создания…',
     'Date created' => 'Дата создания',
     'Location' => 'Место',
+    'Search a city or address…' => 'Поиск по городу или адресу…',
+    'Clear location' => 'Очистить место',
+    'Search a city, click the map, or let it fill from the photo / your device.'
+        => 'Найдите город, кликните по карте — или поле заполнится автоматически из фото / по геолокации устройства.',
+    'Search a city or click the map to set the location.'
+        => 'Найдите город или кликните по карте, чтобы задать место.',
     'Private notes (not shown on the site)' => 'Скрытые заметки (не видны на сайте)',
     'Notes' => 'Комментарии',
     'Material costs' => 'Затраты на материалы',
