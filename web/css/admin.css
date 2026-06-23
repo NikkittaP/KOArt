@@ -399,3 +399,6 @@ input:focus,select:focus,textarea:focus,.amain .form-control:focus{
 .mappick-map{width:100%;height:340px;border:1px solid var(--line);border-radius:6px;z-index:0}
 .mappick-bar{display:flex;align-items:center;gap:12px;margin-top:8px}
 .mappick-status{font-size:12px;color:var(--faint)}
+/* DatePicker addon icons (inline SVG, since FontAwesome isn't loaded) */
+.kv-dp-icon{vertical-align:middle;color:var(--soft)}
+.input-group-addon,.input-group-text{display:inline-flex;align-items:center;justify-content:center}
