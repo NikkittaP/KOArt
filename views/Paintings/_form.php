@@ -29,14 +29,14 @@ RichTextAsset::register($this);
 
     <?php if ($model->isNewRecord): ?>
     <div class="panel" id="photo-panel">
-        <h2><?= Yii::t('admin', 'Photos') ?></h2>
+        <h2><?= Yii::t('admin', 'Photo') ?></h2>
 
         <div class="ph-up">
             <label class="ph-drop" id="ph-drop">
-                <input type="file" id="ph-input" name="photos[]" accept="image/*" multiple>
+                <input type="file" id="ph-input" name="photos[]" accept="image/*">
                 <div class="ph-drop-empty" id="ph-empty">
                     <span class="ph-drop-title"><?= Yii::t('admin', 'Drop a photo here, or click to choose') ?></span>
-                    <span class="ph-drop-sub"><?= Yii::t('admin', 'The first photo is the cover. You can add more — they stay smaller.') ?></span>
+                    <span class="ph-drop-sub"><?= Yii::t('admin', 'One photo per work. This is the cover shown everywhere.') ?></span>
                 </div>
                 <div class="ph-cover" id="ph-cover" hidden>
                     <img id="ph-cover-img" alt="">
@@ -47,7 +47,6 @@ RichTextAsset::register($this);
             <div class="ph-thumbs" id="ph-thumbs" hidden></div>
 
             <p class="ph-hint">
-                <?= Yii::t('admin', 'Click a thumbnail to make it the cover.') ?><br>
                 <?= Yii::t('admin', 'JPG and PNG are accepted (PNG is converted to JPG automatically). Max {mb} MB and {px} px on the longer side.', [
                     'mb' => 15,
                     'px' => 8000,
@@ -57,6 +56,88 @@ RichTextAsset::register($this);
 
         <input type="hidden" name="cover_index" id="ph-cover-index" value="0">
         <input type="hidden" name="device_coords" id="ph-device-coords" value="">
+    </div>
+    <?php else: ?>
+    <?php
+        // Unified photo management on the edit form. A work now has a single
+        // image, but legacy works may still have several — they are all shown
+        // here with delete checkboxes (and a cover radio when there is a
+        // choice). Uploading a new photo replaces the current cover.
+        $photos = \app\models\Photos::find()
+            ->where(['painting_id' => $model->id])
+            ->orderBy(['isMain' => SORT_DESC, 'id' => SORT_ASC])
+            ->all();
+        $mainPhoto = null;
+        foreach ($photos as $p) {
+            if ((int) $p->isMain === 1) { $mainPhoto = $p; break; }
+        }
+        if ($mainPhoto === null && !empty($photos)) {
+            $mainPhoto = $photos[0];
+        }
+        $baseUrl = Yii::$app->request->baseUrl;
+    ?>
+    <div class="panel" id="photo-panel">
+        <h2><?= Yii::t('admin', 'Photo') ?></h2>
+
+        <div class="ph-replace">
+            <div class="ph-replace-now">
+                <span class="ph-replace-label"><?= Yii::t('admin', 'Current') ?></span>
+                <?php if ($mainPhoto): ?>
+                    <img id="ph-now-img" src="<?= $baseUrl . '/paintings_photo/thumb_squared/' . \app\helpers\Img::webp($mainPhoto->filename) ?>" alt="">
+                <?php else: ?>
+                    <span class="thumb ph" id="ph-now-img" style="display:inline-block"></span>
+                <?php endif; ?>
+            </div>
+
+            <span class="ph-replace-arrow" id="ph-replace-arrow" hidden>→</span>
+
+            <div class="ph-replace-next" id="ph-replace-next" hidden>
+                <span class="ph-replace-label"><?= Yii::t('admin', 'After upload') ?></span>
+                <img id="ph-next-img" alt="">
+            </div>
+        </div>
+
+        <label class="ph-drop ph-drop-replace" id="ph-replace-drop">
+            <input type="file" id="ph-replace-input" name="replace_photo" accept="image/*">
+            <div class="ph-drop-empty">
+                <span class="ph-drop-title"><?= Yii::t('admin', 'Drop a new photo here, or click to choose') ?></span>
+                <span class="ph-drop-sub"><?= Yii::t('admin', 'Uploading replaces the current image.') ?></span>
+            </div>
+        </label>
+
+        <p class="ph-hint">
+            <?= Yii::t('admin', 'JPG and PNG are accepted (PNG is converted to JPG automatically). Max {mb} MB and {px} px on the longer side.', [
+                'mb' => 15,
+                'px' => 8000,
+            ]) ?>
+        </p>
+
+        <?php if (count($photos) > 1): ?>
+            <h3 style="margin:18px 0 6px;font-size:13px;color:var(--muted)"><?= Yii::t('admin', 'All photos of this work') ?></h3>
+            <p style="color:var(--faint);font-size:12px;margin:0 0 8px">
+                <?= Yii::t('admin', 'This work has several photos (legacy). Pick the cover and tick any you want to delete.') ?>
+            </p>
+            <div class="photo-grid">
+                <?php foreach ($photos as $photo): ?>
+                    <div class="photo-pick <?= (int) $photo->isMain === 1 ? 'sel' : '' ?>">
+                        <?= Html::img($baseUrl . '/paintings_photo/thumb_squared/' . \app\helpers\Img::webp($photo->filename)) ?>
+                        <label class="photo-cover-pick" title="<?= Yii::t('admin', 'Cover') ?>">
+                            <?= Html::radio('cover_photo_id', (int) $photo->isMain === 1, ['value' => $photo->id]) ?>
+                            <?= Yii::t('admin', 'Cover') ?>
+                        </label>
+                        <label class="photo-del-pick" title="<?= Yii::t('admin', 'Delete') ?>">
+                            <?= Html::checkbox('delete_photo_ids[]', false, ['value' => $photo->id]) ?>
+                            <?= Yii::t('admin', 'Delete') ?>
+                        </label>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php elseif ($mainPhoto): ?>
+            <label class="ph-del-single">
+                <?= Html::checkbox('delete_photo_ids[]', false, ['value' => $mainPhoto->id]) ?>
+                <?= Yii::t('admin', 'Delete the current photo') ?>
+            </label>
+        <?php endif; ?>
     </div>
     <?php endif; ?>
 
@@ -251,6 +332,35 @@ RichTextAsset::register($this);
 
 <?php if ($model->isNewRecord): ?>
     <?php $this->registerJsFile('@web/js/painting-form.js', ['position' => \yii\web\View::POS_END]); ?>
+<?php else: ?>
+    <?php
+    // Edit-form replace preview: when a new file is picked, show it next to the
+    // current image so the author sees what it will be replaced with.
+    $this->registerJs(<<<'JS'
+(function () {
+  var input = document.getElementById('ph-replace-input');
+  if (!input) return;
+  var nextWrap = document.getElementById('ph-replace-next');
+  var nextImg = document.getElementById('ph-next-img');
+  var arrow = document.getElementById('ph-replace-arrow');
+  var url = null;
+  input.addEventListener('change', function () {
+    if (url) { URL.revokeObjectURL(url); url = null; }
+    var file = input.files && input.files[0];
+    if (!file) {
+      nextWrap.hidden = true;
+      arrow.hidden = true;
+      return;
+    }
+    url = URL.createObjectURL(file);
+    nextImg.src = url;
+    nextWrap.hidden = false;
+    arrow.hidden = false;
+  });
+})();
+JS
+    );
+    ?>
 <?php endif; ?>
 
 <?php

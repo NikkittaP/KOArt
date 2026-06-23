@@ -153,8 +153,20 @@ return [
     'Drop a photo here, or click to choose' => 'Перетащите фото сюда или нажмите, чтобы выбрать',
     'The first photo is the cover. You can add more — they stay smaller.'
         => 'Первое фото — обложка. Можно добавить ещё — они будут мельче.',
+    'One photo per work. This is the cover shown everywhere.'
+        => 'Одно фото на работу. Это изображение показывается везде.',
     'Click a thumbnail to make it the cover.' => 'Нажмите на миниатюру, чтобы сделать её обложкой.',
     'Cover' => 'Обложка',
+    // Unified photo panel on the edit form
+    'Photo' => 'Фото',
+    'Current' => 'Сейчас',
+    'After upload' => 'После загрузки',
+    'Drop a new photo here, or click to choose' => 'Перетащите новое фото сюда или нажмите, чтобы выбрать',
+    'Uploading replaces the current image.' => 'Загрузка заменит текущее изображение.',
+    'All photos of this work' => 'Все фото этой работы',
+    'This work has several photos (legacy). Pick the cover and tick any you want to delete.'
+        => 'У этой работы несколько фото (из прошлой версии). Выберите обложку и отметьте те, что хотите удалить.',
+    'Delete the current photo' => 'Удалить текущее фото',
     'Add more' => 'Добавить ещё',
     'Optional — leave blank and a default (genre + month) is filled in automatically.'
         => 'Необязательно — если оставить пустым, подставится автоматически (жанр + месяц).',

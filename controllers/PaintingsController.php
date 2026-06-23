@@ -870,7 +870,8 @@ class PaintingsController extends AdminBaseController
                 }
 
                 // Стоимость картины
-                $priceOld = Prices::find()->where(['painting_id' => $model->id])->orderBy(['datetime_add' => SORT_DESC])->one()->value;
+                $priceRow = Prices::find()->where(['painting_id' => $model->id])->orderBy(['datetime_add' => SORT_DESC])->one();
+                $priceOld = $priceRow ? $priceRow->value : null;
                 if ($priceOld != $model->price) {
                     $price = new Prices();
                     $price->painting_id = $model->id;
@@ -896,6 +897,10 @@ class PaintingsController extends AdminBaseController
                 $authorComments->save();
 
                 $model->save();
+
+                // Photos: handle deletions, cover choice and replacement upload
+                // from the unified edit form.
+                $this->handlePhotoEdits($model);
 
                 return $this->redirect(['paintings/index']);
             }
@@ -949,6 +954,116 @@ class PaintingsController extends AdminBaseController
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * Remove the stored master + every WebP derivative for a single photo.
+     */
+    private function deletePhotoFiles(\app\models\Photos $photo)
+    {
+        $base = Yii::getAlias('@app') . '/web/paintings_photo/';
+        $webp = \app\helpers\Img::webp($photo->filename);
+        // Original master is JPG; all derivatives are WebP.
+        @unlink($base . 'original/' . $photo->filename);
+        @unlink($base . 'original_site/' . $webp);
+        @unlink($base . 'preview/' . $webp);
+        @unlink($base . 'thumb_squared/' . $webp);
+        @unlink($base . 'thumb_tiny/' . $webp);
+    }
+
+    /**
+     * Handle the photo controls on the unified edit form:
+     *   - delete the ticked photos (delete_photo_ids[]),
+     *   - replace the cover with a freshly uploaded image (replace_photo) —
+     *     a work now keeps a single image, so the upload replaces the current
+     *     cover,
+     *   - otherwise honour an explicit cover choice (cover_photo_id) among the
+     *     legacy multi-photo set,
+     *   - and always leave exactly one cover when any photo remains.
+     */
+    private function handlePhotoEdits(Paintings $model)
+    {
+        $req = Yii::$app->request;
+
+        // 1) Delete the ticked photos.
+        $deleteIds = array_filter(array_map('intval', (array) $req->post('delete_photo_ids', [])));
+        if (!empty($deleteIds)) {
+            $toDelete = \app\models\Photos::find()
+                ->where(['painting_id' => $model->id, 'id' => $deleteIds])
+                ->all();
+            foreach ($toDelete as $photo) {
+                $this->deletePhotoFiles($photo);
+                $photo->delete();
+            }
+        }
+
+        // 2) Replacement upload — becomes the single cover image.
+        $replaced = false;
+        if (isset($_FILES['replace_photo']) && is_string($_FILES['replace_photo']['tmp_name'] ?? null)
+            && $_FILES['replace_photo']['tmp_name'] !== ''
+            && (int) ($_FILES['replace_photo']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK
+            && is_uploaded_file($_FILES['replace_photo']['tmp_name'])) {
+
+            $tmp = $_FILES['replace_photo']['tmp_name'];
+            $bytes = (int) $_FILES['replace_photo']['size'];
+            $error = \app\helpers\Img::validate($tmp, $bytes);
+            if ($error !== null) {
+                Yii::$app->session->setFlash('error', $error);
+            } else {
+                $info = @getimagesize($tmp);
+                $isJpeg = \app\helpers\Img::isJpeg(isset($info[2]) ? $info[2] : null);
+                try {
+                    $filename = \app\helpers\Img::store($tmp, $isJpeg);
+                    // Drop every existing photo: one image per work going forward.
+                    foreach (\app\models\Photos::find()->where(['painting_id' => $model->id])->all() as $old) {
+                        $this->deletePhotoFiles($old);
+                        $old->delete();
+                    }
+                    $photo = new \app\models\Photos();
+                    $photo->painting_id = $model->id;
+                    $photo->filename = $filename;
+                    $photo->isMain = 1;
+                    $photo->save();
+                    $replaced = true;
+                } catch (\Exception $e) {
+                    Yii::error('Replace photo store failed: ' . $e->getMessage(), __METHOD__);
+                    Yii::$app->session->setFlash('error', Yii::t('admin', 'Could not process the image. Please try a different file.'));
+                }
+            }
+        }
+
+        // 3) Explicit cover choice among the remaining photos (legacy multi-set).
+        if (!$replaced) {
+            $coverId = (int) $req->post('cover_photo_id', 0);
+            if ($coverId > 0) {
+                foreach (\app\models\Photos::find()->where(['painting_id' => $model->id])->all() as $p) {
+                    $p->isMain = ((int) $p->id === $coverId) ? 1 : 0;
+                    $p->save(false, ['isMain']);
+                }
+            }
+        }
+
+        // 4) Guarantee exactly one cover whenever photos remain.
+        $remaining = \app\models\Photos::find()
+            ->where(['painting_id' => $model->id])
+            ->orderBy(['id' => SORT_ASC])
+            ->all();
+        if (!empty($remaining)) {
+            $mains = array_filter($remaining, function ($p) { return (int) $p->isMain === 1; });
+            if (count($mains) === 0) {
+                $remaining[0]->isMain = 1;
+                $remaining[0]->save(false, ['isMain']);
+            } elseif (count($mains) > 1) {
+                // Collapse to a single cover if duplicates slipped in.
+                $kept = false;
+                foreach ($remaining as $p) {
+                    if ((int) $p->isMain === 1) {
+                        if ($kept) { $p->isMain = 0; $p->save(false, ['isMain']); }
+                        $kept = true;
+                    }
+                }
+            }
+        }
     }
 
     protected function findModel($id)

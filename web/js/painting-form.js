@@ -95,8 +95,14 @@
   }
 
   function addFiles(fileList) {
+    // One image per work: in single mode a new pick replaces the previous one.
+    if (!input.multiple) {
+      selected = [];
+      coverIndex = 0;
+    }
     Array.prototype.forEach.call(fileList, function (f) {
       if (f && f.type && f.type.indexOf('image/') === 0) {
+        if (!input.multiple && selected.length >= 1) return;
         selected.push(f);
       }
     });

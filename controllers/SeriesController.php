@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\helpers\RichText;
 use app\models\Paintings;
+use app\models\PaintingsToSeries;
 use app\models\search\SeriesSearch;
 use app\models\Series;
 use yii\helpers\ArrayHelper;
@@ -225,12 +226,14 @@ class SeriesController extends AdminBaseController
             if ($model->uploadedCover !== null) {
                 if ($model->uploadCover()) {
                     if ($model->save()) {
+                        $this->cascadeHideWorks($model);
                         return $this->redirect(['series/index']);
                     }
                 }
             } else {
                 $model->cover_filename = $savedCoverName;
                 if ($model->save()) {
+                    $this->cascadeHideWorks($model);
                     return $this->redirect(['series/index']);
                 }
             }
@@ -239,6 +242,36 @@ class SeriesController extends AdminBaseController
         return $this->render('update', [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * When a series is archived (hidden), also archive every work in it that is
+     * not still shown through some other visible series. Works that appear in
+     * another visible series stay published.
+     */
+    private function cascadeHideWorks(Series $model)
+    {
+        if ((int) $model->isVisible !== 0) {
+            return; // only cascades when the series itself is hidden
+        }
+
+        $paintingIds = ArrayHelper::getColumn(
+            PaintingsToSeries::find()->where(['series_id' => $model->id])->all(),
+            'painting_id'
+        );
+
+        foreach (array_unique($paintingIds) as $pid) {
+            $inOtherVisibleSeries = PaintingsToSeries::find()
+                ->alias('p2s')
+                ->innerJoin(['s' => Series::tableName()], 's.id = p2s.series_id')
+                ->where(['p2s.painting_id' => $pid, 's.isVisible' => 1])
+                ->andWhere(['<>', 'p2s.series_id', $model->id])
+                ->exists();
+
+            if (!$inOtherVisibleSeries) {
+                Paintings::updateAll(['isVisible' => 0], ['id' => $pid]);
+            }
+        }
     }
 
     /**

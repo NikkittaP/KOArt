@@ -152,7 +152,7 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
             <td>
                 <?php if ($thumb): ?>
                     <?= Html::a(Html::img($thumb, ['class' => 'thumb', 'alt' => Html::encode($m->name), 'loading' => 'lazy']),
-                        ['show', 'id' => $m->id]) ?>
+                        ['update', 'id' => $m->id], ['title' => Yii::t('admin', 'Edit')]) ?>
                 <?php else: ?>
                     <span class="thumb ph"></span>
                 <?php endif; ?>
@@ -197,8 +197,6 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
             <td>
                 <div class="rowact">
                     <?= Html::a(Yii::t('admin', 'Edit'), ['update', 'id' => $m->id], ['class' => 'btn ghost sm']) ?>
-                    <?= Html::a(Yii::t('admin', 'Photos'), ['photos/add', 'painting_id' => $m->id], ['class' => 'btn ghost sm']) ?>
-                    <?= Html::a(Yii::t('admin', 'Cover'), ['photos/selectmain', 'painting_id' => $m->id], ['class' => 'btn ghost sm']) ?>
                     <?php if ($m->mainPhoto && $m->mainPhoto->filename): ?>
                         <?= Html::a(Yii::t('admin', 'Original'), ['photos/download-original', 'id' => $m->mainPhoto->id], ['class' => 'btn ghost sm', 'title' => Yii::t('admin', 'Download full-resolution original')]) ?>
                     <?php endif; ?>
