@@ -63,14 +63,24 @@ a{color:inherit}
 /* Series detail — blog */
 .series-intro{max-width:680px;margin:0 0 14px}
 .series-intro p{font-size:16px;color:var(--soft);line-height:1.75}
-/* Single-work page description: centred under the centred image, left-aligned
-   text for comfortable reading of long rich-text. */
-.workdesc{margin:30px auto 0;text-align:left}
+/* Single-work page: the artwork fits within the viewport (capped height), and
+   on landscape screens the description sits to the right of the image. */
+.workdesc{text-align:left}
 .workdesc p{margin:0 0 1em}
 .workdesc p:last-child{margin-bottom:0}
+.workpage{max-width:1200px;margin:6px auto 0}
+.workpage-media figure{margin:0 0 16px;overflow:hidden;background:#f4f2ec;text-align:center}
+.workpage-media figure:last-child{margin-bottom:0}
+.workpage-media img{display:block;width:auto;max-width:100%;max-height:72vh;height:auto;margin:0 auto}
+.workpage-info{margin-top:30px}
+@media (orientation:landscape) and (min-width:640px){
+  .workpage{display:flex;align-items:flex-start;gap:clamp(28px,4vw,56px)}
+  .workpage-media{flex:0 1 62%;min-width:0}
+  .workpage-media img{max-height:80vh}
+  .workpage-info{flex:1 1 38%;min-width:0;margin-top:0}
+}
 .blogflow{display:flex;flex-direction:column;align-items:center;gap:30px;max-width:880px;margin:26px auto 0}
 .blogflow figure{margin:0;width:100%;cursor:zoom-in;overflow:hidden;background:#f4f2ec}
-.blogflow--static figure{cursor:default}
 .blogflow figure img{width:100%;height:auto}
 .blogtext{max-width:600px;align-self:center;text-align:center}
 .blogtext p{font-size:16px;color:var(--soft);line-height:1.8}

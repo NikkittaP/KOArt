@@ -60,23 +60,28 @@ $contactEmail = Yii::$app->params['contactEmail'];
     <?php if ($metaLine): ?><p class="meta"><?= Html::encode($metaLine) ?></p><?php endif; ?>
 </header>
 
-<?php // Images are already shown full-size here, so no lightbox: figures carry
-      // no data-full, so public.js skips them (no click-to-zoom). ?>
-<div class="blogflow blogflow--static">
-    <?php foreach ($photos as $photo): ?>
-        <?php
-        $file = \app\helpers\Img::webp($photo->filename);
-        $lg = '/paintings_photo/original_site/' . $file;
-        ?>
-        <figure>
-            <img src="<?= Html::encode($lg) ?>" alt="<?= Html::encode($painting->tr('name')) ?>" loading="lazy">
-        </figure>
-    <?php endforeach; ?>
-</div>
+<?php // Image fits the viewport (capped height); on landscape the description
+      // sits to the right of it. Figures carry no data-full, so public.js skips
+      // them (no lightbox / click-to-zoom). ?>
+<div class="workpage">
+    <div class="workpage-media">
+        <?php foreach ($photos as $photo): ?>
+            <?php
+            $file = \app\helpers\Img::webp($photo->filename);
+            $lg = '/paintings_photo/original_site/' . $file;
+            ?>
+            <figure>
+                <img src="<?= Html::encode($lg) ?>" alt="<?= Html::encode($painting->tr('name')) ?>" loading="lazy">
+            </figure>
+        <?php endforeach; ?>
+    </div>
 
-<?php if (trim((string) $description) !== ''): ?>
-    <div class="series-intro workdesc"><?= RichText::purify($description) ?></div>
-<?php endif; ?>
+    <?php if (trim((string) $description) !== ''): ?>
+        <div class="workpage-info">
+            <div class="series-intro workdesc"><?= RichText::purify($description) ?></div>
+        </div>
+    <?php endif; ?>
+</div>
 
 <div class="series-foot">
     <a class="inquire" href="mailto:<?= Html::encode($contactEmail) ?>">Enquire about prints &amp; licensing</a>
