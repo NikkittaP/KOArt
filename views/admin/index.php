@@ -10,6 +10,9 @@ use yii\helpers\Url;
 /* @var $seriesTotal int */
 /* @var $seriesVisible int */
 /* @var $sectionsTotal int */
+/* @var $genresTotal int */
+/* @var $groundsTotal int */
+/* @var $materialsTotal int */
 
 $this->title = Yii::t('admin', 'Dashboard');
 ?>
@@ -45,6 +48,21 @@ $this->title = Yii::t('admin', 'Dashboard');
         <div class="n"><?= $sectionsTotal ?></div>
         <div class="l"><?= Yii::t('admin', 'Sections') ?></div>
         <div class="x"><?= Yii::t('admin', 'navigation') ?></div>
+    </div>
+    <div class="stat">
+        <div class="n"><?= $genresTotal ?></div>
+        <div class="l"><?= Yii::t('admin', 'Genres') ?></div>
+        <div class="x"><?= Yii::t('admin', 'catalogue') ?></div>
+    </div>
+    <div class="stat">
+        <div class="n"><?= $groundsTotal ?></div>
+        <div class="l"><?= Yii::t('admin', 'Grounds') ?></div>
+        <div class="x"><?= Yii::t('admin', 'catalogue') ?></div>
+    </div>
+    <div class="stat">
+        <div class="n"><?= $materialsTotal ?></div>
+        <div class="l"><?= Yii::t('admin', 'Materials') ?></div>
+        <div class="x"><?= Yii::t('admin', 'catalogue') ?></div>
     </div>
 </div>
 

@@ -28,9 +28,11 @@ $this->title = Yii::t('admin', 'Sections');
         <th style="width:70px"><?= Yii::t('admin', 'Order') ?></th>
         <th><?= Yii::t('admin', 'Title') ?></th>
         <th><?= Yii::t('admin', 'Slug') ?></th>
-        <th style="width:90px"><?= Yii::t('admin', 'Works') ?></th>
-        <th style="width:90px"><?= Yii::t('admin', 'Series') ?></th>
-        <th style="width:320px"><?= Yii::t('admin', 'Actions') ?></th>
+        <th style="width:80px"><?= Yii::t('admin', 'Works') ?></th>
+        <th style="width:80px"><?= Yii::t('admin', 'On site') ?></th>
+        <th style="width:80px"><?= Yii::t('admin', 'Series') ?></th>
+        <th style="width:80px"><?= Yii::t('admin', 'On site') ?></th>
+        <th style="width:300px"><?= Yii::t('admin', 'Actions') ?></th>
     </tr>
     </thead>
     <tbody>
@@ -39,8 +41,16 @@ $this->title = Yii::t('admin', 'Sections');
             <td><?= (int) $section->sort ?></td>
             <td><strong style="font-weight:400"><?= Html::encode($section->title) ?></strong></td>
             <td><code><?= Html::encode($section->slug) ?></code></td>
-            <td><?= $section->getPaintings()->count() ?></td>
-            <td><?= $section->getSeries()->count() ?></td>
+            <?php
+            $paintingsTotal = (int) $section->getPaintings()->count();
+            $paintingsLive = (int) $section->getPaintings()->andWhere(['isVisible' => 1])->count();
+            $seriesTotal = (int) $section->getSeries()->count();
+            $seriesLive = (int) $section->getSeries()->andWhere(['isVisible' => 1])->count();
+            ?>
+            <td><?= $paintingsTotal ?></td>
+            <td style="color:var(--muted)"><?= $paintingsLive ?></td>
+            <td><?= $seriesTotal ?></td>
+            <td style="color:var(--muted)"><?= $seriesLive ?></td>
             <td>
                 <div class="rowact">
                     <?= Html::a(Yii::t('admin', 'Edit'), ['update', 'id' => $section->id], ['class' => 'btn ghost sm']) ?>

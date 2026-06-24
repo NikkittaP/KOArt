@@ -4,6 +4,9 @@ namespace app\controllers;
 
 use app\helpers\AdminLang;
 use app\helpers\AdminPrefs;
+use app\models\ArtGenres;
+use app\models\Grounds;
+use app\models\Materials;
 use app\models\Paintings;
 use app\models\Sections;
 use app\models\Series;
@@ -53,6 +56,10 @@ class AdminController extends AdminBaseController
             'seriesTotal' => $hideArchive ? $seriesVisible : $seriesTotal,
             'seriesVisible' => $seriesVisible,
             'sectionsTotal' => (int) Sections::find()->count(),
+            // Taxonomy/catalogue counts (not affected by the archive toggle).
+            'genresTotal' => (int) ArtGenres::find()->count(),
+            'groundsTotal' => (int) Grounds::find()->count(),
+            'materialsTotal' => (int) Materials::find()->count(),
         ]);
     }
 

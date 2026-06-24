@@ -29,6 +29,8 @@ return [
     '{v} shown · {h} hidden' => 'показано {v} · скрыто {h}',
     '{v} shown' => 'показано {v}',
     'navigation' => 'навигация',
+    'catalogue' => 'справочник',
+    'On site' => 'На сайте',
     'published (archive hidden)' => 'опубликовано (архив скрыт)',
     'published' => 'опубликовано',
 
