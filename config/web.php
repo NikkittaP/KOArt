@@ -82,6 +82,11 @@ $config = [
                 // 'admin/series/<action>' first and links get an /admin/ prefix.
                 'series/<id:\d+>' => 'series/show',
 
+                // Public single-work page (long rich-text descriptions live
+                // here, not in the lightbox). Same ordering rationale as the
+                // series rule above: keep it before the admin/<...> rules.
+                'work/<id:\d+>' => 'paintings/work',
+
                 // --- Admin / archive panel (Phase 4b). Must stay BEFORE the
                 // generic <slug> rule so /admin/* never resolves to a section. ---
                 'admin' => 'admin/index',

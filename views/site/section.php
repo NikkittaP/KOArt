@@ -56,12 +56,16 @@ $this->title = $section->tr('title');
             $ground = PaintingPresenter::groundLabel($p);
             $year = PaintingPresenter::yearLabel($p);
             $size = PaintingPresenter::sizeLabel($p);
-            $desc = PaintingPresenter::descPlain($p);
+            // Has a description -> the lightbox shows a "Read more" link to the
+            // dedicated work page (where the full rich text is read). No need to
+            // dump the whole description into the listing markup anymore.
+            $hasDesc = PaintingPresenter::descPlain($p) !== '';
+            $workUrl = $hasDesc ? Url::to(['/paintings/work', 'id' => $p->id]) : '';
             if (!$sm) {
                 continue;
             }
             ?>
-            <figure data-full="<?= Html::encode($lg) ?>" data-title="<?= Html::encode($p->tr('name')) ?>" data-mat="<?= Html::encode($mat) ?>" data-ground="<?= Html::encode($ground) ?>" data-year="<?= Html::encode($year) ?>" data-size="<?= Html::encode($size) ?>" data-desc="<?= Html::encode($desc) ?>">
+            <figure data-full="<?= Html::encode($lg) ?>" data-title="<?= Html::encode($p->tr('name')) ?>" data-mat="<?= Html::encode($mat) ?>" data-ground="<?= Html::encode($ground) ?>" data-year="<?= Html::encode($year) ?>" data-size="<?= Html::encode($size) ?>"<?= $workUrl ? ' data-url="' . Html::encode($workUrl) . '"' : '' ?>>
                 <img src="<?= Html::encode($sm) ?>" alt="<?= Html::encode($p->tr('name')) ?>" loading="lazy">
                 <figcaption class="hov">
                     <span class="t"><?= Html::encode($p->tr('name')) ?></span>

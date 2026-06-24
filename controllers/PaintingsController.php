@@ -27,6 +27,9 @@ class PaintingsController extends AdminBaseController
 {
     public $adminNav = 'works';
 
+    /** actionWork is the PUBLIC single-work page — keep public layout/lang. */
+    protected $publicActions = ['work'];
+
     public function behaviors()
     {
         return [
@@ -278,6 +281,44 @@ class PaintingsController extends AdminBaseController
             'sizesHorizontalGroups' => $sizesHorizontalGroups,
             'sizesVertical' => $sizesVertical,
             'sizesVerticalGroups' => $sizesVerticalGroups,
+        ]);
+    }
+
+    /**
+     * PUBLIC single-work page (public layout). This is where long, rich-text
+     * descriptions are read — the lightbox only carries a short caption and
+     * links here via "Read more". Mirrors SeriesController::actionShow.
+     */
+    public function actionWork($id)
+    {
+        $painting = Paintings::find()->where(['id' => $id])->one();
+
+        if ($painting === null || (int) $painting->isVisible === 0) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        // Back target: the work's series (if it belongs to a visible one),
+        // otherwise its own section page.
+        $series = Series::find()
+            ->joinWith('paintingsToSeries')
+            ->where(['paintings_to_series.painting_id' => $painting->id])
+            ->andWhere(['series.isVisible' => 1])
+            ->one();
+        $section = $painting->section;
+
+        $this->layout = '@app/views/layouts/public';
+        if ($section) {
+            $this->view->params['activeNav'] = $section->slug;
+        } elseif ($series && $series->section) {
+            $this->view->params['activeNav'] = $series->section->slug;
+        }
+        // Logged-in owner: "Edit" jumps straight to this work in admin.
+        $this->view->params['adminEditUrl'] = ['/paintings/update', 'id' => $painting->id];
+
+        return $this->render('work', [
+            'painting' => $painting,
+            'series' => $series,
+            'section' => $section,
         ]);
     }
 

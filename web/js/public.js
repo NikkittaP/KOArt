@@ -24,11 +24,13 @@
   function caption(f){
     var t=f.getAttribute('data-title')||'', mat=f.getAttribute('data-mat')||'',
         g=f.getAttribute('data-ground')||'',
-        y=f.getAttribute('data-year')||'', s=f.getAttribute('data-size')||'', d=f.getAttribute('data-desc')||'';
+        y=f.getAttribute('data-year')||'', s=f.getAttribute('data-size')||'', u=f.getAttribute('data-url')||'';
     var l2=[mat,g,y,s].filter(Boolean).join('  ·  '); var h='';
     if(t) h+="<div class='ct'>"+esc(t)+"</div>";
     if(l2) h+="<div class='cm'>"+esc(l2)+"</div>";
-    if(d) h+="<div class='cd'>"+esc(d)+"</div>";
+    // Long, rich-text descriptions live on the work page, not in the viewer:
+    // we only surface a "Read more" link here when the work has its own page.
+    if(u) h+="<a class='cl' href='"+esc(u)+"'>Read more →</a>";
     return h;
   }
   function preload(i){ var f=figs[(i+figs.length)%figs.length]; if(f){ var im=new Image(); im.src=f.getAttribute('data-full'); } }
