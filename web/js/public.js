@@ -1,4 +1,14 @@
 (function(){
+  // Basic image-copy deterrent: block the right-click "Save image" menu and
+  // image dragging on artwork. This only stops casual saving — screenshots and
+  // DevTools can still reach the file, so it is a deterrent, not real DRM.
+  document.addEventListener('contextmenu', function (e) {
+    if (e.target && e.target.tagName === 'IMG') e.preventDefault();
+  });
+  document.addEventListener('dragstart', function (e) {
+    if (e.target && e.target.tagName === 'IMG') e.preventDefault();
+  });
+
   function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 
   // mobile menu

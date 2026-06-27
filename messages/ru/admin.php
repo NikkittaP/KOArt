@@ -154,6 +154,10 @@ return [
     'Add work' => 'Добавить картину',
     'Edit work' => 'Картина',
     'Work added.' => 'Картина добавлена.',
+    'Image "{name}" is too large — maximum is {max} MB.'
+        => 'Изображение «{name}» слишком большое — максимум {max} МБ.',
+    'File "{name}" is not an image and was skipped.'
+        => 'Файл «{name}» не является изображением и был пропущен.',
     // Photo-first upload panel (Add work)
     'Drop a photo here, or click to choose' => 'Перетащите фото сюда или нажмите, чтобы выбрать',
     'The first photo is the cover. You can add more — they stay smaller.'

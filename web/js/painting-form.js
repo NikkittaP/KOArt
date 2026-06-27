@@ -11,8 +11,18 @@
  * this when the photo has none.
  */
 (function () {
+  // Stop the browser from navigating to (opening) a file that is dropped
+  // anywhere on the page — by default a missed drop opens the image in the
+  // tab, which looks like "nothing happened". This guard runs even if the
+  // uploader below bails out.
+  window.addEventListener('dragover', function (e) { e.preventDefault(); });
+
   var input = document.getElementById('ph-input');
-  if (!input || typeof DataTransfer === 'undefined') return;
+  if (!input || typeof DataTransfer === 'undefined') {
+    // No uploader on this page: still swallow the drop so nothing opens.
+    window.addEventListener('drop', function (e) { e.preventDefault(); });
+    return;
+  }
 
   var dropEl = document.getElementById('ph-drop');
   var emptyEl = document.getElementById('ph-empty');
@@ -21,11 +31,31 @@
   var thumbsEl = document.getElementById('ph-thumbs');
   var coverIndexEl = document.getElementById('ph-cover-index');
   var deviceCoordsEl = document.getElementById('ph-device-coords');
+  var errorEl = document.getElementById('ph-error');
+
+  // Upload limits / messages come from data-* on the dropzone so the copy
+  // stays translated (Yii::t) and the MB cap matches the server.
+  var ds = (dropEl && dropEl.dataset) ? dropEl.dataset : {};
+  var maxMb = parseFloat(ds.maxMb) || 15;
+  var maxBytes = maxMb * 1024 * 1024;
+  var msgLarge = ds.errLarge || 'Image "{name}" is too large — maximum is {max} MB.';
+  var msgType = ds.errType || 'File "{name}" is not an image and was skipped.';
 
   var selected = [];     // our master list of File objects
   var coverIndex = 0;    // index (into selected) of the chosen cover
   var urls = [];         // object URLs to revoke on each render
   var locRequested = false;
+
+  function showErrors(list) {
+    if (!errorEl) return;
+    if (!list.length) { errorEl.hidden = true; errorEl.innerHTML = ''; return; }
+    errorEl.innerHTML = list.map(function (m) {
+      return String(m).replace(/[&<>]/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c];
+      });
+    }).join('<br>');
+    errorEl.hidden = false;
+  }
 
   function revokeUrls() {
     urls.forEach(function (u) { URL.revokeObjectURL(u); });
@@ -95,17 +125,40 @@
   }
 
   function addFiles(fileList) {
-    // One image per work: in single mode a new pick replaces the previous one.
-    if (!input.multiple) {
-      selected = [];
-      coverIndex = 0;
-    }
+    // Validate FIRST, change state only after. A bad drop (too big / not an
+    // image) must never wipe the photo the author already picked — otherwise
+    // the preview "collapses" and they have to reload to try again.
+    var errors = [];
+    var valid = [];
     Array.prototype.forEach.call(fileList, function (f) {
-      if (f && f.type && f.type.indexOf('image/') === 0) {
-        if (!input.multiple && selected.length >= 1) return;
-        selected.push(f);
+      if (!f) return;
+      // Reject non-images with a clear message instead of silently ignoring.
+      if (!f.type || f.type.indexOf('image/') !== 0) {
+        errors.push(msgType.replace('{name}', f.name || '?'));
+        return;
       }
+      // Reject oversized files client-side (the server would reject them too,
+      // but this gives instant, understandable feedback).
+      if (f.size > maxBytes) {
+        errors.push(msgLarge.replace('{name}', f.name || '?').replace('{max}', maxMb));
+        return;
+      }
+      valid.push(f);
     });
+
+    showErrors(errors);
+
+    // Nothing usable in this batch: keep the current selection as-is.
+    if (!valid.length) return;
+
+    if (!input.multiple) {
+      // One image per work: the newest valid pick replaces the previous one.
+      selected = [valid[valid.length - 1]];
+      coverIndex = 0;
+    } else {
+      valid.forEach(function (f) { selected.push(f); });
+    }
+
     syncInput();
     render();
     requestLocationOnce();
@@ -176,7 +229,17 @@
   });
   dropEl.addEventListener('drop', function (e) {
     e.preventDefault();
+    e.stopPropagation();
     dropEl.classList.remove('drag');
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+      addFiles(e.dataTransfer.files);
+    }
+  });
+
+  // Catch drops that land just outside the (small) dropzone too: instead of
+  // the browser opening the image, route them into the uploader.
+  window.addEventListener('drop', function (e) {
+    e.preventDefault();
     if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
       addFiles(e.dataTransfer.files);
     }

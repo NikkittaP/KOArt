@@ -32,7 +32,10 @@ RichTextAsset::register($this);
         <h2><?= Yii::t('admin', 'Photo') ?></h2>
 
         <div class="ph-up">
-            <label class="ph-drop" id="ph-drop">
+            <label class="ph-drop" id="ph-drop"
+                   data-max-mb="15"
+                   data-err-large="<?= Html::encode(Yii::t('admin', 'Image "{name}" is too large — maximum is {max} MB.', ['max' => 15])) ?>"
+                   data-err-type="<?= Html::encode(Yii::t('admin', 'File "{name}" is not an image and was skipped.')) ?>">
                 <input type="file" id="ph-input" name="photos[]" accept="image/*">
                 <div class="ph-drop-empty" id="ph-empty">
                     <span class="ph-drop-title"><?= Yii::t('admin', 'Drop a photo here, or click to choose') ?></span>
@@ -52,6 +55,7 @@ RichTextAsset::register($this);
                     'px' => 8000,
                 ]) ?>
             </p>
+            <p class="ph-error" id="ph-error" role="alert" hidden></p>
         </div>
 
         <input type="hidden" name="cover_index" id="ph-cover-index" value="0">
@@ -97,7 +101,10 @@ RichTextAsset::register($this);
             </div>
         </div>
 
-        <label class="ph-drop ph-drop-replace" id="ph-replace-drop">
+        <label class="ph-drop ph-drop-replace" id="ph-replace-drop"
+               data-max-mb="15"
+               data-err-large="<?= Html::encode(Yii::t('admin', 'Image "{name}" is too large — maximum is {max} MB.', ['max' => 15])) ?>"
+               data-err-type="<?= Html::encode(Yii::t('admin', 'File "{name}" is not an image and was skipped.')) ?>">
             <input type="file" id="ph-replace-input" name="replace_photo" accept="image/*">
             <div class="ph-drop-empty">
                 <span class="ph-drop-title"><?= Yii::t('admin', 'Drop a new photo here, or click to choose') ?></span>
@@ -111,6 +118,7 @@ RichTextAsset::register($this);
                 'px' => 8000,
             ]) ?>
         </p>
+        <p class="ph-error" id="ph-replace-error" role="alert" hidden></p>
 
         <?php if (count($photos) > 1): ?>
             <h3 style="margin:18px 0 6px;font-size:13px;color:var(--muted)"><?= Yii::t('admin', 'All photos of this work') ?></h3>
@@ -375,25 +383,97 @@ $this->registerJsFile('@web/js/map-picker.js', ['position' => \yii\web\View::POS
     // current image so the author sees what it will be replaced with.
     $this->registerJs(<<<'JS'
 (function () {
+  // Stop the browser from opening an image that's dropped anywhere on the page.
+  window.addEventListener('dragover', function (e) { e.preventDefault(); });
+  window.addEventListener('drop', function (e) {
+    // Only swallow real file drops; let normal interactions through otherwise.
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+      e.preventDefault();
+      if (drop) handleFiles(e.dataTransfer.files);
+    }
+  });
+
   var input = document.getElementById('ph-replace-input');
   if (!input) return;
+  var drop = document.getElementById('ph-replace-drop');
   var nextWrap = document.getElementById('ph-replace-next');
   var nextImg = document.getElementById('ph-next-img');
   var arrow = document.getElementById('ph-replace-arrow');
+  var errorEl = document.getElementById('ph-replace-error');
+  var ds = (drop && drop.dataset) ? drop.dataset : {};
+  var maxMb = parseFloat(ds.maxMb) || 15;
+  var maxBytes = maxMb * 1024 * 1024;
+  var msgLarge = ds.errLarge || 'Image "{name}" is too large — maximum is {max} MB.';
+  var msgType = ds.errType || 'File "{name}" is not an image and was skipped.';
   var url = null;
-  input.addEventListener('change', function () {
+
+  function showError(msg) {
+    if (!errorEl) return;
+    if (!msg) { errorEl.hidden = true; errorEl.textContent = ''; return; }
+    errorEl.textContent = msg;
+    errorEl.hidden = false;
+  }
+
+  function preview(file) {
     if (url) { URL.revokeObjectURL(url); url = null; }
-    var file = input.files && input.files[0];
-    if (!file) {
-      nextWrap.hidden = true;
-      arrow.hidden = true;
-      return;
-    }
+    if (!file) { nextWrap.hidden = true; arrow.hidden = true; return; }
     url = URL.createObjectURL(file);
     nextImg.src = url;
     nextWrap.hidden = false;
     arrow.hidden = false;
+  }
+
+  // Validate a dropped/picked file, then push it into the real input so it
+  // submits with the form (and show the side-by-side preview).
+  function handleFiles(fileList) {
+    var file = fileList && fileList[0];
+    if (!file) return;
+    if (!file.type || file.type.indexOf('image/') !== 0) {
+      showError(msgType.replace('{name}', file.name || '?'));
+      return;
+    }
+    if (file.size > maxBytes) {
+      showError(msgLarge.replace('{name}', file.name || '?').replace('{max}', maxMb));
+      return;
+    }
+    showError('');
+    if (typeof DataTransfer !== 'undefined') {
+      var dt = new DataTransfer();
+      dt.items.add(file);
+      input.files = dt.files;
+    }
+    preview(file);
+  }
+
+  input.addEventListener('change', function () {
+    var file = input.files && input.files[0];
+    // Re-validate native picks too, so oversize files get a clear message.
+    if (file && (file.type.indexOf('image/') !== 0 || file.size > maxBytes)) {
+      handleFiles(input.files);
+      // handleFiles already showed the error; clear the bad pick.
+      if (typeof DataTransfer !== 'undefined') { input.value = ''; preview(null); }
+      return;
+    }
+    showError('');
+    preview(file);
   });
+
+  if (drop) {
+    ['dragenter', 'dragover'].forEach(function (ev) {
+      drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('drag'); });
+    });
+    ['dragleave', 'dragend'].forEach(function (ev) {
+      drop.addEventListener(ev, function () { drop.classList.remove('drag'); });
+    });
+    drop.addEventListener('drop', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      drop.classList.remove('drag');
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+        handleFiles(e.dataTransfer.files);
+      }
+    });
+  }
 })();
 JS
     );
