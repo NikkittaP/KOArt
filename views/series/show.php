@@ -25,7 +25,6 @@ $backUrl = $section
 $backLabel = $section ? $section->tr('title') : 'Back';
 
 $metaLine = PaintingPresenter::seriesMetaLine($series, $paintings);
-$contactEmail = Yii::$app->params['contactEmail'];
 ?>
 <a class="back" href="<?= $backUrl ?>">← <?= Html::encode($backLabel) ?></a>
 <header class="shead pj">
@@ -57,8 +56,4 @@ $contactEmail = Yii::$app->params['contactEmail'];
             <div class="blogtext"><?= RichText::purify($p->tr('description')) ?></div>
         <?php endif; ?>
     <?php endforeach; ?>
-</div>
-
-<div class="series-foot">
-    <a class="inquire" href="mailto:<?= Html::encode($contactEmail) ?>">Enquire about prints &amp; licensing</a>
 </div>

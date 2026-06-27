@@ -213,18 +213,24 @@ RichTextAsset::register($this);
     <div class="panel">
         <h2><?= Yii::t('admin', 'Dimensions') ?></h2>
         <?php
-        $sizesModelHorizontal = Paintings::find()->select(['width', 'height'])->where(new \yii\db\Expression('`width` >= `height`'))->orderBy('width ASC, height ASC')->all();
+        // Стандартные размеры берём из легко расширяемого файла-конфига
+        // (config/canvas_sizes.php) — без таблицы в БД. Из каждого размера
+        // строим и альбомный (ширина ≥ высота), и портретный вариант.
+        // Значение опции — "ШИРИНАxВЫСОТА" (его ждёт разбор в контроллере),
+        // подпись — понятная, например "A4 (29.7 × 21 см)".
+        $standardSizes = require Yii::getAlias('@app') . '/config/canvas_sizes.php';
+        $fmtNum = function ($n) {
+            return rtrim(rtrim(number_format((float) $n, 2, '.', ''), '0'), '.');
+        };
         $sizesHorizontal = [];
-        foreach ($sizesModelHorizontal as $sizeModelHorizontal) {
-            $key = $sizeModelHorizontal->width . 'x' . $sizeModelHorizontal->height;
-            $sizesHorizontal[$key] = $key;
-        }
-
-        $sizesModelVertical = Paintings::find()->select(['width', 'height'])->where(new \yii\db\Expression('`width` < `height`'))->orderBy('width ASC, height ASC')->all();
         $sizesVertical = [];
-        foreach ($sizesModelVertical as $sizeModelVertical) {
-            $key = $sizeModelVertical->width . 'x' . $sizeModelVertical->height;
-            $sizesVertical[$key] = $key;
+        foreach ($standardSizes as $sizeName => $dims) {
+            $short = $fmtNum($dims[0]);
+            $long = $fmtNum($dims[1]);
+            // Альбомная ориентация: ширина = длинная сторона.
+            $sizesHorizontal[$long . 'x' . $short] = $sizeName . ' (' . $long . ' × ' . $short . ' см)';
+            // Портретная ориентация: ширина = короткая сторона.
+            $sizesVertical[$short . 'x' . $long] = $sizeName . ' (' . $short . ' × ' . $long . ' см)';
         }
 
         echo $form->field($model, 'size_horizontal')->dropdownlist($sizesHorizontal, [

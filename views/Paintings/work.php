@@ -51,7 +51,6 @@ $photos = \app\models\Photos::find()
     ->all();
 
 $description = $painting->tr('description');
-$contactEmail = Yii::$app->params['contactEmail'];
 ?>
 <a class="back" href="<?= $backUrl ?>">← <?= Html::encode($backLabel) ?></a>
 
@@ -81,8 +80,4 @@ $contactEmail = Yii::$app->params['contactEmail'];
             <div class="series-intro workdesc"><?= RichText::purify($description) ?></div>
         </div>
     <?php endif; ?>
-</div>
-
-<div class="series-foot">
-    <a class="inquire" href="mailto:<?= Html::encode($contactEmail) ?>">Enquire about prints &amp; licensing</a>
 </div>
