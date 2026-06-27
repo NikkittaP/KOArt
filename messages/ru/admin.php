@@ -61,6 +61,9 @@ return [
     'Works in section' => 'Картины раздела',
     'Delete section "{name}"? Only possible if it has no works or series.'
         => 'Удалить раздел «{name}»? Возможно только если в нём нет картин и серий.',
+    'Delete series "{name}"? The works themselves stay, they are only removed from this series.'
+        => 'Удалить серию «{name}»? Сами картины останутся, они лишь будут убраны из этой серии.',
+    'Series "{name}" deleted.' => 'Серия «{name}» удалена.',
     'Used in the section URL, e.g. "picturebooks". Latin letters, digits, hyphen.'
         => 'Используется в URL раздела, например «picturebooks». Латиница, цифры, дефис.',
     'Position in the navigation (lower = higher).' => 'Порядок раздела в навигации (меньше — выше).',

@@ -95,6 +95,13 @@ $ordering = (int) $selectedSection !== -1;
                 <div class="rowact">
                     <?= Html::a(Yii::t('admin', 'Edit'), ['update', 'id' => $m->id], ['class' => 'btn ghost sm']) ?>
                     <?= Html::a(Yii::t('admin', 'Open ↗'), ['show', 'id' => $m->id], ['class' => 'btn ghost sm', 'target' => '_blank']) ?>
+                    <?= Html::a(Yii::t('admin', 'Delete'), ['delete', 'id' => $m->id], [
+                        'class' => 'btn danger sm',
+                        'data' => [
+                            'confirm' => Yii::t('admin', 'Delete series "{name}"? The works themselves stay, they are only removed from this series.', ['name' => $m->name]),
+                            'method' => 'post',
+                        ],
+                    ]) ?>
                 </div>
             </td>
         </tr>

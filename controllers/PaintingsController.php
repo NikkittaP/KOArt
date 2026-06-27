@@ -726,9 +726,13 @@ class PaintingsController extends AdminBaseController
             }
 
             if ($model->save()) {
-                // Серия для картины
+                // Серия для картины.
+                // Синхронизацию выполняем ВСЕГДА, даже когда серий не выбрано:
+                // если поле очистили, $selectedIDs останется пустым и все
+                // прежние связи удалятся (раньше блок целиком пропускался при
+                // пустом seriesName, из-за чего серия не снималась с картины).
+                $selectedIDs = [];
                 if (!empty($model->seriesName)) {
-                    $selectedIDs = [];
                     foreach ($model->seriesName as $key => $seriesName) {
                         if (is_numeric($seriesName)) {
                             $seriesModel = Series::find()->where(['id' => $seriesName])->one();
@@ -744,24 +748,24 @@ class PaintingsController extends AdminBaseController
 
                         $selectedIDs[] = $seriesModel->id;
                     }
+                }
 
-                    $savedIDs = PaintingsToSeries::find()->where(['painting_id' => $model->id])->all();
-                    // Удаляем ненужные записи из БД
-                    foreach ($savedIDs as $savedID) {
-                        if (!in_array($savedID->series_id, $selectedIDs)) {
-                            $savedID->delete();
-                        }
-
+                $savedIDs = PaintingsToSeries::find()->where(['painting_id' => $model->id])->all();
+                // Удаляем ненужные записи из БД
+                foreach ($savedIDs as $savedID) {
+                    if (!in_array($savedID->series_id, $selectedIDs)) {
+                        $savedID->delete();
                     }
-                    $savedIDsArray = ArrayHelper::map(PaintingsToSeries::find()->where(['painting_id' => $model->id])->all(), 'id', 'series_id');
-                    // Добавляем новые записи из БД
-                    foreach ($selectedIDs as $selectedID) {
-                        if (!in_array($selectedID, $savedIDsArray)) {
-                            $paintingsToSeriesModel = new PaintingsToSeries();
-                            $paintingsToSeriesModel->painting_id = $model->id;
-                            $paintingsToSeriesModel->series_id = $selectedID;
-                            $paintingsToSeriesModel->save();
-                        }
+
+                }
+                $savedIDsArray = ArrayHelper::map(PaintingsToSeries::find()->where(['painting_id' => $model->id])->all(), 'id', 'series_id');
+                // Добавляем новые записи из БД
+                foreach ($selectedIDs as $selectedID) {
+                    if (!in_array($selectedID, $savedIDsArray)) {
+                        $paintingsToSeriesModel = new PaintingsToSeries();
+                        $paintingsToSeriesModel->painting_id = $model->id;
+                        $paintingsToSeriesModel->series_id = $selectedID;
+                        $paintingsToSeriesModel->save();
                     }
                 }
 

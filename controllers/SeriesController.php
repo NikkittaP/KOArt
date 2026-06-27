@@ -283,7 +283,24 @@ class SeriesController extends AdminBaseController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+
+        // Снимаем серию со всех картин (в join-таблице нет каскадного FK —
+        // иначе остались бы «висящие» связи на несуществующую серию).
+        PaintingsToSeries::deleteAll(['series_id' => $model->id]);
+
+        // Удаляем файлы обложки (мастер + WebP-производные), если они есть.
+        if (!empty($model->cover_filename)) {
+            $base = Yii::getAlias('@app') . '/web/series_cover/';
+            $webp = \app\helpers\Img::webp($model->cover_filename);
+            @unlink($base . 'original/' . $model->cover_filename);
+            @unlink($base . 'thumb/' . $webp);
+            @unlink($base . $webp);
+        }
+
+        $name = $model->name;
+        $model->delete();
+        Yii::$app->session->setFlash('success', Yii::t('admin', 'Series "{name}" deleted.', ['name' => $name]));
 
         return $this->redirect(['index']);
     }
