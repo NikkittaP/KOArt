@@ -87,7 +87,9 @@ RichTextAsset::register($this);
             <div class="ph-replace-now">
                 <span class="ph-replace-label"><?= Yii::t('admin', 'Current') ?></span>
                 <?php if ($mainPhoto): ?>
-                    <img id="ph-now-img" src="<?= $baseUrl . '/paintings_photo/thumb_squared/' . \app\helpers\Img::webp($mainPhoto->filename) ?>" alt="">
+                    <img id="ph-now-img" src="<?= $baseUrl . '/paintings_photo/thumb_squared/' . \app\helpers\Img::webp($mainPhoto->filename) ?>" alt=""
+                         data-full="<?= $baseUrl . '/paintings_photo/original_site/' . \app\helpers\Img::webp($mainPhoto->filename) ?>"
+                         style="cursor:zoom-in" title="<?= Yii::t('admin', 'Click to view full size') ?>">
                 <?php else: ?>
                     <span class="thumb ph" id="ph-now-img" style="display:inline-block"></span>
                 <?php endif; ?>
@@ -474,6 +476,43 @@ $this->registerJsFile('@web/js/map-picker.js', ['position' => \yii\web\View::POS
       }
     });
   }
+})();
+JS
+    );
+
+    // Click the current-photo preview to view it full size in a lightbox.
+    // Clicking anywhere (or pressing Esc) closes it.
+    $this->registerCss(<<<'CSS'
+#ph-lightbox{position:fixed;inset:0;z-index:9999;display:none;align-items:center;
+  justify-content:center;background:rgba(0,0,0,.86);cursor:zoom-out;padding:24px}
+#ph-lightbox.on{display:flex}
+#ph-lightbox img{max-width:96vw;max-height:96vh;width:auto;height:auto;
+  box-shadow:0 10px 40px rgba(0,0,0,.5)}
+CSS
+    );
+    $this->registerJs(<<<'JS'
+(function () {
+  var now = document.getElementById('ph-now-img');
+  if (!now || !now.getAttribute('data-full')) return;
+  var box = document.getElementById('ph-lightbox');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'ph-lightbox';
+    box.innerHTML = '<img alt="">';
+    document.body.appendChild(box);
+  }
+  var big = box.querySelector('img');
+  function open(e) {
+    if (e) e.preventDefault();
+    big.src = now.getAttribute('data-full');
+    box.classList.add('on');
+  }
+  function close() { box.classList.remove('on'); big.src = ''; }
+  now.addEventListener('click', open);
+  box.addEventListener('click', close);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && box.classList.contains('on')) close();
+  });
 })();
 JS
     );

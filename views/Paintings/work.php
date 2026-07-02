@@ -21,7 +21,7 @@ use app\helpers\RichText;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
-$this->title = $painting->tr('name') ?: ('#' . $painting->id);
+$this->title = $painting->tr('name', true) ?: ('#' . $painting->id);
 
 // Back link: prefer the parent series page, else the section, else home.
 if ($series) {
@@ -55,7 +55,7 @@ $description = $painting->tr('description');
 <a class="back" href="<?= $backUrl ?>">← <?= Html::encode($backLabel) ?></a>
 
 <header class="shead pj">
-    <h1><?= Html::encode($painting->tr('name') ?: ('#' . $painting->id)) ?></h1>
+    <h1><?= Html::encode($painting->tr('name', true) ?: ('#' . $painting->id)) ?></h1>
     <?php if ($metaLine): ?><p class="meta"><?= Html::encode($metaLine) ?></p><?php endif; ?>
 </header>
 
@@ -70,7 +70,7 @@ $description = $painting->tr('description');
             $lg = '/paintings_photo/original_site/' . $file;
             ?>
             <figure>
-                <img src="<?= Html::encode($lg) ?>" alt="<?= Html::encode($painting->tr('name')) ?>" loading="lazy">
+                <img src="<?= Html::encode($lg) ?>" alt="<?= Html::encode($painting->tr('name', true)) ?>" loading="lazy">
             </figure>
         <?php endforeach; ?>
     </div>

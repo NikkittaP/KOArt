@@ -12,12 +12,22 @@ namespace app\models;
  */
 trait BilingualTrait
 {
-    public function tr($attr)
+    /**
+     * @param string $attr   base (Russian) attribute name
+     * @param bool   $strict when true and the site language is English, an
+     *                       empty "<attr>_en" returns '' instead of falling
+     *                       back to the Russian value (used for painting
+     *                       titles the author left untranslated).
+     */
+    public function tr($attr, $strict = false)
     {
         $en = $attr . '_en';
-        if (strncmp(\Yii::$app->language, 'en', 2) === 0
-            && $this->hasAttribute($en) && !empty($this->$en)) {
+        $isEn = strncmp(\Yii::$app->language, 'en', 2) === 0;
+        if ($isEn && $this->hasAttribute($en) && !empty($this->$en)) {
             return $this->$en;
+        }
+        if ($strict && $isEn && $this->hasAttribute($en)) {
+            return '';
         }
         return $this->$attr;
     }

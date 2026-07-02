@@ -49,8 +49,9 @@ $metaLine = PaintingPresenter::seriesMetaLine($series, $paintings);
             continue;
         }
         ?>
-        <figure data-full="<?= Html::encode($lg) ?>" data-title="<?= Html::encode($p->tr('name')) ?>" data-mat="<?= Html::encode($mat) ?>" data-ground="<?= Html::encode($ground) ?>" data-year="<?= Html::encode($year) ?>" data-size="<?= Html::encode($size) ?>" data-desc="<?= Html::encode($descPlain) ?>">
-            <img src="<?= Html::encode($lg) ?>" alt="<?= Html::encode($p->tr('name')) ?>" loading="lazy">
+        <?php $name = $p->tr('name', true); ?>
+        <figure data-full="<?= Html::encode($lg) ?>" data-title="<?= Html::encode($name) ?>" data-mat="<?= Html::encode($mat) ?>" data-ground="<?= Html::encode($ground) ?>" data-year="<?= Html::encode($year) ?>" data-size="<?= Html::encode($size) ?>" data-desc="<?= Html::encode($descPlain) ?>">
+            <img src="<?= Html::encode($lg) ?>" alt="<?= Html::encode($name) ?>" loading="lazy">
         </figure>
         <?php if ($p->tr('description')): ?>
             <div class="blogtext"><?= RichText::purify($p->tr('description')) ?></div>

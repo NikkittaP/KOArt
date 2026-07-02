@@ -123,8 +123,6 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
         <th style="width:160px"></th>
         <th><?= Yii::t('admin', 'Name') ?></th>
         <th style="width:130px"><?= Yii::t('admin', 'Section') ?></th>
-        <th style="width:140px"><?= Yii::t('admin', 'Series') ?></th>
-        <th style="width:220px"><?= Yii::t('admin', 'Notes') ?></th>
         <th style="width:90px"><?= Yii::t('admin', 'Size') ?></th>
         <th style="width:42px" title="<?= Yii::t('admin', 'Geotag set') ?>"><?= Yii::t('admin', 'Geo') ?></th>
         <th style="width:110px"><?= Yii::t('admin', 'Visibility') ?></th>
@@ -139,14 +137,8 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
         $hidden = ($m->isVisible === null || (int) $m->isVisible === 0);
         $thumb = ($m->mainPhoto && $m->mainPhoto->filename)
             ? $baseUrl . '/paintings_photo/preview/' . \app\helpers\Img::webp($m->mainPhoto->filename) : null;
-        $seriesNames = [];
-        foreach ($m->paintingsToSeries as $p2s) {
-            if (isset($series[$p2s->series_id])) $seriesNames[] = $series[$p2s->series_id];
-        }
         $sizeLabel = (is_numeric($m->width) && is_numeric($m->height)) ? $m->width . '×' . $m->height : '';
         $hasGeo = ($m->latitude !== null && $m->latitude !== '' && $m->longitude !== null && $m->longitude !== '');
-        $noteModel = $m->authorComments;
-        $note = $noteModel ? trim((string) $noteModel->comments) : '';
         ?>
         <tr class="<?= $hidden ? 'is-hidden' : '' ?>">
             <td><input type="checkbox" name="ids[]" value="<?= (int) $m->id ?>"></td>
@@ -159,18 +151,9 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
                     <span class="thumb ph"></span>
                 <?php endif; ?>
             </td>
-            <td><?= Html::encode($m->name) ?></td>
+            <?php $nameEn = $m->hasAttribute('name_en') ? trim((string) $m->name_en) : ''; ?>
+            <td><?= $nameEn !== '' ? Html::encode($nameEn) : '<span style="color:var(--faint)">—</span>' ?></td>
             <td><?= isset($sections[$m->section_id]) ? Html::encode($sections[$m->section_id]) : '<span style="color:var(--faint)">—</span>' ?></td>
-            <td><?= $seriesNames ? Html::encode(implode(', ', $seriesNames)) : '<span style="color:var(--faint)">—</span>' ?></td>
-            <td>
-                <?php if ($note === ''): ?>
-                    <span style="color:var(--faint)">—</span>
-                <?php elseif (mb_strlen($note) <= 70): ?>
-                    <span style="color:var(--soft)"><?= Html::encode($note) ?></span>
-                <?php else: ?>
-                    <details class="note"><summary><span class="trunc"><?= Html::encode(mb_substr($note, 0, 70)) ?>…</span></summary><div class="full"><?= nl2br(Html::encode($note)) ?></div></details>
-                <?php endif; ?>
-            </td>
             <td><?= $sizeLabel ?: '<span style="color:var(--faint)">—</span>' ?></td>
             <td style="text-align:center">
                 <span class="geodot <?= $hasGeo ? 'on' : 'off' ?>"
@@ -181,7 +164,11 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
                 <?php if ($hidden): ?>
                     <span class="pill off"><?= Yii::t('admin', 'Archived') ?></span>
                 <?php else: ?>
-                    <span class="pill on"><?= Yii::t('admin', 'On site') ?></span>
+                    <?php // Links to the live English public work page for this piece. ?>
+                    <?= Html::a(Yii::t('admin', 'On site'),
+                        ['/paintings/work', 'id' => $m->id, 'language' => 'en'],
+                        ['class' => 'pill on', 'target' => '_blank', 'rel' => 'noopener',
+                         'title' => Yii::t('admin', 'Open on the public site')]) ?>
                 <?php endif; ?>
             </td>
             <?php if ($hasStatus): ?>
@@ -220,7 +207,7 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
         </tr>
     <?php endforeach; ?>
     <?php if (empty($models)): ?>
-        <tr><td colspan="<?= 11 + ($ordering ? 1 : 0) + ($hasStatus ? 1 : 0) ?>" style="text-align:center;color:var(--muted);padding:34px"><?= Yii::t('admin', 'Nothing here yet.') ?></td></tr>
+        <tr><td colspan="<?= 9 + ($ordering ? 1 : 0) + ($hasStatus ? 1 : 0) ?>" style="text-align:center;color:var(--muted);padding:34px"><?= Yii::t('admin', 'Nothing here yet.') ?></td></tr>
     <?php endif; ?>
     </tbody>
 </table>

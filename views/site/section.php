@@ -13,6 +13,7 @@
  */
 
 use app\helpers\PaintingPresenter;
+use app\helpers\RichText;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
@@ -20,8 +21,10 @@ $this->title = $section->tr('title');
 ?>
 <header class="shead">
     <h1><?= Html::encode($section->tr('title')) ?></h1>
-    <?php if ($intro): ?>
-        <p><?= Html::encode($intro) ?></p>
+    <?php if (trim((string) $intro) !== ''): ?>
+        <?php // Intro is stored as sanitised rich-text HTML (paragraphs etc.),
+              // so render it purified rather than escaping the tags. ?>
+        <?= RichText::purify($intro) ?>
     <?php endif; ?>
 </header>
 
@@ -46,7 +49,11 @@ $this->title = $section->tr('title');
 <?php endif; ?>
 
 <?php if ($paintings): ?>
-    <div class="blocklabel"><span>Works</span></div>
+    <?php // The "Works" divider is only meaningful when it separates loose works
+          // from a series grid above. With no series in this section, we skip it. ?>
+    <?php if ($series): ?>
+        <div class="blocklabel"><span>Works</span></div>
+    <?php endif; ?>
     <div class="mosaic">
         <?php foreach ($paintings as $p): ?>
             <?php
@@ -65,10 +72,11 @@ $this->title = $section->tr('title');
                 continue;
             }
             ?>
-            <figure data-full="<?= Html::encode($lg) ?>" data-title="<?= Html::encode($p->tr('name')) ?>" data-mat="<?= Html::encode($mat) ?>" data-ground="<?= Html::encode($ground) ?>" data-year="<?= Html::encode($year) ?>" data-size="<?= Html::encode($size) ?>"<?= $workUrl ? ' data-url="' . Html::encode($workUrl) . '"' : '' ?>>
-                <img src="<?= Html::encode($sm) ?>" alt="<?= Html::encode($p->tr('name')) ?>" loading="lazy">
+            <?php $name = $p->tr('name', true); ?>
+            <figure data-full="<?= Html::encode($lg) ?>" data-title="<?= Html::encode($name) ?>" data-mat="<?= Html::encode($mat) ?>" data-ground="<?= Html::encode($ground) ?>" data-year="<?= Html::encode($year) ?>" data-size="<?= Html::encode($size) ?>"<?= $workUrl ? ' data-url="' . Html::encode($workUrl) . '"' : '' ?>>
+                <img src="<?= Html::encode($sm) ?>" alt="<?= Html::encode($name) ?>" loading="lazy">
                 <figcaption class="hov">
-                    <span class="t"><?= Html::encode($p->tr('name')) ?></span>
+                    <?php if ($name !== ''): ?><span class="t"><?= Html::encode($name) ?></span><?php endif; ?>
                     <?php if ($mat): ?><span class="m"><?= Html::encode($mat) ?></span><?php endif; ?>
                 </figcaption>
             </figure>
