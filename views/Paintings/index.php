@@ -126,6 +126,7 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
         <th style="width:140px"><?= Yii::t('admin', 'Series') ?></th>
         <th style="width:220px"><?= Yii::t('admin', 'Notes') ?></th>
         <th style="width:90px"><?= Yii::t('admin', 'Size') ?></th>
+        <th style="width:42px" title="<?= Yii::t('admin', 'Geotag set') ?>"><?= Yii::t('admin', 'Geo') ?></th>
         <th style="width:110px"><?= Yii::t('admin', 'Visibility') ?></th>
         <?php if ($hasStatus): ?><th style="width:140px"><?= Yii::t('admin', 'Status') ?></th><?php endif; ?>
         <?php if ($ordering): ?><th style="width:60px"><?= Yii::t('admin', 'Order') ?></th><?php endif; ?>
@@ -143,6 +144,7 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
             if (isset($series[$p2s->series_id])) $seriesNames[] = $series[$p2s->series_id];
         }
         $sizeLabel = (is_numeric($m->width) && is_numeric($m->height)) ? $m->width . '×' . $m->height : '';
+        $hasGeo = ($m->latitude !== null && $m->latitude !== '' && $m->longitude !== null && $m->longitude !== '');
         $noteModel = $m->authorComments;
         $note = $noteModel ? trim((string) $noteModel->comments) : '';
         ?>
@@ -170,6 +172,11 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
                 <?php endif; ?>
             </td>
             <td><?= $sizeLabel ?: '<span style="color:var(--faint)">—</span>' ?></td>
+            <td style="text-align:center">
+                <span class="geodot <?= $hasGeo ? 'on' : 'off' ?>"
+                      title="<?= $hasGeo ? Yii::t('admin', 'Geotag set') : Yii::t('admin', 'No geotag') ?>"
+                      aria-label="<?= $hasGeo ? Yii::t('admin', 'Geotag set') : Yii::t('admin', 'No geotag') ?>"></span>
+            </td>
             <td>
                 <?php if ($hidden): ?>
                     <span class="pill off"><?= Yii::t('admin', 'Archived') ?></span>
@@ -213,7 +220,7 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
         </tr>
     <?php endforeach; ?>
     <?php if (empty($models)): ?>
-        <tr><td colspan="<?= 10 + ($ordering ? 1 : 0) + ($hasStatus ? 1 : 0) ?>" style="text-align:center;color:var(--muted);padding:34px"><?= Yii::t('admin', 'Nothing here yet.') ?></td></tr>
+        <tr><td colspan="<?= 11 + ($ordering ? 1 : 0) + ($hasStatus ? 1 : 0) ?>" style="text-align:center;color:var(--muted);padding:34px"><?= Yii::t('admin', 'Nothing here yet.') ?></td></tr>
     <?php endif; ?>
     </tbody>
 </table>

@@ -140,6 +140,29 @@ textarea:not(.select2-search__field){width:100%;min-height:120px;line-height:1.6
 .pill.status-1{background:#e7f0ea;color:var(--ok)}
 .pill.status-2{background:#efe9e9;color:var(--danger)}
 .pill.status-3{background:#f0ece4;color:var(--muted)}
+/* Geotag indicator — deliberately quiet secondary info: a small soft dot.
+   Green tint = coordinates set, neutral gray = none. */
+.geodot{display:inline-block;width:8px;height:8px;border-radius:50%;vertical-align:middle}
+.geodot.on{background:#b7d3bf}
+.geodot.off{background:#e2ded4}
+
+/* --- Admin works map (Leaflet) --- */
+.works-map{height:calc(100vh - 220px);min-height:420px;border:1px solid var(--line);border-radius:5px;overflow:hidden;background:var(--card)}
+.leaflet-container{font-family:'Jost',system-ui,sans-serif}
+.wm-popup{width:100%}
+.wm-pop-img{background:#f4f2ec;border-radius:3px;overflow:hidden;margin-bottom:9px}
+.wm-pop-img img{display:block;width:100%;height:auto;max-height:200px;object-fit:contain}
+.wm-pop-noimg{display:flex;align-items:center;justify-content:center;height:90px;color:var(--faint);font-size:12px}
+.wm-pop-title{font-size:15px;font-weight:400;color:var(--ink);margin-bottom:6px}
+.wm-pop-meta{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--soft);margin-bottom:8px}
+.wm-pop-meta b{font-weight:500;color:var(--muted)}
+.wm-pop-arch{display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:#efe9e9;color:var(--danger);padding:2px 8px;border-radius:20px;margin-bottom:8px}
+.wm-pop-actions{display:flex;gap:8px;margin-top:10px;align-items:stretch}
+.wm-btn{flex:1 1 0;display:inline-flex;align-items:center;justify-content:center;text-align:center;min-height:40px;padding:6px 12px;font-size:10.5px;font-weight:400;letter-spacing:.1em;line-height:1.25;text-transform:uppercase;text-decoration:none;border-radius:4px;box-sizing:border-box;transition:.15s;background:var(--accent);color:#fff;border:1px solid var(--accent)}
+.wm-btn:hover{background:var(--accent-d);border-color:var(--accent-d);color:#fff}
+.wm-btn-ghost{background:transparent;color:var(--ink);border-color:#d8d4cb}
+.wm-btn-ghost:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+.leaflet-popup-content{margin:12px 14px;width:auto!important}
 
 /* ---- Bulk action bar ---- */
 .bulkbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:#f7f6f2;border:1px solid var(--line);border-radius:5px;padding:12px 16px;margin-bottom:14px;font-size:12.5px}

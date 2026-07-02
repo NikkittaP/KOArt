@@ -25,6 +25,7 @@ $hideArchive = AdminPrefs::hideArchive();
 $nav = [
     'dashboard' => ['Dashboard', ['/admin/index'], '▦'],
     'works'     => ['Works',     ['/paintings/index'], '▥'],
+    'map'       => ['Map',       ['/paintings/map'], '◎'],
     'sections'  => ['Sections',  ['/sections/index'], '☰'],
     'series'    => ['Series',    ['/series/index'], '❏'],
     'genres'    => ['Genres',    ['/art-genres/index'], '#'],

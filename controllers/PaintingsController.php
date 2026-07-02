@@ -21,6 +21,7 @@ use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 
 class PaintingsController extends AdminBaseController
@@ -35,10 +36,10 @@ class PaintingsController extends AdminBaseController
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['index', 'stats', 'view', 'create', 'update', 'delete', 'move', 'bulk-visibility', 'bulk-section', 'bulk-status'],
+                'only' => ['index', 'map', 'stats', 'view', 'create', 'update', 'delete', 'move', 'bulk-visibility', 'bulk-section', 'bulk-status'],
                 'rules' => [
                     [
-                        'actions' => ['index', 'stats', 'view', 'create', 'update', 'delete', 'move', 'bulk-visibility', 'bulk-section', 'bulk-status'],
+                        'actions' => ['index', 'map', 'stats', 'view', 'create', 'update', 'delete', 'move', 'bulk-visibility', 'bulk-section', 'bulk-status'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -110,6 +111,70 @@ class PaintingsController extends AdminBaseController
             'show' => $show,
             'totalCount' => $totalCount,
             'hasMore' => $totalCount > $show,
+        ]);
+    }
+
+    /**
+     * Admin-only interactive world map of all works that have a geotag.
+     * Uses Leaflet + Leaflet.markercluster (client side). This page exists only
+     * in the admin panel; nothing about it is exposed on the public site.
+     */
+    public function actionMap()
+    {
+        $this->view->params['adminNav'] = 'map';
+
+        $query = Paintings::find()
+            ->andWhere(['not', ['latitude' => null]])
+            ->andWhere(['not', ['longitude' => null]])
+            ->andWhere(['not', ['latitude' => '']])
+            ->andWhere(['not', ['longitude' => '']])
+            ->with(['mainPhoto', 'paintingsToSeries']);
+
+        // Respect the global "hide archive" toggle, same as the works list.
+        if (\app\helpers\AdminPrefs::hideArchive()) {
+            $query->andWhere(['paintings.isVisible' => 1]);
+        }
+
+        $sections = ArrayHelper::map(Sections::find()->all(), 'id', 'title');
+        $series = ArrayHelper::map(Series::find()->all(), 'id', 'name');
+        $baseUrl = Yii::$app->request->baseUrl;
+
+        $points = [];
+        foreach ($query->each() as $m) {
+            $lat = (float) $m->latitude;
+            $lng = (float) $m->longitude;
+            if ($lat === 0.0 && $lng === 0.0) {
+                continue; // treat 0,0 as "no real location"
+            }
+
+            $thumb = ($m->mainPhoto && $m->mainPhoto->filename)
+                ? $baseUrl . '/paintings_photo/preview/' . \app\helpers\Img::webp($m->mainPhoto->filename)
+                : null;
+
+            $seriesNames = [];
+            foreach ($m->paintingsToSeries as $p2s) {
+                if (isset($series[$p2s->series_id])) {
+                    $seriesNames[] = $series[$p2s->series_id];
+                }
+            }
+
+            $points[] = [
+                'id' => (int) $m->id,
+                'name' => (string) $m->name,
+                'lat' => $lat,
+                'lng' => $lng,
+                'thumb' => $thumb,
+                'section' => isset($sections[$m->section_id]) ? (string) $sections[$m->section_id] : '',
+                'series' => implode(', ', $seriesNames),
+                'date' => (string) $m->date,
+                'visible' => (int) $m->isVisible === 1,
+                'editUrl' => Url::to(['update', 'id' => $m->id]),
+                'viewUrl' => Url::to(['/paintings/work', 'id' => $m->id]),
+            ];
+        }
+
+        return $this->render('map', [
+            'points' => $points,
         ]);
     }
 

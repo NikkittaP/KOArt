@@ -18,6 +18,7 @@ return [
     'Sections' => 'Разделы',
     'Genres' => 'Жанры',
     'Grounds' => 'Основы',
+    'Map' => 'Карта',
     'View site' => 'Открыть сайт',
     'View site ↗' => 'Открыть сайт ↗',
     'Log out' => 'Выйти',
@@ -276,4 +277,16 @@ return [
     'The photo is a file, not a database field. To change it, replace this image:'
         => 'Фото — это файл, а не поле в базе. Чтобы заменить, перезапишите изображение:',
     'About page saved.' => 'Страница «Об авторе» сохранена.',
+
+    // Geotag column + works map
+    'Geo' => 'Гео',
+    'Geotag set' => 'Геотег проставлен',
+    'No geotag' => 'Геотег не проставлен',
+    'View on site' => 'Смотреть на сайте',
+    'No photo' => 'Нет фото',
+    '{n} works with a geotag' => 'Картин с геотегом: {n}',
+    'Click a cluster to zoom in; click a marker for details.'
+        => 'Кликните на группу, чтобы приблизить; на метку — чтобы увидеть детали.',
+    'No works have a geotag yet. Add a location to a work to see it here.'
+        => 'Пока ни у одной картины нет геотега. Добавьте место у картины, чтобы увидеть её здесь.',
 ];
