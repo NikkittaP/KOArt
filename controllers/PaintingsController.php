@@ -1000,9 +1000,42 @@ class PaintingsController extends AdminBaseController
         ]);
     }
 
+    /**
+     * Delete a whole work: its photo files + rows and every related record
+     * (prices, author comments, series/genre/style/material links), then the
+     * painting itself. Triggered by the "Delete" button on the works list
+     * (POST + confirmation via yii.js data-confirm).
+     */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        $name = $model->name;
+
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            // Photos: remove stored master + WebP derivatives, then the rows.
+            foreach (\app\models\Photos::find()->where(['painting_id' => $model->id])->all() as $photo) {
+                $this->deletePhotoFiles($photo);
+                $photo->delete();
+            }
+
+            // Related rows (no DB-level cascade is defined for these tables).
+            Prices::deleteAll(['painting_id' => $model->id]);
+            AuthorComments::deleteAll(['painting_id' => $model->id]);
+            PaintingsToSeries::deleteAll(['painting_id' => $model->id]);
+            ArtGenresToPainting::deleteAll(['painting_id' => $model->id]);
+            ArtStylesToPainting::deleteAll(['painting_id' => $model->id]);
+            MaterialsToPainting::deleteAll(['painting_id' => $model->id]);
+
+            $model->delete();
+
+            $transaction->commit();
+            Yii::$app->session->setFlash('success', Yii::t('admin', 'Work “{name}” deleted.', ['name' => $name]));
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            Yii::error('Delete work failed: ' . $e->getMessage(), __METHOD__);
+            Yii::$app->session->setFlash('error', Yii::t('admin', 'Could not delete the work. Please try again.'));
+        }
 
         return $this->redirect(['index']);
     }

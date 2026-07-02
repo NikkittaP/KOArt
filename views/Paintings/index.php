@@ -200,6 +200,14 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
                     <?php if ($m->mainPhoto && $m->mainPhoto->filename): ?>
                         <?= Html::a(Yii::t('admin', 'Original'), ['photos/download-original', 'id' => $m->mainPhoto->id], ['class' => 'btn ghost sm', 'title' => Yii::t('admin', 'Download full-resolution original')]) ?>
                     <?php endif; ?>
+                    <?= Html::a(Yii::t('admin', 'Delete'), ['delete', 'id' => $m->id], [
+                        'class' => 'btn danger sm',
+                        'title' => Yii::t('admin', 'Delete this work'),
+                        'data' => [
+                            'confirm' => Yii::t('admin', 'Delete the work “{name}” completely? Its photos and all related data will be removed. This cannot be undone.', ['name' => $m->name]),
+                            'method' => 'post',
+                        ],
+                    ]) ?>
                 </div>
             </td>
         </tr>
