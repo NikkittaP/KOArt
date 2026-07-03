@@ -29,21 +29,10 @@ $config = [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        'mailer' => [
-            'class' => 'yii\swiftmailer\Mailer',
-            // Locally: keep MAIL_USE_FILE_TRANSPORT=true (or unset) — mails are
-            // written to runtime/mail instead of being sent. On the server set it
-            // to false and fill MAIL_USERNAME / MAIL_PASSWORD (Gmail App Password).
-            'useFileTransport' => filter_var($_ENV['MAIL_USE_FILE_TRANSPORT'] ?? true, FILTER_VALIDATE_BOOLEAN),
-            'transport' => [
-                'class' => 'Swift_SmtpTransport',
-                'host' => $_ENV['MAIL_HOST'] ?? 'smtp.gmail.com',
-                'username' => $_ENV['MAIL_USERNAME'] ?? '',
-                'password' => $_ENV['MAIL_PASSWORD'] ?? '',
-                'port' => (int)($_ENV['MAIL_PORT'] ?? 587),
-                'encryption' => $_ENV['MAIL_ENCRYPTION'] ?? 'tls',
-            ],
-        ],
+        // No 'mailer' component: the contact form is disabled (the site uses a
+        // plain mailto: link), so no SMTP/SwiftMailer is needed. If a server-side
+        // contact form is ever added, install yiisoft/yii2-symfonymailer and
+        // configure the mailer component here.
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
