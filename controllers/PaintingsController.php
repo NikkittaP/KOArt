@@ -728,8 +728,8 @@ class PaintingsController extends AdminBaseController
                     return $this->redirect(['index']);
                 }
 
-                // No photo uploaded inline — keep the old "add photos" step.
-                return $this->redirect(['photos/add', 'painting_id' => $model->id]);
+                // No photo uploaded inline — send them to the photo manager.
+                return $this->redirect(['photos/manage', 'painting_id' => $model->id]);
             }
         }
 
@@ -1146,7 +1146,8 @@ class PaintingsController extends AdminBaseController
             }
         }
 
-        // 2) Replacement upload — becomes the single cover image.
+        // 2) Replacement upload — swaps out the cover image only. Any extra
+        //    photos (managed on the dedicated "Manage photos" page) are kept.
         $replaced = false;
         if (isset($_FILES['replace_photo']) && is_string($_FILES['replace_photo']['tmp_name'] ?? null)
             && $_FILES['replace_photo']['tmp_name'] !== ''
@@ -1163,8 +1164,14 @@ class PaintingsController extends AdminBaseController
                 $isJpeg = \app\helpers\Img::isJpeg(isset($info[2]) ? $info[2] : null);
                 try {
                     $filename = \app\helpers\Img::store($tmp, $isJpeg);
-                    // Drop every existing photo: one image per work going forward.
-                    foreach (\app\models\Photos::find()->where(['painting_id' => $model->id])->all() as $old) {
+                    // Remove only the current cover(s); keep any extra photos.
+                    // The new image inherits the old cover's position in order.
+                    $coverOrder = 0;
+                    $oldCovers = \app\models\Photos::find()
+                        ->where(['painting_id' => $model->id, 'isMain' => 1])
+                        ->all();
+                    foreach ($oldCovers as $old) {
+                        $coverOrder = (int) $old->sort_order;
                         $this->deletePhotoFiles($old);
                         $old->delete();
                     }
@@ -1172,6 +1179,7 @@ class PaintingsController extends AdminBaseController
                     $photo->painting_id = $model->id;
                     $photo->filename = $filename;
                     $photo->isMain = 1;
+                    $photo->sort_order = $coverOrder;
                     $photo->save();
                     $replaced = true;
                 } catch (\Exception $e) {

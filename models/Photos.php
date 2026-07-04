@@ -11,6 +11,7 @@ use Yii;
  * @property int $painting_id Картина
  * @property string $filename Название файла
  * @property int $isMain Является главной
+ * @property int $sort_order Порядок отображения
  *
  * @property Paintings $painting
  */
@@ -30,7 +31,8 @@ class Photos extends \yii\db\ActiveRecord
     {
         return [
             [['painting_id', 'filename'], 'required'],
-            [['painting_id', 'isMain'], 'integer'],
+            [['painting_id', 'isMain', 'sort_order'], 'integer'],
+            [['sort_order'], 'default', 'value' => 0],
             [['filename'], 'string', 'max' => 255],
             [['painting_id'], 'exist', 'skipOnError' => true, 'targetClass' => Paintings::className(), 'targetAttribute' => ['painting_id' => 'id']],
             [['selected'], 'safe'],
@@ -47,6 +49,7 @@ class Photos extends \yii\db\ActiveRecord
             'painting_id' => 'Картина',
             'filename' => 'Название файла',
             'isMain' => '',
+            'sort_order' => 'Порядок',
             'selected' => '',
         ];
     }

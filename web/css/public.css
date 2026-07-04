@@ -74,11 +74,17 @@ a{color:inherit}
 .workpage-media img{display:block;width:auto;max-width:100%;max-height:72vh;height:auto;margin:0 auto}
 .workpage-info{margin-top:30px}
 @media (orientation:landscape) and (min-width:640px){
-  .workpage{display:flex;align-items:flex-start;gap:clamp(28px,4vw,56px)}
-  .workpage-media{flex:0 1 62%;min-width:0}
-  .workpage-media img{max-height:80vh}
-  .workpage-info{flex:1 1 38%;min-width:0;margin-top:0}
+  .workpage.single{display:flex;align-items:flex-start;gap:clamp(28px,4vw,56px)}
+  .workpage.single .workpage-media{flex:0 1 62%;min-width:0}
+  .workpage.single .workpage-media img{max-height:80vh}
+  .workpage.single .workpage-info{flex:1 1 38%;min-width:0;margin-top:0}
 }
+/* Several photos: description on top, photos stacked full-width, each capped to
+   the viewport height so a single photo sits comfortably in view on any screen. */
+.workpage.multi{max-width:960px}
+.workpage.multi .workpage-info{margin:0 auto 34px;max-width:680px}
+.workpage.multi .workpage-media figure{margin:0 0 30px}
+.workpage.multi .workpage-media img{max-height:92vh}
 .blogflow{display:flex;flex-direction:column;align-items:center;gap:30px;max-width:880px;margin:26px auto 0}
 .blogflow figure{margin:0;width:100%;cursor:zoom-in;overflow:hidden;background:#fff}
 .blogflow figure img{width:100%;height:auto}

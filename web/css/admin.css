@@ -110,7 +110,8 @@ textarea:not(.select2-search__field){width:100%;min-height:120px;line-height:1.6
 /* Thumbnails preserve the artwork's real aspect ratio (fixed height, auto width). */
 .atable .thumb{display:block;height:104px;width:auto;max-width:150px;object-fit:contain;border-radius:3px;background:#f4f2ec;border:1px solid var(--line)}
 .atable .thumb.ph{width:84px;height:104px}
-.atable .rowact{display:flex;gap:7px;flex-wrap:nowrap;align-items:center}
+.atable .rowact{display:grid;grid-template-columns:1fr 1fr;gap:7px;align-items:center;max-width:250px}
+.atable .rowact .btn{justify-content:center;padding-left:8px;padding-right:8px}
 .atable code{font-size:12px;background:#f3f1ec;padding:1px 6px;border-radius:2px;color:var(--soft)}
 .atable .note summary{cursor:pointer;color:var(--soft);font-size:12.5px;list-style:none}
 .atable .note summary::-webkit-details-marker{display:none}

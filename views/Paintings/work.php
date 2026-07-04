@@ -47,10 +47,16 @@ $metaLine = implode(' · ', array_filter([$mat, $ground, $year, $size]));
 // Photos: main first, then any extras, each shown full-width.
 $photos = \app\models\Photos::find()
     ->where(['painting_id' => $painting->id])
-    ->orderBy(['isMain' => SORT_DESC, 'id' => SORT_ASC])
+    ->orderBy(['sort_order' => SORT_ASC, 'id' => SORT_ASC])
     ->all();
 
 $description = $painting->tr('description');
+$hasDescription = trim((string) $description) !== '';
+
+// One photo → the classic layout (image beside the description on landscape).
+// Several photos → the description sits on top and the photos stack full-width
+// below, each capped to the viewport height so one is comfortably in view.
+$multi = count($photos) > 1;
 ?>
 <a class="back" href="<?= $backUrl ?>">← <?= Html::encode($backLabel) ?></a>
 
@@ -59,10 +65,19 @@ $description = $painting->tr('description');
     <?php if ($metaLine): ?><p class="meta"><?= Html::encode($metaLine) ?></p><?php endif; ?>
 </header>
 
-<?php // Image fits the viewport (capped height); on landscape the description
-      // sits to the right of it. Figures carry no data-full, so public.js skips
-      // them (no lightbox / click-to-zoom). ?>
-<div class="workpage">
+<?php
+// The info block (description). Rendered above the photos when there are
+// several, or beside them (single) — see the CSS. Figures carry no data-full,
+// so public.js skips them (no lightbox / click-to-zoom).
+$infoHtml = '';
+if ($hasDescription) {
+    $infoHtml = '<div class="workpage-info"><div class="series-intro workdesc">'
+        . RichText::purify($description) . '</div></div>';
+}
+?>
+<div class="workpage <?= $multi ? 'multi' : 'single' ?>">
+    <?php if ($multi): echo $infoHtml; endif; ?>
+
     <div class="workpage-media">
         <?php foreach ($photos as $photo): ?>
             <?php
@@ -75,9 +90,5 @@ $description = $painting->tr('description');
         <?php endforeach; ?>
     </div>
 
-    <?php if (trim((string) $description) !== ''): ?>
-        <div class="workpage-info">
-            <div class="series-intro workdesc"><?= RichText::purify($description) ?></div>
-        </div>
-    <?php endif; ?>
+    <?php if (!$multi): echo $infoHtml; endif; ?>
 </div>

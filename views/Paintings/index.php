@@ -191,6 +191,10 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
             <td>
                 <div class="rowact">
                     <?= Html::a(Yii::t('admin', 'Edit'), ['update', 'id' => $m->id], ['class' => 'btn ghost sm']) ?>
+                    <?= Html::a(Yii::t('admin', 'Photos'), ['photos/manage', 'painting_id' => $m->id], [
+                        'class' => 'btn ghost sm',
+                        'title' => Yii::t('admin', 'Additional photos'),
+                    ]) ?>
                     <?php if ($m->mainPhoto && $m->mainPhoto->filename): ?>
                         <?= Html::a(Yii::t('admin', 'Original'), ['photos/download-original', 'id' => $m->mainPhoto->id], ['class' => 'btn ghost sm', 'title' => Yii::t('admin', 'Download full-resolution original')]) ?>
                     <?php endif; ?>

@@ -25,7 +25,7 @@ $hasComments = $comments && (trim((string) $comments->comments) !== ''
     </div>
     <div class="actions">
         <?= Html::a(Yii::t('admin', 'Edit'), ['/paintings/update', 'id' => $painting->id], ['class' => 'btn accent']) ?>
-        <?= Html::a(Yii::t('admin', 'Photos'), ['/photos/add', 'painting_id' => $painting->id], ['class' => 'btn ghost']) ?>
+        <?= Html::a(Yii::t('admin', 'Photos'), ['/photos/manage', 'painting_id' => $painting->id], ['class' => 'btn ghost']) ?>
     </div>
 </div>
 

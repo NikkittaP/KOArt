@@ -122,32 +122,27 @@ RichTextAsset::register($this);
         </p>
         <p class="ph-error" id="ph-replace-error" role="alert" hidden></p>
 
-        <?php if (count($photos) > 1): ?>
-            <h3 style="margin:18px 0 6px;font-size:13px;color:var(--muted)"><?= Yii::t('admin', 'All photos of this work') ?></h3>
-            <p style="color:var(--faint);font-size:12px;margin:0 0 8px">
-                <?= Yii::t('admin', 'This work has several photos (legacy). Pick the cover and tick any you want to delete.') ?>
-            </p>
-            <div class="photo-grid">
-                <?php foreach ($photos as $photo): ?>
-                    <div class="photo-pick <?= (int) $photo->isMain === 1 ? 'sel' : '' ?>">
-                        <?= Html::img($baseUrl . '/paintings_photo/thumb_squared/' . \app\helpers\Img::webp($photo->filename)) ?>
-                        <label class="photo-cover-pick" title="<?= Yii::t('admin', 'Cover') ?>">
-                            <?= Html::radio('cover_photo_id', (int) $photo->isMain === 1, ['value' => $photo->id]) ?>
-                            <?= Yii::t('admin', 'Cover') ?>
-                        </label>
-                        <label class="photo-del-pick" title="<?= Yii::t('admin', 'Delete') ?>">
-                            <?= Html::checkbox('delete_photo_ids[]', false, ['value' => $photo->id]) ?>
-                            <?= Yii::t('admin', 'Delete') ?>
-                        </label>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        <?php elseif ($mainPhoto): ?>
+        <?php if ($mainPhoto): ?>
             <label class="ph-del-single">
                 <?= Html::checkbox('delete_photo_ids[]', false, ['value' => $mainPhoto->id]) ?>
                 <?= Yii::t('admin', 'Delete the current photo') ?>
             </label>
         <?php endif; ?>
+
+        <?php // Extra photos live on their own page — kept out of the way so the
+              // common case (one cover per work) stays simple. The count is the
+              // number of photos beyond the cover. ?>
+        <?php $extraCount = max(0, count($photos) - 1); ?>
+        <div class="ph-extra-link" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line)">
+            <?= Html::a(
+                Yii::t('admin', 'Additional photos') . ($extraCount > 0 ? ' (' . $extraCount . ')' : ''),
+                ['/photos/manage', 'painting_id' => $model->id],
+                ['class' => 'btn ghost']
+            ) ?>
+            <p style="color:var(--faint);font-size:12px;margin:8px 0 0">
+                <?= Yii::t('admin', 'Optional. Add more views of this work (e.g. photos of the finished piece). On the site they stack under the description.') ?>
+            </p>
+        </div>
     </div>
     <?php endif; ?>
 

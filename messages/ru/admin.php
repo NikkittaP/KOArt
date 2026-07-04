@@ -278,6 +278,19 @@ return [
         => 'Фото — это файл, а не поле в базе. Чтобы заменить, перезапишите изображение:',
     'About page saved.' => 'Страница «Об авторе» сохранена.',
 
+    // Additional photos manager
+    'Manage photos' => 'Управление фото',
+    'Additional photos' => 'Дополнительные фото',
+    'Optional. Add more views of this work (e.g. photos of the finished piece). On the site they stack under the description.'
+        => 'Необязательно. Добавьте другие ракурсы этой работы (например, фото готового изделия). На сайте они идут в столбик под описанием.',
+    'Order, cover & delete' => 'Порядок, обложка и удаление',
+    'Drag the cards to set the order shown on the work page. Pick one cover (used for thumbnails), and tick any photo to delete it.'
+        => 'Перетаскивайте карточки, чтобы задать порядок на странице работы. Выберите одну обложку (для миниатюр) и отметьте фото, которые нужно удалить.',
+    'Drag to reorder' => 'Перетащите, чтобы изменить порядок',
+    'No photos yet — add some above.' => 'Фото пока нет — добавьте выше.',
+    'Photos updated.' => 'Фото обновлены.',
+    'Back to work' => 'К работе',
+
     // Geotag column + works map
     'Geo' => 'Гео',
     'Geotag set' => 'Геотег проставлен',

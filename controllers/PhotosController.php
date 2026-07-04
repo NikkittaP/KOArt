@@ -25,10 +25,10 @@ class PhotosController extends AdminBaseController
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['add', 'selectmain', 'delete', 'upload', 'resizeImage', 'download-original'],
+                'only' => ['add', 'selectmain', 'delete', 'manage', 'upload', 'resizeImage', 'download-original'],
                 'rules' => [
                     [
-                        'actions' => ['add', 'selectmain', 'delete', 'upload', 'resizeImage', 'download-original'],
+                        'actions' => ['add', 'selectmain', 'delete', 'manage', 'upload', 'resizeImage', 'download-original'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -124,6 +124,104 @@ class PhotosController extends AdminBaseController
         ]);
     }
 
+    /**
+     * Single, convenient page to manage the *additional* photos of a work:
+     * upload new ones, drag to reorder, pick the cover, and delete. The cover
+     * (isMain) is used for thumbnails across the site; the drag order
+     * (sort_order) drives how the photos stack on the public work page.
+     *
+     * GET  → render the sortable grid + uploader.
+     * POST → apply deletions, then the new order, then the cover choice.
+     */
+    public function actionManage($painting_id)
+    {
+        $paintingModel = Paintings::find()->where(['id' => $painting_id])->one();
+        if ($paintingModel === null) {
+            throw new NotFoundHttpException('The requested work does not exist.');
+        }
+
+        if (Yii::$app->request->isPost) {
+            $req = Yii::$app->request;
+
+            // 1) Delete the ticked photos (files + rows).
+            $deleteIds = array_filter(array_map('intval', (array) $req->post('delete_photo_ids', [])));
+            if (!empty($deleteIds)) {
+                $toDelete = Photos::find()
+                    ->where(['painting_id' => $painting_id, 'id' => $deleteIds])
+                    ->all();
+                foreach ($toDelete as $photo) {
+                    $this->deletePhotoFiles($photo);
+                    $photo->delete();
+                }
+            }
+
+            // 2) Apply the drag order. `order` is a comma-separated id list.
+            $orderRaw = (string) $req->post('order', '');
+            $orderIds = array_filter(array_map('intval', explode(',', $orderRaw)));
+            if (!empty($orderIds)) {
+                $pos = 0;
+                foreach ($orderIds as $pid) {
+                    $p = Photos::find()->where(['id' => $pid, 'painting_id' => $painting_id])->one();
+                    if ($p !== null) {
+                        $p->sort_order = $pos++;
+                        $p->save(false, ['sort_order']);
+                    }
+                }
+            }
+
+            // 3) Cover choice, then guarantee exactly one cover remains.
+            $coverId = (int) $req->post('cover_photo_id', 0);
+            $remaining = Photos::find()
+                ->where(['painting_id' => $painting_id])
+                ->orderBy(['sort_order' => SORT_ASC, 'id' => SORT_ASC])
+                ->all();
+            if (!empty($remaining)) {
+                $haveCover = false;
+                foreach ($remaining as $p) {
+                    $isCover = ($coverId > 0 && (int) $p->id === $coverId);
+                    if ($isCover) { $haveCover = true; }
+                    if ((int) $p->isMain !== ($isCover ? 1 : 0)) {
+                        $p->isMain = $isCover ? 1 : 0;
+                        $p->save(false, ['isMain']);
+                    }
+                }
+                // No valid cover chosen → make the first photo the cover.
+                if (!$haveCover) {
+                    $first = $remaining[0];
+                    if ((int) $first->isMain !== 1) {
+                        $first->isMain = 1;
+                        $first->save(false, ['isMain']);
+                    }
+                }
+            }
+
+            Yii::$app->session->setFlash('success', Yii::t('admin', 'Photos updated.'));
+            return $this->redirect(['manage', 'painting_id' => $painting_id]);
+        }
+
+        $photos = Photos::find()
+            ->where(['painting_id' => $painting_id])
+            ->orderBy(['sort_order' => SORT_ASC, 'id' => SORT_ASC])
+            ->all();
+
+        return $this->render('manage', [
+            'paintingModel' => $paintingModel,
+            'photos' => $photos,
+        ]);
+    }
+
+    /** Remove the stored JPG master + every WebP derivative for one photo. */
+    protected function deletePhotoFiles(Photos $photo)
+    {
+        $base = Yii::getAlias('@app') . '/web/paintings_photo/';
+        $webp = Img::webp($photo->filename);
+        @unlink($base . 'original/' . $photo->filename);
+        @unlink($base . 'original_site/' . $webp);
+        @unlink($base . 'preview/' . $webp);
+        @unlink($base . 'thumb_squared/' . $webp);
+        @unlink($base . 'thumb_tiny/' . $webp);
+    }
+
     public function actionUpload()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
@@ -151,10 +249,16 @@ class PhotosController extends AdminBaseController
         try {
             $originalName = Img::store($tmpFilePath, $isJpeg);
 
+            // Append to the end of the current order for this work.
+            $maxOrder = (int) Photos::find()
+                ->where(['painting_id' => $painting_id])
+                ->max('sort_order');
+
             $photoModel = new Photos();
             $photoModel->painting_id = $painting_id;
             $photoModel->filename = $originalName;
             $photoModel->isMain = 0;
+            $photoModel->sort_order = $maxOrder + 1;
             $photoModel->save();
         } catch (\Exception $e) {
             Yii::error('Photo upload failed: ' . $e->getMessage(), __METHOD__);
