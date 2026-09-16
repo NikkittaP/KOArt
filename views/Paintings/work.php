@@ -17,6 +17,9 @@
  */
 
 use app\helpers\PaintingPresenter;
+use app\helpers\OgImage;
+use app\helpers\Schema;
+use app\helpers\Seo;
 use app\helpers\RichText;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -57,6 +60,37 @@ $hasDescription = trim((string) $description) !== '';
 // Several photos → the description sits on top and the photos stack full-width
 // below, each capped to the viewport height so one is comfortably in view.
 $multi = count($photos) > 1;
+
+// Meta description: the work's own text if it has any, otherwise the
+// materials/ground/year/size line, which still describes the piece usefully.
+$this->params['seo'] = [
+    'description' => Seo::firstExcerpt([
+        $description,
+        trim($this->title . ($metaLine !== '' ? ' — ' . $metaLine : '')),
+    ]),
+    'type' => 'article',
+    // Generated 1200x630 card: the whole work, letterboxed, so portraits are
+    // not cropped through the middle by Facebook/LinkedIn.
+    'image' => OgImage::forPainting($painting),
+    'imageAlt' => $painting->tr('name', true) ?: ('#' . $painting->id),
+];
+
+// schema.org: the work itself, plus the trail that led here. VisualArtwork
+// carries the art-specific fields (medium, surface, dimensions, year) that a
+// generic CreativeWork cannot express.
+$workUrl = Seo::canonical();
+$this->params['jsonLd'] = [
+    Schema::visualArtwork(
+        $painting,
+        $workUrl,
+        Seo::absolute(OgImage::forPainting($painting)),
+        $this->params['seo']['description']
+    ),
+    Schema::breadcrumbs([
+        $backLabel => Seo::absolute($backUrl),
+        ($painting->tr('name', true) ?: ('#' . $painting->id)) => $workUrl,
+    ]),
+];
 ?>
 <a class="back" href="<?= $backUrl ?>">← <?= Html::encode($backLabel) ?></a>
 
