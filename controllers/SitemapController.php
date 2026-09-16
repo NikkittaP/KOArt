@@ -79,6 +79,7 @@ class SitemapController extends Controller
 
         // --- Static pages ---------------------------------------------------
         $entries[] = ['path' => '/about', 'lastmod' => null, 'priority' => '0.7', 'changefreq' => 'yearly'];
+        $entries[] = ['path' => '/privacy', 'lastmod' => null, 'priority' => '0.1', 'changefreq' => 'yearly'];
 
         // --- Series ---------------------------------------------------------
         $seriesUpdated = $this->latestWorkPerSeries();

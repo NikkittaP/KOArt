@@ -162,6 +162,20 @@ class SiteController extends Controller
     }
 
     /**
+     * Privacy policy. A static page, but rendered through the controller so
+     * it picks up the public layout, the SEO head block and /ru/ routing like
+     * any other page.
+     *
+     * @return string
+     */
+    public function actionPrivacy()
+    {
+        $this->layout = '@app/views/layouts/public';
+
+        return $this->render('privacy');
+    }
+
+    /**
      * Displays about page.
      *
      * @return string

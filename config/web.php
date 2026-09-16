@@ -77,6 +77,7 @@ $config = [
                 // catches the first request for a card, before it exists.
                 'og_cache/<token:[a-z]+-\d+-[a-f0-9]+>.jpg' => 'og/image',
                 'about' => 'site/about',
+                'privacy' => 'site/privacy',
                 'login' => 'site/login',
 
                 // Public series page. MUST stay before the admin rules below:
