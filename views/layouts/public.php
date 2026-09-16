@@ -92,6 +92,9 @@ $this->beginPage();
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($pageTitle) ?></title>
     <meta name="description" content="<?= Html::encode($seoDescription) ?>">
+<?php if (!empty(Yii::$app->params['googleSiteVerification'])): ?>
+    <meta name="google-site-verification" content="<?= Html::encode(Yii::$app->params['googleSiteVerification']) ?>">
+<?php endif; ?>
     <link rel="canonical" href="<?= Html::encode($canonical) ?>">
 <?php if ($seoNoindex): ?>
     <meta name="robots" content="noindex, follow">

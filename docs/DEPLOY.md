@@ -29,6 +29,14 @@
 
 5. **Расширение для картинок:** убедись, что GD собран с WebP (проверишь через phpinfo).
    Для подстраховки включи расширение **ImageMagick** в PHP Configuration.
+   GD с WebP нужен не только для миниатюр, но и для карточек превью соцсетей
+   (`app\helpers\OgImage`).
+
+5a. **Модули Apache.** `web/.htaccess` включает сжатие, кеширование и
+   security-заголовки. Нужны `mod_deflate` (или `mod_brotli`), `mod_expires`
+   и `mod_headers` — на shared-хостинге Hetzner они стандартно включены.
+   Все блоки обёрнуты в `<IfModule>`, поэтому отсутствие модуля не уронит
+   сайт в 500 — просто заголовок не появится. Как проверить — см. раздел 6.
 
 6. **База данных:** создай MySQL-базу и пользователя (konsoleH → Databases).
    Запиши: имя базы, имя пользователя, пароль, хост (обычно `localhost`).
@@ -91,6 +99,10 @@
    - `web/paintings_photo/` и все подпапки (`original`, `preview`, `thumb_squared`,
      `thumb_squared_small`, `thumb_tiny`, `original_site`) → 775
    - `web/series_cover/` и подпапки → 775
+   - `web/og_cache/` → 775 — сюда генерируются карточки превью для соцсетей.
+     Папки может не быть: создай её вручную. Если прав на запись нет, сайт
+     продолжит работать, но при шеринге ссылки на работу будет показываться
+     общая карточка с логотипом вместо самой картины.
 
 ---
 
@@ -112,9 +124,63 @@
 - [ ] Главная и галерея открываются, **картинки (webp) отображаются** → GD/Imagick с WebP ок
 - [ ] Внутренние ссылки работают без `index.php` в URL (pretty URLs / mod_rewrite)
 - [ ] Вход в админку, **пробная загрузка фото ~15 МБ проходит** → лимиты upload и память ок
-- [ ] Папки runtime/assets/paintings_photo доступны на запись (нет ошибок при загрузке)
-- [ ] Форма обратной связи реально отправляет письмо (mailer переведён на SMTP)
+- [ ] Папки runtime/assets/paintings_photo/og_cache доступны на запись
 - [ ] В исходниках нет следов dev: debug-панель и gii недоступны (YII_ENV=prod)
+- [ ] Прошёл раздел 6 «Проверка после деплоя» ниже
+
+---
+
+## 6. Проверка после деплоя (SEO, скорость, соцсети)
+
+Всё проверяется из командной строки, ничего ставить не надо.
+
+**Сжатие и кеш.** Должны быть `Content-Encoding` и годичный `Cache-Control`:
+
+```
+curl -sI -H "Accept-Encoding: gzip,br" https://katiaoskina.com/css/public.css
+```
+
+Если `Content-Encoding` нет — на домене не включён `mod_deflate`/`mod_brotli`
+(konsoleH → PHP/Apache). Если нет `Cache-Control: public, max-age=31536000` —
+нет `mod_headers`.
+
+**HTML не должен кешироваться.** Тут, наоборот, ждём `max-age=0`:
+
+```
+curl -sI https://katiaoskina.com/ | grep -i cache-control
+```
+
+**Канонический хост.** `www` обязан отдавать 301 на домен без `www`:
+
+```
+curl -sI https://www.katiaoskina.com/ | head -1
+```
+
+**Sitemap и robots:**
+
+```
+curl -s https://katiaoskina.com/sitemap.xml | head -5
+curl -s https://katiaoskina.com/robots.txt
+```
+
+**Карточки соцсетей.** Открой любую работу, найди `og:image` и скачай его —
+должен быть JPEG 1200×630, а не 404:
+
+```
+curl -s https://katiaoskina.com/work/156 | grep 'og:image"'
+```
+
+Если 404 — у `web/og_cache/` нет прав на запись (см. раздел 3).
+Живую проверку превью удобно делать в отладчиках Facebook и LinkedIn:
+https://developers.facebook.com/tools/debug/ и
+https://www.linkedin.com/post-inspector/
+
+**Полные оригиналы закрыты.** Должно быть 404:
+
+```
+curl -so /dev/null -w "%{http_code}
+" https://katiaoskina.com/paintings_photo/original/ЛЮБОЕ_ИМЯ.jpg
+```
 
 ---
 

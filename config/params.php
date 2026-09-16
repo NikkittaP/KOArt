@@ -33,6 +33,12 @@ return [
     'artistLatitude' => '55.6050',
     'artistLongitude' => '13.0038',
 
+    // --- Search engines ------------------------------------------------------
+    // Google Search Console offers several ways to prove you own the domain.
+    // The simplest that needs no DNS access: choose "HTML tag" verification
+    // and paste the content="..." value here. Safe to leave empty.
+    'googleSiteVerification' => '',
+
     // --- Analytics ----------------------------------------------------------
     // Umami is cookieless and stores no personal data, so it needs no consent
     // banner. Leave the ID empty to disable analytics entirely (that is the
