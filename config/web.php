@@ -22,6 +22,13 @@ $config = [
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
+        'assetManager' => [
+            // Appends ?v=<mtime> to every bundled css/js URL. This is what makes
+            // the one-year Cache-Control in web/.htaccess safe: edit public.css
+            // and the URL changes, so returning visitors get the new file
+            // instead of a year-old cached copy.
+            'appendTimestamp' => true,
+        ],
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
