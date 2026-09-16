@@ -59,6 +59,8 @@ $err = function ($attr) use ($model) {
         <div class="hint" style="margin-top:0">
             <?= Yii::t('admin', 'The photo is a file, not a database field. To change it, replace this image:') ?>
             <code>web/about_photo/about.jpg</code>
+            <br>
+            <?= Yii::t('admin', 'A smaller WebP copy (about.webp) is served when it is newer than the JPG. Uploading a new JPG on its own is safe: the old WebP is then ignored automatically, the page just gets slightly heavier until a new WebP is generated.') ?>
         </div>
         <img src="<?= Url::to('@web/about_photo/about.jpg') ?>" alt=""
              style="margin-top:10px;max-width:160px;height:auto;border-radius:6px">
