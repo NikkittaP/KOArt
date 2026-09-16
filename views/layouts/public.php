@@ -122,6 +122,19 @@ $this->beginPage();
     <meta name="twitter:image" content="<?= Html::encode($seoImage) ?>">
 
     <script type="application/ld+json"><?= $jsonLd ?></script>
+
+<?php // Analytics. Umami is cookieless and stores nothing that identifies a
+      // visitor, which is why the site needs no consent banner. Three guards:
+      // never in dev, never without an ID configured (config/params.php), and
+      // never for the signed-in owner, whose own browsing would otherwise show
+      // up as traffic.
+      if (!YII_ENV_DEV
+          && !empty(Yii::$app->params['umamiWebsiteId'])
+          && Yii::$app->user->isGuest): ?>
+    <script defer
+            src="<?= Html::encode(Yii::$app->params['umamiScriptUrl']) ?>"
+            data-website-id="<?= Html::encode(Yii::$app->params['umamiWebsiteId']) ?>"></script>
+<?php endif; ?>
     <?php // Jost is self-hosted (web/fonts + @font-face in public.css). Preload
           // the latin subset so text paints without a second round trip. ?>
     <link rel="preload" href="<?= Url::to('@web/fonts/jost-latin.woff2') ?>" as="font" type="font/woff2" crossorigin>
