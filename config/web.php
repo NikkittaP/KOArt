@@ -70,6 +70,7 @@ $config = [
             'enableLanguagePersistence' => false,
             'rules' => [
                 '' => 'site/index',
+                'sitemap.xml' => 'sitemap/index',
 
                 // Social preview cards. These are real files under
                 // web/og_cache/ that Apache serves directly; this rule only

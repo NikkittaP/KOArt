@@ -26,6 +26,15 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . index.php
 
+# --- Full-resolution masters ------------------------------------------------
+# */original/ holds the untouched JPG masters (several MB each) and exists
+# only so derivatives can be regenerated. Nothing public links them, and the
+# admin "download original" action streams them through PHP behind a login,
+# so the HTTP path itself can be closed. Without this, a full-resolution
+# artwork is one guessed filename away - which sits badly next to the
+# right-click deterrent already in public.js.
+RedirectMatch 404 ^(/web)?/(paintings_photo|series_cover)/original/
+
 # --- Compression ------------------------------------------------------------
 # Nothing was compressed before this: jQuery went over the wire as 285 KB of
 # raw text. Images (webp/jpg) are already compressed and are left alone.

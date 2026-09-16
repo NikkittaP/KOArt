@@ -1,2 +1,25 @@
+# katiaoskina.com
+#
+# The previous file was "User-agent: * / Disallow:" - technically valid, but
+# it named no sitemap and left the admin panel and login page open to being
+# indexed.
+
 User-agent: *
-Disallow:
+Allow: /
+
+# Nothing here is useful in search results.
+Disallow: /admin
+Disallow: /login
+Disallow: /site/login
+Disallow: /site/logout
+
+# Full-resolution masters. Nothing public links them and direct access is
+# blocked in web/.htaccess; this keeps them out of image search too.
+Disallow: /paintings_photo/original/
+Disallow: /series_cover/original/
+
+# /og_cache/ is deliberately NOT disallowed: Facebook's and LinkedIn's
+# crawlers honour robots.txt, and blocking it would stop link previews from
+# loading their image.
+
+Sitemap: https://katiaoskina.com/sitemap.xml

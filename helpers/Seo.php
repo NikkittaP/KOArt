@@ -123,26 +123,26 @@ class Seo
      */
     public static function alternates()
     {
-        $languages = Yii::$app->urlManager->languages ?? ['en'];
+        return self::alternatesForPath(strtok(Yii::$app->request->getUrl(), '?'));
+    }
+
+    /**
+     * Same as alternates(), for an arbitrary path rather than the current
+     * request. Used by the sitemap, which has to emit every language of every
+     * page without visiting it.
+     *
+     * @param string $path with or without a language prefix
+     * @return array [language => absolute URL], plus an "x-default" entry
+     */
+    public static function alternatesForPath($path)
+    {
+        $languages = self::languages();
         if (count($languages) < 2) {
             return [];
         }
 
-        $path = strtok(Yii::$app->request->getUrl(), '?');
-
-        // Strip any existing language prefix to get the neutral path.
-        foreach ($languages as $code) {
-            if ($path === '/' . $code || strpos($path, '/' . $code . '/') === 0) {
-                $path = substr($path, strlen($code) + 1);
-                break;
-            }
-        }
-        $path = '/' . ltrim((string) $path, '/');
-        $path = $path !== '/' ? rtrim($path, '/') : '/';
-
-        // English is the language without a URL prefix (see config/web.php:
-        // enableDefaultLanguageUrlCode = false).
-        $default = in_array('en', $languages, true) ? 'en' : reset($languages);
+        $path = self::neutralPath($path);
+        $default = self::defaultLanguage();
 
         $out = [];
         foreach ($languages as $code) {
@@ -153,5 +153,49 @@ class Seo
         $out['x-default'] = $out[$default];
 
         return $out;
+    }
+
+    /**
+     * @return array language codes the site serves
+     */
+    public static function languages()
+    {
+        return Yii::$app->urlManager->languages ?? ['en'];
+    }
+
+    /**
+     * The language served without a URL prefix (config/web.php sets
+     * enableDefaultLanguageUrlCode = false).
+     *
+     * @return string
+     */
+    public static function defaultLanguage()
+    {
+        $languages = self::languages();
+
+        return in_array('en', $languages, true) ? 'en' : reset($languages);
+    }
+
+    /**
+     * Strip any language prefix and normalise, so "/ru/about/" and "/about"
+     * both become "/about".
+     *
+     * @param string $path
+     * @return string
+     */
+    public static function neutralPath($path)
+    {
+        $path = strtok((string) $path, '?');
+
+        foreach (self::languages() as $code) {
+            if ($path === '/' . $code || strpos($path, '/' . $code . '/') === 0) {
+                $path = substr($path, strlen($code) + 1);
+                break;
+            }
+        }
+
+        $path = '/' . ltrim((string) $path, '/');
+
+        return $path !== '/' ? rtrim($path, '/') : '/';
     }
 }
