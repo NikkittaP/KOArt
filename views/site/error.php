@@ -18,6 +18,10 @@ $statusCode = ($exception instanceof \yii\web\HttpException) ? $exception->statu
 $isNotFound = $statusCode === 404;
 
 $this->title = $name;
+
+// A 404 must never land in search results, but its links should still be
+// followed so crawlers can find their way back into the site.
+$this->params['seo'] = ['noindex' => true];
 ?>
 <header class="shead error-head">
     <?php if ($statusCode): ?>

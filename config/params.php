@@ -14,6 +14,33 @@ return [
     'socialBehance' => 'https://www.behance.net/katiaoskina',
     'socialLinkedin' => 'https://www.linkedin.com/in/katiaoskina',
     'socialInstagram' => 'https://www.instagram.com/katia.oskina',
+
+    // --- Public SEO / social sharing ----------------------------------------
+    // siteDescription is the fallback meta description and the og:description
+    // for any page that has no text of its own. Keep it under ~160 characters
+    // (Google truncates around there) and keep "Malmö, Sweden" in it: it is
+    // one of the few places the site states where the artist works, which is
+    // what local search has to match on.
+    'siteName' => 'Katia Oskina',
+    'siteDescription' => 'Katia Oskina is an illustrator and artist based in Malmö, Sweden — artworks, commercial illustration, picturebooks and sketchbooks.',
+    // Fallback social preview, used for pages with no artwork of their own.
+    'ogDefaultImage' => '/img/og-default.jpg',
+
+    // --- Location, for schema.org and local search --------------------------
+    'artistCity' => 'Malmö',
+    'artistRegion' => 'Skåne County',
+    'artistCountry' => 'SE',
+    'artistLatitude' => '55.6050',
+    'artistLongitude' => '13.0038',
+
+    // --- Analytics ----------------------------------------------------------
+    // Umami is cookieless and stores no personal data, so it needs no consent
+    // banner. Leave the ID empty to disable analytics entirely (that is the
+    // local/dev default — the script is only emitted when this is filled in).
+    // Get the ID from cloud.umami.is → Settings → Websites → Edit → Website ID.
+    'umamiWebsiteId' => '',
+    'umamiScriptUrl' => 'https://cloud.umami.is/script.js',
+
     // Bump on every public-frontend asset/markup change — shown in the footer
     // so we can tell a stale cached mobile page from a fresh one (see
     // docs/00-START-HERE.md "practical lessons" / 03-data-model "constraints").

@@ -11,6 +11,7 @@
  * @var \app\models\Authors|null $author
  */
 
+use app\helpers\Seo;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
@@ -18,6 +19,11 @@ $this->title = 'About';
 
 $bio = $author ? (string) $author->tr('biography') : '';
 $paragraphs = array_filter(array_map('trim', preg_split('/\R{2,}|\R/u', trim($bio))), 'strlen');
+
+$this->params['seo'] = [
+    'description' => Seo::firstExcerpt([$bio]),
+    'type' => 'profile',
+];
 ?>
 <header class="shead"><h1>About</h1></header>
 <div class="about">

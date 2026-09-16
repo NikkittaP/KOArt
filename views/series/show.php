@@ -13,6 +13,7 @@
 
 use app\helpers\PaintingPresenter;
 use app\helpers\RichText;
+use app\helpers\Seo;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
@@ -25,6 +26,13 @@ $backUrl = $section
 $backLabel = $section ? $section->tr('title') : 'Back';
 
 $metaLine = PaintingPresenter::seriesMetaLine($series, $paintings);
+
+// A series is a self-contained piece of work, so it is shared as an article
+// rather than as a site page.
+$this->params['seo'] = [
+    'description' => Seo::firstExcerpt([$series->tr('description'), $metaLine]),
+    'type' => 'article',
+];
 ?>
 <a class="back" href="<?= $backUrl ?>">← <?= Html::encode($backLabel) ?></a>
 <header class="shead pj">

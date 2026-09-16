@@ -14,10 +14,23 @@
 
 use app\helpers\PaintingPresenter;
 use app\helpers\RichText;
+use app\helpers\Seo;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
 $this->title = $section->tr('title');
+
+// The section intro is the only prose on this page, so it is also the best
+// meta description. Sections with no intro fall back to a line that still
+// names the section and where the artist works.
+$this->params['seo'] = [
+    'description' => Seo::firstExcerpt([
+        $intro,
+        $section->tr('title') . ' by ' . Yii::$app->params['siteName']
+            . ', illustrator and artist based in '
+            . Yii::$app->params['contactLocation'] . '.',
+    ]),
+];
 ?>
 <header class="shead">
     <h1><?= Html::encode($section->tr('title')) ?></h1>

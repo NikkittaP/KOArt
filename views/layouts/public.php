@@ -13,6 +13,7 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use app\assets\PublicAsset;
+use app\helpers\Seo;
 use app\models\Sections;
 
 PublicAsset::register($this);
@@ -32,6 +33,31 @@ $socialBehance = Yii::$app->params['socialBehance'];
 $socialLinkedin = Yii::$app->params['socialLinkedin'];
 $socialInstagram = Yii::$app->params['socialInstagram'];
 $buildVersion = Yii::$app->params['buildVersion'];
+
+// --- SEO / social sharing --------------------------------------------------
+// Views describe themselves through $this->params['seo'], which may carry:
+//   description  string  meta description + og:description (falls back to
+//                        params['siteDescription'])
+//   image        string  absolute or web-root-relative social preview image,
+//                        expected to be 1200x630 (falls back to the default card)
+//   imageAlt     string  alt text for that image
+//   type         string  og:type, 'website' (default) or 'article'
+//   noindex      bool    keep the page out of search results
+$seo = $this->params['seo'] ?? [];
+$pageTitle = trim((string) $this->title) !== ''
+    ? $this->title . ' — ' . Yii::$app->params['siteName']
+    : Yii::$app->params['siteName'];
+$seoDescription = trim((string) ($seo['description'] ?? '')) !== ''
+    ? $seo['description']
+    : Yii::$app->params['siteDescription'];
+$seoImage = Seo::absolute($seo['image'] ?? Yii::$app->params['ogDefaultImage']);
+$seoImageAlt = $seo['imageAlt'] ?? Yii::$app->params['siteName'];
+$seoType = $seo['type'] ?? 'website';
+$seoNoindex = !empty($seo['noindex']);
+$canonical = Seo::canonical();
+$alternates = Seo::alternates();
+$ogLocales = ['en' => 'en_GB', 'ru' => 'ru_RU'];
+$ogLocale = $ogLocales[Yii::$app->language] ?? 'en_GB';
 
 // Nav is built from the DB `sections` (title + order). "artworks" is the
 // homepage; the others use the section route. About (static page) and Shop
@@ -55,7 +81,36 @@ $this->beginPage();
     <meta charset="<?= Yii::$app->charset ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Html::csrfMetaTags() ?>
-    <title><?= Html::encode($this->title) ?> — Katia Oskina</title>
+    <title><?= Html::encode($pageTitle) ?></title>
+    <meta name="description" content="<?= Html::encode($seoDescription) ?>">
+    <link rel="canonical" href="<?= Html::encode($canonical) ?>">
+<?php if ($seoNoindex): ?>
+    <meta name="robots" content="noindex, follow">
+<?php endif; ?>
+<?php // /ru/ is a real translation of the same pages, not duplicate content.
+      // hreflang is what tells search engines to treat the two as one page in
+      // two languages and serve the right one per visitor.
+      foreach ($alternates as $hrefLang => $altUrl): ?>
+    <link rel="alternate" hreflang="<?= Html::encode($hrefLang) ?>" href="<?= Html::encode($altUrl) ?>">
+<?php endforeach; ?>
+
+    <?php // Open Graph / Twitter: without these, sharing a link anywhere
+          // (Instagram DM, Telegram, WhatsApp, LinkedIn, Slack) produced a
+          // bare grey rectangle with no image and no description. ?>
+    <meta property="og:type" content="<?= Html::encode($seoType) ?>">
+    <meta property="og:site_name" content="<?= Html::encode(Yii::$app->params['siteName']) ?>">
+    <meta property="og:title" content="<?= Html::encode($pageTitle) ?>">
+    <meta property="og:description" content="<?= Html::encode($seoDescription) ?>">
+    <meta property="og:url" content="<?= Html::encode($canonical) ?>">
+    <meta property="og:locale" content="<?= Html::encode($ogLocale) ?>">
+    <meta property="og:image" content="<?= Html::encode($seoImage) ?>">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="<?= Html::encode($seoImageAlt) ?>">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?= Html::encode($pageTitle) ?>">
+    <meta name="twitter:description" content="<?= Html::encode($seoDescription) ?>">
+    <meta name="twitter:image" content="<?= Html::encode($seoImage) ?>">
     <?php // Jost is self-hosted (web/fonts + @font-face in public.css). Preload
           // the latin subset so text paints without a second round trip. ?>
     <link rel="preload" href="<?= Url::to('@web/fonts/jost-latin.woff2') ?>" as="font" type="font/woff2" crossorigin>
