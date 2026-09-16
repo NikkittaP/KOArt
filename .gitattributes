@@ -1,20 +1,20 @@
-# Server-side config and text must keep LF endings: these files are uploaded
-# to a Linux host (Hetzner) by SFTP straight from the working copy, and CRLF
-# in an .htaccess or a shell-ish config can break directive parsing.
-*           text=auto
+# The site is deployed by uploading this working copy to a Linux host
+# (Hetzner) over SFTP - there is no build step and no SSH. Files where CRLF
+# line endings could actually break server-side parsing are pinned to LF in
+# the working tree, not just in the repository.
+#
+# Deliberately narrow: PHP/CSS/JS are fine with either ending on Linux, so
+# they are left alone to avoid renormalising the whole tree.
 .htaccess   text eol=lf
 *.htaccess  text eol=lf
-*.php       text eol=lf
-*.css       text eol=lf
-*.js        text eol=lf
-*.xml       text eol=lf
-*.json      text eol=lf
 robots.txt  text eol=lf
+*.webmanifest text eol=lf
 
-# Binary assets must never be touched.
+# Binary assets must never be line-ending converted.
 *.woff2 binary
 *.woff  binary
 *.png   binary
 *.jpg   binary
+*.jpeg  binary
 *.webp  binary
 *.ico   binary
