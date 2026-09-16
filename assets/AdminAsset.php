@@ -16,6 +16,9 @@ class AdminAsset extends AssetBundle
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
+        // Self-hosted Jost. Shared with the other bundle so the admin and
+        // login screens no longer reach out to fonts.googleapis.com either.
+        'css/fonts.css',
         'css/admin.css',
     ];
     public $js = [

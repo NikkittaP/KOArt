@@ -43,9 +43,9 @@ $this->beginPage();
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?> — <?= Yii::t('admin', 'Admin') ?> · Katia Oskina</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <?php // Jost is self-hosted; the @font-face rules ship in css/fonts.css,
+          // loaded by AdminAsset. ?>
+    <link rel="preload" href="<?= \yii\helpers\Url::to('@web/fonts/jost-latin.woff2') ?>" as="font" type="font/woff2" crossorigin>
     <?php $this->head() ?>
 </head>
 <body>
