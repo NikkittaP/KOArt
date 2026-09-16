@@ -13,6 +13,7 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use app\assets\PublicAsset;
+use app\helpers\Schema;
 use app\helpers\Seo;
 use app\models\Sections;
 
@@ -58,6 +59,14 @@ $canonical = Seo::canonical();
 $alternates = Seo::alternates();
 $ogLocales = ['en' => 'en_GB', 'ru' => 'ru_RU'];
 $ogLocale = $ogLocales[Yii::$app->language] ?? 'en_GB';
+
+// schema.org. Every page carries the WebSite and the artist (which is what
+// states, machine-readably, that she works in Malmö); pages add their own
+// entities - a VisualArtwork, a breadcrumb trail - via $this->params['jsonLd'].
+$jsonLd = Schema::render(array_merge(
+    [Schema::website(), Schema::person()],
+    $this->params['jsonLd'] ?? []
+));
 
 // Nav is built from the DB `sections` (title + order). "artworks" is the
 // homepage; the others use the section route. About (static page) and Shop
@@ -111,6 +120,8 @@ $this->beginPage();
     <meta name="twitter:title" content="<?= Html::encode($pageTitle) ?>">
     <meta name="twitter:description" content="<?= Html::encode($seoDescription) ?>">
     <meta name="twitter:image" content="<?= Html::encode($seoImage) ?>">
+
+    <script type="application/ld+json"><?= $jsonLd ?></script>
     <?php // Jost is self-hosted (web/fonts + @font-face in public.css). Preload
           // the latin subset so text paints without a second round trip. ?>
     <link rel="preload" href="<?= Url::to('@web/fonts/jost-latin.woff2') ?>" as="font" type="font/woff2" crossorigin>
