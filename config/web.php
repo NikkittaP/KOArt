@@ -70,6 +70,11 @@ $config = [
             'enableLanguagePersistence' => false,
             'rules' => [
                 '' => 'site/index',
+
+                // Social preview cards. These are real files under
+                // web/og_cache/ that Apache serves directly; this rule only
+                // catches the first request for a card, before it exists.
+                'og_cache/<token:[a-z]+-\d+-[a-f0-9]+>.jpg' => 'og/image',
                 'about' => 'site/about',
                 'login' => 'site/login',
 

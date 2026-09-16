@@ -78,11 +78,19 @@ RewriteRule . index.php
 
 <IfModule mod_headers.c>
     # Long-lived immutable assets. HTML is excluded and handled below.
+    # "unset" first: if the server or vhost config already sets a
+    # Cache-Control (OSPanel locally sends max-age=0, must-revalidate), a bare
+    # "set" here leaves both headers on the response and the two max-age
+    # values contradict each other.
     <FilesMatch "\.(webp|jpe?g|png|gif|ico|svg|css|js|woff2?)$">
-        Header set Cache-Control "public, max-age=31536000, immutable"
+        Header unset Cache-Control
+        Header always unset Cache-Control
+        Header always set Cache-Control "public, max-age=31536000, immutable"
     </FilesMatch>
     <FilesMatch "\.(xml|json|webmanifest)$">
-        Header set Cache-Control "public, max-age=3600"
+        Header unset Cache-Control
+        Header always unset Cache-Control
+        Header always set Cache-Control "public, max-age=3600"
     </FilesMatch>
 
     # --- Security headers ---------------------------------------------------

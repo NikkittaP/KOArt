@@ -42,6 +42,8 @@ tests/_support/_generated
 /web/series_cover/
 /web/about_photo/
 /web/uploads/
+# Generated social preview cards (rebuilt on demand by OgController).
+/web/og_cache/
 
 # === Yii runtime & published assets ===
 /web/assets/

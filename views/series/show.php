@@ -12,6 +12,7 @@
  */
 
 use app\helpers\PaintingPresenter;
+use app\helpers\OgImage;
 use app\helpers\RichText;
 use app\helpers\Seo;
 use yii\helpers\Html;
@@ -32,6 +33,8 @@ $metaLine = PaintingPresenter::seriesMetaLine($series, $paintings);
 $this->params['seo'] = [
     'description' => Seo::firstExcerpt([$series->tr('description'), $metaLine]),
     'type' => 'article',
+    'image' => OgImage::forSeries($series),
+    'imageAlt' => $series->tr('name'),
 ];
 ?>
 <a class="back" href="<?= $backUrl ?>">← <?= Html::encode($backLabel) ?></a>
