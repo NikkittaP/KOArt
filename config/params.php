@@ -37,14 +37,14 @@ return [
     // Google Search Console offers several ways to prove you own the domain.
     // The simplest that needs no DNS access: choose "HTML tag" verification
     // and paste the content="..." value here. Safe to leave empty.
-    'googleSiteVerification' => '',
+    'googleSiteVerification' => '8HxEEYpPcuYXGOt_D9ZjdXFarAkN6z7K174avkMv1Cw',
 
     // --- Analytics ----------------------------------------------------------
     // Umami is cookieless and stores no personal data, so it needs no consent
     // banner. Leave the ID empty to disable analytics entirely (that is the
     // local/dev default — the script is only emitted when this is filled in).
     // Get the ID from cloud.umami.is → Settings → Websites → Edit → Website ID.
-    'umamiWebsiteId' => '',
+    'umamiWebsiteId' => 'ceeb84f5-bcde-4347-8e44-938b4a53419c',
     'umamiScriptUrl' => 'https://cloud.umami.is/script.js',
 
     // Bump on every public-frontend asset/markup change — shown in the footer
