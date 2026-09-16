@@ -59,6 +59,15 @@ $this->beginPage();
     <?php // Jost is self-hosted (web/fonts + @font-face in public.css). Preload
           // the latin subset so text paints without a second round trip. ?>
     <link rel="preload" href="<?= Url::to('@web/fonts/jost-latin.woff2') ?>" as="font" type="font/woff2" crossorigin>
+
+    <?php // The icon files always existed but were never linked, so iOS
+          // "Add to Home Screen" fell back to a screenshot of the page. ?>
+    <link rel="icon" href="<?= Url::to('@web/favicon.ico') ?>" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= Url::to('@web/favicon-32x32.png') ?>">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?= Url::to('@web/favicon-16x16.png') ?>">
+    <link rel="apple-touch-icon" href="<?= Url::to('@web/apple-touch-icon.png') ?>">
+    <link rel="manifest" href="<?= Url::to('@web/site.webmanifest') ?>">
+    <meta name="theme-color" content="#ffffff">
     <?php $this->head() ?>
 </head>
 <body>
