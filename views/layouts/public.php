@@ -17,6 +17,13 @@ use app\models\Sections;
 
 PublicAsset::register($this);
 
+// public.js is plain vanilla JS, so the public pages carry no jQuery. The one
+// exception is the signed-in admin bar: its "Log out" link uses Yii's
+// data-method="post" handler, which lives in yii.js (and needs jQuery).
+if (!Yii::$app->user->isGuest) {
+    \yii\web\YiiAsset::register($this);
+}
+
 $activeNav = $this->params['activeNav'] ?? null;
 $shopUrl = Yii::$app->params['shopUrl'];
 $contactEmail = Yii::$app->params['contactEmail'];
@@ -49,9 +56,9 @@ $this->beginPage();
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?> — Katia Oskina</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <?php // Jost is self-hosted (web/fonts + @font-face in public.css). Preload
+          // the latin subset so text paints without a second round trip. ?>
+    <link rel="preload" href="<?= Url::to('@web/fonts/jost-latin.woff2') ?>" as="font" type="font/woff2" crossorigin>
     <?php $this->head() ?>
 </head>
 <body>

@@ -1,0 +1,20 @@
+# Server-side config and text must keep LF endings: these files are uploaded
+# to a Linux host (Hetzner) by SFTP straight from the working copy, and CRLF
+# in an .htaccess or a shell-ish config can break directive parsing.
+*           text=auto
+.htaccess   text eol=lf
+*.htaccess  text eol=lf
+*.php       text eol=lf
+*.css       text eol=lf
+*.js        text eol=lf
+*.xml       text eol=lf
+*.json      text eol=lf
+robots.txt  text eol=lf
+
+# Binary assets must never be touched.
+*.woff2 binary
+*.woff  binary
+*.png   binary
+*.jpg   binary
+*.webp  binary
+*.ico   binary
