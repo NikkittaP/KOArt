@@ -30,8 +30,20 @@
   unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;
 }
 
+/* Text colours are tuned to WCAG 2.1 AA against the white page background:
+   4.5:1 for normal text, 3:1 for large text (>=24px) and non-text UI.
+
+     --ink    17.6:1  body copy, headings
+     --soft    7.8:1  secondary prose
+     --muted   4.7:1  small print: captions, meta lines, uppercase labels
+     --faint   3.1:1  LARGE text and decoration ONLY - the 404 numeral and
+                      hairline borders. Never use it for small text.
+
+   The previous values (--muted #8c887e at 3.5:1, --faint #b6b1a6 at 2.1:1)
+   both failed AA: they were used for 10-12px uppercase captions, the footer
+   copyright and the contact line in the sidebar. */
 :root{
-  --ink:#1a1916;--soft:#55524b;--muted:#8c887e;--faint:#b6b1a6;--line:#ececE6;--sidebar:236px;--max:1140px;
+  --ink:#1a1916;--soft:#55524b;--muted:#78746a;--faint:#999384;--line:#ececE6;--sidebar:236px;--max:1140px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -69,7 +81,7 @@ a{color:inherit}
 
 /* Block label */
 .blocklabel{display:flex;align-items:center;gap:18px;margin:54px 0 24px}
-.blocklabel span{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--faint)}
+.blocklabel span{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--muted)}
 .blocklabel::after{content:"";flex:1;height:1px;background:var(--line)}
 
 /* Series cards */
@@ -137,8 +149,8 @@ a{color:inherit}
 .site-footer .social a{display:inline-flex;color:var(--muted);transition:color .2s}
 .site-footer .social a:hover{color:var(--ink)}
 .site-footer .social svg{width:21px;height:21px;fill:currentColor;display:block}
-.site-footer .copy{font-size:11.5px;color:var(--faint);max-width:640px;line-height:1.7;letter-spacing:.01em}
-.site-footer .ver{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);opacity:.7}
+.site-footer .copy{font-size:11.5px;color:var(--muted);max-width:640px;line-height:1.7;letter-spacing:.01em}
+.site-footer .ver{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);opacity:.7}
 
 /* Lightbox */
 .lb{position:fixed;inset:0;background:rgba(20,19,17,.96);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:60}
