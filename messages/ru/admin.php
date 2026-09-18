@@ -302,4 +302,10 @@ return [
         => 'Кликните на группу, чтобы приблизить; на метку — чтобы увидеть детали.',
     'No works have a geotag yet. Add a location to a work to see it here.'
         => 'Пока ни у одной картины нет геотега. Добавьте место у картины, чтобы увидеть её здесь.',
+
+    // Projects & PDF portfolio
+    'Type' => 'Тип',
+    'Artwork' => 'Картина',
+    'Project' => 'Проект',
+    'A project opens straight to its own page instead of the lightbox.' => 'Проект открывается сразу своей страницей, а не в просмотрщике.',
 ];

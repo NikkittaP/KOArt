@@ -69,6 +69,12 @@ a{color:inherit}
 .mosaic figure:hover img{transform:scale(1.035)}
 .hov{position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;gap:2px;padding:34px 16px 14px;color:#fff;opacity:0;transition:opacity .3s;background:linear-gradient(to top,rgba(0,0,0,.62),rgba(0,0,0,.18) 55%,transparent)}
 .mosaic figure:hover .hov{opacity:1}
+/* Project tiles: the figure sits inside a link, so the link takes over the
+   column-break and spacing duties the bare figure has for artworks. */
+.mosaic a.proj{display:block;break-inside:avoid;margin:0 0 20px;color:inherit;text-decoration:none}
+.mosaic a.proj figure{margin:0;cursor:pointer}
+.mosaic a.proj:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+.mosaic a.proj:focus-visible .hov{opacity:1}
 .hov .t{font-size:15px;font-weight:400;letter-spacing:.01em}
 .hov .m{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
 
@@ -167,6 +173,7 @@ a{color:inherit}
   .series-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:22px 16px}
   .mosaic{columns:1;column-gap:0}
   .mosaic figure{margin-bottom:14px}
+  .mosaic a.proj{margin-bottom:14px}
   .hov{opacity:1;background:linear-gradient(to top,rgba(0,0,0,.6),transparent 60%)}
   .about{grid-template-columns:1fr;gap:26px;max-width:460px}
   .about-photo{max-width:300px}
@@ -177,6 +184,7 @@ a{color:inherit}
 @media (orientation:landscape) and (max-height:600px){
   .mosaic{columns:2;column-gap:12px}
   .mosaic figure{margin-bottom:12px}
+  .mosaic a.proj{margin-bottom:12px}
   /* Short viewport: shrink the image so the stacked caption stays on screen,
      and trim the caption to one line (title + "Read more"). */
   .lb img{max-height:62vh}
