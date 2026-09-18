@@ -17,6 +17,10 @@ use yii\helpers\FileHelper;
  * carries a hash of everything that affects the output (manifest()), so any
  * edit to the section's works yields a new file; older files for the section
  * are deleted after a successful build. Nothing has to be invalidated by hand.
+ * The manifest also records each source image's mtime/size, so a photo that
+ * was missing (and so skipped) at build time and is later restored on disk
+ * gets a fresh cache key too, instead of the incomplete PDF being served
+ * forever.
  *
  * Sized for Hetzner Webhosting S (192 MB, 120 s): images come from the
  * ~1500 px original_site WebP derivatives, are converted to JPEG one at a
@@ -110,7 +114,9 @@ class PortfolioPdf
     /**
      * Everything that affects the PDF, in a canonical order. Its hash is the
      * cache key, so anything rendered must be derived from here or be a
-     * constant covered by LAYOUT_VERSION.
+     * constant covered by LAYOUT_VERSION. Each photo's tuple also carries its
+     * source file's mtime/size (false when missing), so a photo that is
+     * missing at build time and later restored on disk changes the key.
      *
      * @param Paintings[] $works
      */
@@ -120,7 +126,8 @@ class PortfolioPdf
         foreach ($works as $w) {
             $photos = [];
             foreach ($w->portfolioPhotos() as $ph) {
-                $photos[] = [(int) $ph->id, (string) $ph->filename];
+                $src = self::sourcePath($ph);
+                $photos[] = [(int) $ph->id, (string) $ph->filename, @filemtime($src), @filesize($src)];
             }
             if ($photos) {
                 $items[] = [(int) $w->id, self::title($w), PaintingPresenter::metaLine($w), $photos];
@@ -236,10 +243,16 @@ class PortfolioPdf
         return trim((string) $w->tr('name', true));
     }
 
+    /** Absolute path to a photo's original_site WebP derivative (may not exist). */
+    private static function sourcePath(Photos $photo): string
+    {
+        return Yii::getAlias('@app/web/paintings_photo/original_site/') . Img::webp($photo->filename);
+    }
+
     /** original_site WebP → temporary JPEG; null if the source is missing or unreadable. */
     private static function toJpeg(Photos $photo, string $tmpDir): ?string
     {
-        $src = Yii::getAlias('@app/web/paintings_photo/original_site/') . Img::webp($photo->filename);
+        $src = self::sourcePath($photo);
         if (!is_file($src) || !function_exists('imagecreatefromwebp')) {
             return null;
         }
