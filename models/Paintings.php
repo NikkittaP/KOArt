@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\db\ActiveRecord;
+use yii\db\ActiveQuery;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 
@@ -41,6 +42,10 @@ class Paintings extends \yii\db\ActiveRecord
     const STATUS_AVAILABLE = 1;     // В наличии
     const STATUS_SOLD = 2;          // Продано
     const STATUS_NOT_AVAILABLE = 3; // Нет в наличии
+
+    // How a work opens from the section mosaic (column `display_type`).
+    const TYPE_ARTWORK = 'artwork'; // lightbox; "Read more" / "All photos" link to its page
+    const TYPE_PROJECT = 'project'; // straight to its own page (board game, picture book…)
 
     public $coverPhoto;
     public $coordinates;
@@ -99,6 +104,10 @@ class Paintings extends \yii\db\ActiveRecord
             $rules[] = [['status'], 'default', 'value' => self::STATUS_AVAILABLE];
             $rules[] = [['status'], 'in', 'range' => array_keys(self::statuses())];
         }
+        if ($this->hasAttribute('display_type')) {
+            $rules[] = [['display_type'], 'default', 'value' => self::TYPE_ARTWORK];
+            $rules[] = [['display_type'], 'in', 'range' => array_keys(self::displayTypes())];
+        }
         return $rules;
     }
 
@@ -142,6 +151,7 @@ class Paintings extends \yii\db\ActiveRecord
             'section_id' => 'Раздел',
             'sort_order' => 'Порядок сортировки',
             'status' => 'Статус',
+            'display_type' => 'Тип',
         ];
     }
 
@@ -159,6 +169,73 @@ class Paintings extends \yii\db\ActiveRecord
             self::STATUS_SOLD => Yii::t('admin', 'Sold'),
             self::STATUS_NOT_AVAILABLE => Yii::t('admin', 'Not available'),
         ];
+    }
+
+    /**
+     * Display types → admin labels (radio in the work form).
+     *
+     * @return array type const => label
+     */
+    public static function displayTypes()
+    {
+        return [
+            self::TYPE_ARTWORK => Yii::t('admin', 'Artwork'),
+            self::TYPE_PROJECT => Yii::t('admin', 'Project'),
+        ];
+    }
+
+    /** True when the work opens straight to its own page (false pre-migration). */
+    public function isProject(): bool
+    {
+        return $this->hasAttribute('display_type') && $this->display_type === self::TYPE_PROJECT;
+    }
+
+    /**
+     * Photos that go into the section PDF portfolio, in page order.
+     *
+     * The ticked ones (photos.in_portfolio) if any; otherwise just the cover
+     * (main photo, else the first). This fallback is what guarantees every
+     * work in a section appears in its PDF, and it is why the migration does
+     * not back-fill the flag. Empty only when the work has no photos at all.
+     *
+     * @return Photos[]
+     */
+    public function portfolioPhotos(): array
+    {
+        $photos = $this->photos;
+        if (!$photos) {
+            return [];
+        }
+        usort($photos, function ($a, $b) {
+            return [(int) $a->sort_order, (int) $a->id] <=> [(int) $b->sort_order, (int) $b->id];
+        });
+
+        $ticked = array_values(array_filter($photos, function ($p) {
+            return $p->hasAttribute('in_portfolio') && (int) $p->in_portfolio === 1;
+        }));
+        if ($ticked) {
+            return $ticked;
+        }
+        foreach ($photos as $p) {
+            if ((int) $p->isMain === 1) {
+                return [$p];
+            }
+        }
+        return [$photos[0]];
+    }
+
+    /**
+     * The works shown in a section's mosaic: visible, in the section, not part
+     * of any series, in manual order. Shared by the section page and its PDF
+     * portfolio so the two can never list different works.
+     */
+    public static function findForSectionMosaic(int $sectionId): ActiveQuery
+    {
+        return static::find()
+            ->where(['section_id' => $sectionId, 'isVisible' => 1])
+            ->andWhere(['not in', 'id', PaintingsToSeries::find()->select('painting_id')])
+            ->with(['photos', 'mainPhoto', 'materialsToPaintings.material', 'ground'])
+            ->orderBy(['sort_order' => SORT_ASC, 'id' => SORT_ASC]);
     }
 
     /** Russian month names, 1-indexed, for the auto title / date labels. */
