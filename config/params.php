@@ -50,5 +50,5 @@ return [
     // Bump on every public-frontend asset/markup change — shown in the footer
     // so we can tell a stale cached mobile page from a fresh one (see
     // docs/00-START-HERE.md "practical lessons" / 03-data-model "constraints").
-    'buildVersion' => 1,
+    'buildVersion' => 2,
 ];

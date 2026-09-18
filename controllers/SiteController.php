@@ -4,7 +4,6 @@ namespace app\controllers;
 
 use app\models\LoginForm;
 use app\models\Paintings;
-use app\models\PaintingsToSeries;
 use app\models\Sections;
 use app\models\Series;
 use Yii;
@@ -101,12 +100,9 @@ class SiteController extends Controller
             ->orderBy(['sort_order' => SORT_ASC, 'id' => SORT_ASC])
             ->all();
 
-        $loosePaintingIds = PaintingsToSeries::find()->select('painting_id');
-        $paintings = Paintings::find()
-            ->where(['section_id' => $section->id, 'isVisible' => 1])
-            ->andWhere(['not in', 'id', $loosePaintingIds])
-            ->orderBy(['sort_order' => SORT_ASC, 'id' => SORT_ASC])
-            ->all();
+        // Same query as the section PDF (PortfolioController), so the page and
+        // the download always list the same works. Eager-loads photos too.
+        $paintings = Paintings::findForSectionMosaic($section->id)->all();
 
         $this->layout = '@app/views/layouts/public';
         $this->view->params['activeNav'] = $section->slug;

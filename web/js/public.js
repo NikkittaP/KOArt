@@ -39,8 +39,8 @@
     if(t) h+="<div class='ct'>"+esc(t)+"</div>";
     if(l2) h+="<div class='cm'>"+esc(l2)+"</div>";
     // Long, rich-text descriptions live on the work page, not in the viewer:
-    // we only surface a "Read more" link here when the work has its own page.
-    if(u) h+="<a class='cl' href='"+esc(u)+"'>Read more →</a>";
+    // we only surface a link here when the work has a description or extra photos.
+    if(u) h+="<a class='cl' href='"+esc(u)+"'>"+esc(f.getAttribute('data-more')||'Read more →')+"</a>";
     return h;
   }
   function preload(i){ var f=figs[(i+figs.length)%figs.length]; if(f){ var im=new Image(); im.src=f.getAttribute('data-full'); } }

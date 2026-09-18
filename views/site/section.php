@@ -76,17 +76,16 @@ $this->params['seo'] = [
             $ground = PaintingPresenter::groundLabel($p);
             $year = PaintingPresenter::yearLabel($p);
             $size = PaintingPresenter::sizeLabel($p);
-            // Has a description -> the lightbox shows a "Read more" link to the
-            // dedicated work page (where the full rich text is read). No need to
-            // dump the whole description into the listing markup anymore.
-            $hasDesc = PaintingPresenter::descPlain($p) !== '';
-            $workUrl = $hasDesc ? Url::to(['/paintings/work', 'id' => $p->id]) : '';
+            // The lightbox links to the work's own page when there is more to
+            // see there than the viewer shows: a description or extra photos.
+            // data-more carries the link text ("Read more" / "All photos (N)").
+            $workUrl = PaintingPresenter::hasOwnPage($p) ? Url::to(['/paintings/work', 'id' => $p->id]) : '';
             if (!$sm) {
                 continue;
             }
             ?>
             <?php $name = $p->tr('name', true); ?>
-            <figure data-full="<?= Html::encode($lg) ?>" data-title="<?= Html::encode($name) ?>" data-mat="<?= Html::encode($mat) ?>" data-ground="<?= Html::encode($ground) ?>" data-year="<?= Html::encode($year) ?>" data-size="<?= Html::encode($size) ?>"<?= $workUrl ? ' data-url="' . Html::encode($workUrl) . '"' : '' ?>>
+            <figure data-full="<?= Html::encode($lg) ?>" data-title="<?= Html::encode($name) ?>" data-mat="<?= Html::encode($mat) ?>" data-ground="<?= Html::encode($ground) ?>" data-year="<?= Html::encode($year) ?>" data-size="<?= Html::encode($size) ?>"<?= $workUrl ? ' data-url="' . Html::encode($workUrl) . '" data-more="' . Html::encode(PaintingPresenter::moreLabel($p)) . '"' : '' ?>>
                 <img src="<?= Html::encode($sm) ?>" alt="<?= Html::encode($name) ?>" loading="lazy">
                 <figcaption class="hov">
                     <?php if ($name !== ''): ?><span class="t"><?= Html::encode($name) ?></span><?php endif; ?>
