@@ -90,6 +90,10 @@ $config = [
                 // series rule above: keep it before the admin/<...> rules.
                 'work/<id:\d+>' => 'paintings/work',
 
+                // Section PDF portfolio (built and cached on first request by
+                // app\helpers\PortfolioPdf). Before the generic <slug> rule.
+                'portfolio/<slug:[\w-]+>.pdf' => 'portfolio/section',
+
                 // --- Admin / archive panel (Phase 4b). Must stay BEFORE the
                 // generic <slug> rule so /admin/* never resolves to a section. ---
                 'admin' => 'admin/index',

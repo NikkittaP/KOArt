@@ -18,6 +18,10 @@ Disallow: /site/logout
 Disallow: /paintings_photo/original/
 Disallow: /series_cover/original/
 
+# Section PDF portfolios duplicate the section pages; keep crawlers off them
+# (and off the on-demand PDF build).
+Disallow: /portfolio/
+
 # /og_cache/ is deliberately NOT disallowed: Facebook's and LinkedIn's
 # crawlers honour robots.txt, and blocking it would stop link previews from
 # loading their image.

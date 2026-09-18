@@ -13,6 +13,7 @@
  */
 
 use app\helpers\PaintingPresenter;
+use app\helpers\PortfolioPdf;
 use app\helpers\RichText;
 use app\helpers\Seo;
 use yii\helpers\Html;
@@ -38,6 +39,9 @@ $this->params['seo'] = [
         <?php // Intro is stored as sanitised rich-text HTML (paragraphs etc.),
               // so render it purified rather than escaping the tags. ?>
         <?= RichText::purify($intro) ?>
+    <?php endif; ?>
+    <?php if (PortfolioPdf::hasContent($paintings)): ?>
+        <a class="pdf-dl" href="<?= Url::to(['/portfolio/section', 'slug' => $section->slug, 'language' => 'en']) ?>" target="_blank" rel="noopener">Download portfolio (PDF)</a>
     <?php endif; ?>
 </header>
 
