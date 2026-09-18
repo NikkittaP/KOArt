@@ -74,6 +74,9 @@ if ($coverId === 0 && !empty($photos)) {
         <p style="color:var(--faint);font-size:12.5px;margin:0 0 12px">
             <?= Yii::t('admin', 'Drag the cards to set the order shown on the work page. Pick one cover (used for thumbnails), and tick any photo to delete it.') ?>
         </p>
+        <p style="color:var(--faint);font-size:12.5px;margin:-6px 0 12px">
+            <?= Yii::t('admin', 'Tick the photos that go into the section PDF portfolio. If nothing is ticked, the cover is used.') ?>
+        </p>
 
         <input type="hidden" name="order" id="photo-order" value="<?= Html::encode($orderCsv) ?>">
 
@@ -84,6 +87,12 @@ if ($coverId === 0 && !empty($photos)) {
                     <?= Html::img($baseUrl . '/paintings_photo/thumb_squared/' . \app\helpers\Img::webp($photo->filename)) ?>
                     <?= Html::a(Yii::t('admin', 'Original'), ['download-original', 'id' => $photo->id], ['class' => 'photo-dl', 'title' => Yii::t('admin', 'Download full-resolution original')]) ?>
                     <div class="photo-sort-controls">
+                        <?php if ($photo->hasAttribute('in_portfolio')): ?>
+                        <label class="pc-pf" title="<?= Yii::t('admin', 'In portfolio') ?>">
+                            <?= Html::checkbox('portfolio_photo_ids[]', (int) $photo->in_portfolio === 1, ['value' => $photo->id]) ?>
+                            <?= Yii::t('admin', 'In portfolio') ?>
+                        </label>
+                        <?php endif; ?>
                         <label class="pc-cover" title="<?= Yii::t('admin', 'Cover') ?>">
                             <?= Html::radio('cover_photo_id', (int) $photo->id === $coverId, ['value' => $photo->id]) ?>
                             <?= Yii::t('admin', 'Cover') ?>
@@ -113,10 +122,11 @@ $css = <<<CSS
 .photo-sort-item>img{width:100%;height:150px;object-fit:cover;display:block}
 .photo-sort-item .drag-handle{position:absolute;top:6px;left:6px;z-index:3;cursor:grab;font-size:16px;line-height:1;padding:3px 6px;border-radius:4px;background:rgba(20,18,16,.7);color:#fff;user-select:none}
 .photo-sort-item .drag-handle:active{cursor:grabbing}
-.photo-sort-controls{display:flex}
+.photo-sort-controls{display:flex;flex-wrap:wrap}
 .photo-sort-controls label{flex:1 1 50%;min-width:0;display:flex;align-items:center;justify-content:center;gap:4px;padding:7px 3px;font-size:10px;letter-spacing:.01em;line-height:1;white-space:nowrap;color:#fff;cursor:pointer;margin:0}
 .photo-sort-controls .pc-cover{background:rgba(20,18,16,.82)}
 .photo-sort-controls .pc-del{background:rgba(140,38,30,.85)}
+.photo-sort-controls .pc-pf{flex-basis:100%;background:rgba(46,84,62,.85)}
 .photo-sort-controls input{flex:none;width:13px;height:13px;margin:0;cursor:pointer}
 CSS;
 $this->registerCss($css);

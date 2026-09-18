@@ -308,4 +308,6 @@ return [
     'Artwork' => 'Картина',
     'Project' => 'Проект',
     'A project opens straight to its own page instead of the lightbox.' => 'Проект открывается сразу своей страницей, а не в просмотрщике.',
+    'In portfolio' => 'В портфолио',
+    'Tick the photos that go into the section PDF portfolio. If nothing is ticked, the cover is used.' => 'Отметьте фото для PDF-портфолио раздела. Если ничего не отмечено, в PDF попадёт обложка.',
 ];
