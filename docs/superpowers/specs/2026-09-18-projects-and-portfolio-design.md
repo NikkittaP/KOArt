@@ -43,7 +43,7 @@ One Yii migration (`m260918_120000_add_display_type_and_in_portfolio`), with
 | Column | Type | Default | Back-fill |
 |---|---|---|---|
 | `paintings.display_type` | `varchar(16)` not null | `'artwork'` | all rows stay `artwork`; the author flips the ~6 existing projects herself |
-| `photos.in_portfolio` | `tinyint(1)` not null | `0` | `1` where `isMain = 1`; for paintings with no `isMain` photo, the photo with the lowest `sort_order` |
+| `photos.in_portfolio` | `tinyint(1)` not null | `0` | none — "nothing ticked" already means "use the cover" (see `portfolioPhotos()`), and that keeps following the cover if the author changes it later; a back-fill would freeze today's cover |
 
 Model changes:
 
@@ -51,7 +51,9 @@ Model changes:
   `displayTypes()` label map, `isProject(): bool`, validation `in` range.
   Guard with `hasAttribute()` the same way `status` is guarded, so code
   deployed before the migration runs does not fatal.
-- `Photos`: `in_portfolio` in rules (boolean) and labels.
+- `Photos`: `in_portfolio` label only. No validation rule: the flag is only
+  written with `save(false, ['in_portfolio'])`, and a rule on a column that
+  does not exist yet would break photo uploads before the migration runs.
 - `Paintings::portfolioPhotos(): Photos[]` — photos with `in_portfolio = 1`
   ordered by `sort_order, id`; **if none are flagged, returns `[cover]`**
   (main photo, else first photo). If the work has no photos at all, returns
@@ -78,8 +80,10 @@ the rest of the admin UI.
   and cover: set `in_portfolio = 1` for the posted ids of this painting and
   `0` for the rest. Help text: "If nothing is ticked, the cover goes into the
   PDF" (ru: «Если ничего не отмечено, в PDF попадёт обложка»).
-- New uploads: `in_portfolio = 0` unless the photo becomes the cover as the
-  work's first photo, in which case `1` (mirrors the back-fill).
+- New uploads: `in_portfolio = 0` (column default). Photos are created in
+  five places (`PhotosController` add/upload, `PaintingsController`
+  create/update); none of them needs to change, because the cover fallback
+  covers a work with nothing ticked.
 
 ## 3. Public site
 
@@ -151,8 +155,12 @@ Per work: `portfolioPhotos()` in order.
 
 - Library: **`setasign/tfpdf`** (FPDF with UTF-8 + TTF). Chosen for its small
   footprint and low memory use on Hetzner Webhosting S (192 MB, 120 s).
-  Font: Jost TTF (Regular + Medium) added to `assets/fonts/` (outside
-  `web/`); tFPDF font cache dir set to `runtime/tfpdf/`.
+  Font: Jost TTF (400 + 500, latin + latin-ext + cyrillic, fetched from
+  Google Fonts) in `assets/fonts/` (outside `web/`), passed to tFPDF via
+  its `_SYSTEM_TTFONTS` constant. tFPDF only writes its metrics cache when
+  its font dir is writable and silently skips it otherwise, so no extra
+  writable directory is needed. Cyrillic matters because material and
+  ground names fall back to Russian when their `_en` is empty.
 - Images: FPDF cannot read WebP. For each photo, load
   `web/paintings_photo/original_site/<name>.webp` (~1500 px) with GD
   `imagecreatefromwebp`, write a temporary JPEG (quality 85) to
@@ -184,7 +192,7 @@ Per work: `portfolioPhotos()` in order.
 - Run the migration: there is no console on hosting and DEPLOY.md has no
   migration procedure (production was seeded from a full dump). Ship an
   equivalent `docs/sql/2026-09-18-display-type-and-portfolio.sql` (the
-  `ALTER TABLE`s, the back-fill `UPDATE`s, and the `INSERT INTO migration`
+  `ALTER TABLE`s and the `INSERT INTO migration`
   row so a later `yii migrate` does not re-run it) to be pasted into
   phpMyAdmin, and add a short "Schema updates" section to DEPLOY.md. Deploy
   order: run SQL first, then upload code (the `hasAttribute()` guards make
