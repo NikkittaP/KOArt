@@ -2,9 +2,9 @@ Jost* — Copyright (c) 2020 Owen Earl (indestructibletype.com)
 Licensed under the SIL Open Font License, Version 1.1 (full text below).
 
 Self-hosting is explicitly permitted by this licence. The files in this
-directory (jost-latin.woff2, jost-latin-ext.woff2, jost-cyrillic.woff2) are
-the unmodified woff2 subsets served by Google Fonts for Jost v20, stored
-locally so the site makes no request to Google's servers.
+directory (Jost-Regular.ttf, Jost-Medium.ttf) are the Jost 400/500 TTFs
+(covering the latin, latin-ext and cyrillic subsets) fetched from Google
+Fonts, stored locally for use by tFPDF when rendering the PDF portfolio.
 
 --------------------------------------------------------------------------
 

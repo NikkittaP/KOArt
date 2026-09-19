@@ -53,7 +53,7 @@ class PortfolioPdf
         $prev = Yii::$app->language;
         Yii::$app->language = 'en';
         try {
-            $key = sha1(json_encode(self::manifest($section, $works), JSON_UNESCAPED_UNICODE));
+            $key = sha1(json_encode(self::manifest($section, $works), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
             $dir = Yii::getAlias('@runtime/portfolio');
             $path = $dir . '/' . $section->slug . '-' . $key . '.pdf';
             if (is_file($path)) {
@@ -77,6 +77,7 @@ class PortfolioPdf
                 }
             }
             self::pruneOld($dir, $section->slug, $path);
+            self::pruneStaleTemp($dir);
             return $path;
         } finally {
             Yii::$app->language = $prev;
@@ -174,12 +175,16 @@ class PortfolioPdf
                     Yii::warning("Portfolio: skipped photo #{$photo->id} of work #{$w->id} (missing or unreadable)", __METHOD__);
                     continue;
                 }
-                $pdf->AddPage();
-                self::placeImage($pdf, $jpg, $first);
-                if ($first) {
-                    self::caption($pdf, $w);
+                try {
+                    $pdf->AddPage();
+                    self::placeImage($pdf, $jpg, $first);
+                    if ($first) {
+                        self::caption($pdf, $w);
+                    }
+                } finally {
+                    // Delete the temp JPEG even if Image()/getimagesize() throws.
+                    @unlink($jpg);
                 }
-                @unlink($jpg); // FPDF has already read it inside Image()
                 $first = false;
             }
         }
@@ -271,6 +276,27 @@ class PortfolioPdf
         $pattern = '/^' . preg_quote($slug, '/') . '-[0-9a-f]{40}\.pdf$/';
         foreach (glob($dir . '/*.pdf') ?: [] as $file) {
             if ($file !== $keep && preg_match($pattern, basename($file))) {
+                @unlink($file);
+            }
+        }
+    }
+
+    /**
+     * Deletes stale leftovers a dead build (OOM / hit the timeout) can leave
+     * behind: the renamed-in-place *.tmp file, and per-photo JPEGs under
+     * tmp/. Only files older than 10 minutes are touched, so an in-progress
+     * build running alongside this one is never disturbed.
+     */
+    private static function pruneStaleTemp(string $dir): void
+    {
+        $cutoff = time() - 600;
+        foreach (glob($dir . '/*.tmp') ?: [] as $file) {
+            if ((@filemtime($file) ?: PHP_INT_MAX) < $cutoff) {
+                @unlink($file);
+            }
+        }
+        foreach (glob($dir . '/tmp/*.jpg') ?: [] as $file) {
+            if ((@filemtime($file) ?: PHP_INT_MAX) < $cutoff) {
                 @unlink($file);
             }
         }
