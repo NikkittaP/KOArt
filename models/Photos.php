@@ -51,6 +51,7 @@ class Photos extends \yii\db\ActiveRecord
             'isMain' => '',
             'sort_order' => 'Порядок',
             'selected' => '',
+            'in_portfolio' => 'В портфолио',
         ];
     }
 

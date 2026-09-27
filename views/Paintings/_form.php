@@ -171,6 +171,12 @@ RichTextAsset::register($this);
 
         <?= $form->field($model, 'isVisible')->checkbox(['class' => 'intranet_checkbox'])->label(Yii::t('admin', 'Visible on the site')) ?>
 
+        <?php if ($model->hasAttribute('display_type')): ?>
+            <?= $form->field($model, 'display_type')->radioList(Paintings::displayTypes())
+                ->label(Yii::t('admin', 'Type'))
+                ->hint(Yii::t('admin', 'A project opens straight to its own page instead of the lightbox.')) ?>
+        <?php endif; ?>
+
         <?php
         // Section sits above Series: it's the higher-level grouping. It applies
         // only to "loose" works (not in any series). When a work has series,

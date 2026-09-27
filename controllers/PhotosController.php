@@ -131,7 +131,7 @@ class PhotosController extends AdminBaseController
      * (sort_order) drives how the photos stack on the public work page.
      *
      * GET  → render the sortable grid + uploader.
-     * POST → apply deletions, then the new order, then the cover choice.
+     * POST → apply deletions, then the new order, then the cover choice, then the portfolio ticks.
      */
     public function actionManage($painting_id)
     {
@@ -191,6 +191,20 @@ class PhotosController extends AdminBaseController
                     if ((int) $first->isMain !== 1) {
                         $first->isMain = 1;
                         $first->save(false, ['isMain']);
+                    }
+                }
+            }
+
+            // 4) Portfolio selection. Ticked photos go into the section PDF;
+            // none ticked is valid and means "use the cover"
+            // (Paintings::portfolioPhotos()). Skipped before the migration.
+            if (Photos::getTableSchema()->getColumn('in_portfolio') !== null) {
+                $portfolioIds = array_map('intval', (array) $req->post('portfolio_photo_ids', []));
+                foreach (Photos::find()->where(['painting_id' => $painting_id])->all() as $p) {
+                    $want = in_array((int) $p->id, $portfolioIds, true) ? 1 : 0;
+                    if ((int) $p->in_portfolio !== $want) {
+                        $p->in_portfolio = $want;
+                        $p->save(false, ['in_portfolio']);
                     }
                 }
             }

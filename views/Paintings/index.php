@@ -152,7 +152,7 @@ if ($searchName !== '') $filters['PaintingsSearch']['name'] = $searchName;
                 <?php endif; ?>
             </td>
             <?php $nameEn = $m->hasAttribute('name_en') ? trim((string) $m->name_en) : ''; ?>
-            <td><?= $nameEn !== '' ? Html::encode($nameEn) : '<span style="color:var(--faint)">—</span>' ?></td>
+            <td><?= $nameEn !== '' ? Html::encode($nameEn) : '<span style="color:var(--faint)">—</span>' ?><?php if ($m->isProject()): ?> <span class="pill proj"><?= Yii::t('admin', 'Project') ?></span><?php endif; ?></td>
             <td><?= isset($sections[$m->section_id]) ? Html::encode($sections[$m->section_id]) : '<span style="color:var(--faint)">—</span>' ?></td>
             <td><?= $sizeLabel ?: '<span style="color:var(--faint)">—</span>' ?></td>
             <td style="text-align:center">

@@ -64,6 +64,51 @@ class PaintingPresenter
     }
 
     /**
+     * "Materials · ground · year · size", skipping empty parts. Used by the
+     * work page header and the PDF portfolio captions.
+     */
+    public static function metaLine(Paintings $painting): string
+    {
+        return implode(' · ', array_filter([
+            self::materialsLabel($painting),
+            self::groundLabel($painting),
+            self::yearLabel($painting),
+            self::sizeLabel($painting),
+        ]));
+    }
+
+    /** Number of photos of a work (uses the eager-loaded relation when present). */
+    public static function photoCount(Paintings $painting): int
+    {
+        return count($painting->photos);
+    }
+
+    /**
+     * Whether an artwork's lightbox should link to its own page: there is more
+     * to see there than the viewer shows — a description, or extra photos.
+     */
+    public static function hasOwnPage(Paintings $painting): bool
+    {
+        return self::descPlain($painting) !== '' || self::photoCount($painting) > 1;
+    }
+
+    /** Lightbox link text for an artwork that hasOwnPage(). */
+    public static function moreLabel(Paintings $painting): string
+    {
+        if (self::descPlain($painting) !== '') {
+            return 'Read more →';
+        }
+        return 'All photos (' . self::photoCount($painting) . ') →';
+    }
+
+    /** Second hover line on a project tile, e.g. "Project · 8 images". */
+    public static function projectLabel(Paintings $painting): string
+    {
+        $n = self::photoCount($painting);
+        return $n > 1 ? "Project · {$n} images" : 'Project';
+    }
+
+    /**
      * Plain-text description, safe to drop into an HTML data-* attribute
      * (the lightbox JS expects flat text, not markup, for data-desc).
      */

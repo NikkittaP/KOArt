@@ -6,9 +6,9 @@ return [
     'adminEmail' => 'ekaterina.oskina@gmail.com',
     'senderEmail' => 'ekaterina.oskina@gmail.com',
     'senderName' => 'Katia Oskina',
-    // Public-site content constants (Phase 3). TODO: replace placeholder shop URL
-    // with the real Etsy shop link once the owner provides it.
-    'shopUrl' => 'https://www.etsy.com/',
+    // Public-site content constants (Phase 3). The "Shop" nav link is hidden
+    // while shopUrl is empty - put the real Etsy shop link here to show it.
+    'shopUrl' => '',
     'contactEmail' => 'ekaterina.oskina@gmail.com',
     'contactLocation' => 'Malmö, Sweden',
     'socialBehance' => 'https://www.behance.net/katiaoskina',
@@ -50,5 +50,5 @@ return [
     // Bump on every public-frontend asset/markup change — shown in the footer
     // so we can tell a stale cached mobile page from a fresh one (see
     // docs/00-START-HERE.md "practical lessons" / 03-data-model "constraints").
-    'buildVersion' => 1,
+    'buildVersion' => 4,
 ];

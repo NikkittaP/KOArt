@@ -41,11 +41,7 @@ if ($series) {
 }
 
 // Meta line: materials · ground · year · size.
-$mat = PaintingPresenter::materialsLabel($painting);
-$ground = PaintingPresenter::groundLabel($painting);
-$year = PaintingPresenter::yearLabel($painting);
-$size = PaintingPresenter::sizeLabel($painting);
-$metaLine = implode(' · ', array_filter([$mat, $ground, $year, $size]));
+$metaLine = PaintingPresenter::metaLine($painting);
 
 // Photos: main first, then any extras, each shown full-width.
 $photos = \app\models\Photos::find()
