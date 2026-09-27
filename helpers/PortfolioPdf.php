@@ -147,10 +147,19 @@ class PortfolioPdf
     private static function build(Sections $section, array $works, string $dest): void
     {
         if (!defined('_SYSTEM_TTFONTS')) {
-            // tFPDF looks for TTFs here. It also tries to write a metrics cache
-            // next to its own font dir and silently skips that when it is not
-            // writable (vendor/ on the host), so no extra writable dir is needed.
+            // tFPDF looks for TTFs here.
             define('_SYSTEM_TTFONTS', Yii::getAlias('@app/assets/fonts') . '/');
+        }
+        if (!defined('FPDF_FONTPATH')) {
+            // tFPDF caches font metrics (*.mtx.php) under <FPDF_FONTPATH>unifont/,
+            // including the absolute TTF path, and trusts that cache whenever the
+            // TTF size matches. Left at its default (vendor/) a cache written on
+            // one machine and uploaded with vendor/ points at a path that does
+            // not exist on the other, and the build dies when embedding the font.
+            // So the cache lives in runtime/, in a dir keyed by the fonts path.
+            $fontCache = Yii::getAlias('@runtime/portfolio/fonts/') . substr(md5(_SYSTEM_TTFONTS), 0, 12) . '/';
+            FileHelper::createDirectory($fontCache . 'unifont');
+            define('FPDF_FONTPATH', $fontCache);
         }
         $params = Yii::$app->params;
 
