@@ -27,7 +27,7 @@ if (!Yii::$app->user->isGuest) {
 }
 
 $activeNav = $this->params['activeNav'] ?? null;
-$shopUrl = Yii::$app->params['shopUrl'];
+$shopUrl = Yii::$app->params['shopUrl'] ?? '';
 $contactEmail = Yii::$app->params['contactEmail'];
 $contactLocation = Yii::$app->params['contactLocation'];
 $socialBehance = Yii::$app->params['socialBehance'];
@@ -162,7 +162,9 @@ $this->beginPage();
         <?php foreach ($navItems as $key => $item): ?>
             <a href="<?= $item['url'] ?>"<?= $key === $activeNav ? ' class="active"' : '' ?>><?= Html::encode($item['label']) ?></a>
         <?php endforeach; ?>
-        <a href="<?= Html::encode($shopUrl) ?>" target="_blank" rel="noopener">Shop ↗</a>
+        <?php if ($shopUrl): ?>
+            <a href="<?= Html::encode($shopUrl) ?>" target="_blank" rel="noopener">Shop ↗</a>
+        <?php endif; ?>
         <div class="foot"><?= Html::encode($contactEmail) ?><br><?= Html::encode($contactLocation) ?></div>
     </nav>
 </div>
